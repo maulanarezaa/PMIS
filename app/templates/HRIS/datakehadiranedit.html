@@ -1,0 +1,57 @@
+{% extends 'HRIS/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Edit Data Kehadiran</h3>
+</div>
+<section class="section">
+    <div class="card">
+        <form class="form form-vertical" method="POST">
+            {% csrf_token %}
+            <div class="card-header">
+                <h4 class="card-title">Informasi Kehadiran</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <label for="tanggal">Tanggal</label>
+                        <input type="date" class="form-control" name="Tanggal" value="{{ data.Tanggal|date:'Y-m-d' }}"
+                            required>
+                    </div>
+                    <div class="col-6">
+                        <label for="proyek">Proyek</label>
+                        <select name="Proyek" class="form-control">
+
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <label>Nama</label>
+                        <input type="text" class="form-control" value="{{ data.Karyawan.Nama }}" disabled>
+                        <input type="hidden" name="Nama" value="{{ data.Karyawan.id }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Status Hadir</label>
+                        <select name="statushadir" class="form-select">
+                            <option value="True" {% if data.StatusHadir %}selected{% endif %}>Hadir</option>
+                            <option value="False" {% if not data.StatusHadir %}selected{% endif %}>Tidak Hadir</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Keterangan</label>
+                        <input type="text" name="keterangan" class="form-control" value="{{ data.Keterangan }}">
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <a href="{% url 'viewattendance' %}" class="btn btn-secondary ms-2">Kembali</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock content %}

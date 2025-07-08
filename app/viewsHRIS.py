@@ -251,3 +251,50 @@ def deletekontrak(request, id):
     datakontrak = models.Kontrak.objects.get(pk=id)
     datakontrak.delete()
     return redirect("viewkontrak")
+
+
+def viewattendance(request):
+    data = models.Absensi.objects.all()
+    for item in data:
+        item.Tanggal = item.Tanggal.strftime("%Y-%m-%d")
+    return render(request, "HRIS/datakehadiran.html", {"data": data})
+
+
+def inputattendace(request):
+    datamanpower = models.MasterKaryawan.objects.all()
+    if request.method == "POST":
+        print(request.POST)
+        tanggal = request.POST["Tanggal"]
+        listidmanpower = request.POST.getlist("Nama")
+        liststatushadir = request.POST.getlist("statushadir")
+        listketerangan = request.POST.getlist("keterangan")
+        for nama, status, keterangan in zip(
+            listidmanpower, liststatushadir, listketerangan
+        ):
+            absensiobj = models.Absensi(
+                Karyawan=models.MasterKaryawan.objects.get(pk=nama),
+                Tanggal=tanggal,
+                StatusHadir=status,
+                Keterangan=keterangan,
+            ).save()
+    return render(request, "HRIS/inputkehadiran.html", {"datamanpower": datamanpower})
+
+
+def editattendance(request, id):
+    dataattendance = models.Absensi.objects.get(pk=id)
+    if request.method == "POST":
+        print(request.POST)
+        statushadir = bool(request.POST["statushadir"])
+        keterangan = request.POST["keterangan"]
+        dataattendance.StatusHadir = statushadir
+        dataattendance.Keterangan = keterangan
+        dataattendance.save()
+        return redirect("viewattendance")
+
+    return render(request, "HRIS/datakehadiranedit.html", {"data": dataattendance})
+
+
+def deleteattendance(request, id):
+    dataattendance = models.Absensi.objects.get(pk=id)
+    dataattendance.delete()
+    return redirect("viewattendance")

@@ -1,0 +1,65 @@
+{% extends 'HRIS/base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<div class="page-heading">
+    <h3>Data Kehadiran</h3>
+</div>
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+            <a href="{% url 'inputattendance' %}">
+                <button class="btn btn-primary">Input Data Absen</button>
+            </a>
+            <table class="table table-striped" id="table1">
+
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Tanggal</th>
+                        <th>Status Kehadiran</th>
+                        <th>Keterangan</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in data %}
+                    <tr>
+                        <td>{{item.Karyawan.Nama}}</td>
+                        <td>{{item.Tanggal}}</td>
+                        <td>
+                            {% if item.StatusHadir == True %}
+                            <span class="badge bg-light-success">
+                                Hadir
+                            </span>
+                            {% else %}
+                            <span class="badge bg-light-danger">
+                                Tidak Hadir
+                            </span>
+
+                            {% endif %}
+                        </td>
+                        <td>{{item.Keterangan}}</td>
+                        <td>
+                            <a href="{% url 'editabsensi' item.id %}">
+                                <button type="button" class="btn btn-warning">
+                                    Edit
+                                </button>
+                            </a>
+                            <a href="{% url 'deleteattendance' item.id %}">
+                                <button type="button" class="btn btn-danger">
+                                    Hapus
+
+                                </button>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+{% endblock content %}

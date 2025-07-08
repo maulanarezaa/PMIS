@@ -21,4 +21,13 @@ urlpatterns = [
     path(
         "datakontrak/delete/<str:id>", viewsHRIS.deletekontrak, name="hapusdatakontrak"
     ),
+    # Attendance Section
+    path("datakehadiran", viewsHRIS.viewattendance, name="viewattendance"),
+    path("inputdatakehadiran", viewsHRIS.inputattendace, name="inputattendance"),
+    path("datakehadiran/edit/<str:id>", viewsHRIS.editattendance, name="editabsensi"),
+    path(
+        "datakehadiran/hapus/<str:id>",
+        viewsHRIS.deleteattendance,
+        name="deleteattendance",
+    ),
 ]

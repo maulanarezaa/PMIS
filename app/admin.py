@@ -6,3 +6,4 @@ from . import models
 admin.site.register(models.MasterKaryawan)
 admin.site.register(models.Kontrak)
 admin.site.register(models.Proyek)
+admin.site.register(models.Absensi)
