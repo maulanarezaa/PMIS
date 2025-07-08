@@ -1,0 +1,266 @@
+{% extends 'HRIS/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Input Data Kontrak</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <form class="form form-vertical" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="card-header">
+                <h4 class="card-title">Data Diri</h4>
+            </div>
+
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Nama Karyawan -->
+                        <div class="col-12">
+                            <div class="form-group has-icon-left">
+                                <label for="first-name-icon">Nama Lengkap</label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control" placeholder="Masukkan Nama lengkap"
+                                        id="first-name-icon" list="datalistkaryawan" onchange="loadKaryawanDetail(this)"
+                                        value="{{data.Nama.Nama}}">
+                                    <datalist id="datalistkaryawan">
+                                        {% for item in datakaryawan %}
+                                        <option value="{{ item.Nama }}">{{item.NIK}}</option>
+                                        {% endfor %}
+                                    </datalist>
+                                    <input type="hidden" name="Nama" id="id-karyawan">
+                                    <div class="form-control-icon"><i class="bi bi-person"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alamat -->
+                        <div class="col-12">
+                            <div class="form-group has-icon-left">
+                                <label>Alamat</label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control AlamatInput" disabled
+                                        value="{{data.Nama.Alamat}}">
+                                    <div class="form-control-icon"><i class="bi bi-house"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kontak dan NIK -->
+                        <div class="col-6">
+                            <div class="form-group has-icon-left">
+                                <label>Kontak</label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control KontakInput" value="{{data.Nama.Kontak}}"
+                                        disabled>
+                                    <div class="form-control-icon"><i class="bi bi-phone"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group has-icon-left">
+                                <label>NIK</label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control NIKInput" disabled value="{{data.Nama.NIK}}">
+                                    <div class="form-control-icon"><i class="bi bi-window"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NPWP dan NOKK -->
+                        <div class="col-6">
+                            <div class="form-group has-icon-left">
+                                <label>NPWP</label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control NPWPInput" disabled
+                                        value="{{data.Nama.NPWP}}">
+                                    <div class="form-control-icon"><i class="bi bi-wallet"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group has-icon-left">
+                                <label>NOKK</label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control NOKKInput" disabled
+                                        value="{{data.Nama.NOKK}}">
+                                    <div class="form-control-icon"><i class="bi bi-upc"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nama Ibu dan Remarks -->
+                        <div class="col-6">
+                            <div class="form-group has-icon-left">
+                                <label>Nama Ibu</label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control NamaIbuInput" disabled
+                                        value="{{data.Nama.NamaIbu}}">
+                                    <div class="form-control-icon"><i class="bi bi-person-check"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group has-icon-left">
+                                <label>Remarks</label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control RemarksInput" disabled
+                                        value="{{data.Nama.Remarks}}">
+                                    <div class="form-control-icon"><i class="bi bi-file-text"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bagian Kontrak -->
+            <div class="card-header">
+                <h4 class="card-title">Pekerjaan</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Nama Proyek -->
+                    <div class="col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Nama Proyek</label>
+                            <div class="position-relative">
+                                <select name="Proyek" class="form-control" required>
+                                    <option value="" disabled selected>Pilih Proyek</option>
+                                    {% for item in dataproyek %}
+                                    <option value="{{ item.id }}">{{ item.Nama }} - {{ item.Lokasi }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-control-icon"><i class="bi bi-bar-chart"></i></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Jenis Kontrak -->
+                    <div class="col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Kontrak</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="DurasiKontrak" placeholder="Durasi"
+                                    min="1" required>
+                                <select name="JenisKontrak" class="form-select" required>
+                                    <option value="Hari">Hari</option>
+                                    <option value="Bulan">Bulan</option>
+                                    <option value="Tahun">Tahun</option>
+                                </select>
+                                <div class="form-control-icon"><i class="bi bi-files"></i></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tanggal Mulai dan Posisi -->
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Nomor Kontrak</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="NomorKontrak" required>
+                                <div class="form-control-icon"><i class="bi bi-file"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Tanggal Mulai</label>
+                            <div class="position-relative">
+                                <input type="date" class="form-control" name="TanggalAwal" required>
+                                <div class="form-control-icon"><i class="bi bi-calendar"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Posisi</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="Posisi" required>
+                                <div class="form-control-icon"><i class="bi bi-file-person"></i></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Keterangan dan Status -->
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Keterangan</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="RemarksKontrak">
+                                <div class="form-control-icon"><i class="bi bi-card-checklist"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Status Keaktifan</label>
+                            <div class="position-relative">
+                                <select name="StatusAktif" class="form-control" required>
+                                    <option value="True">Aktif</option>
+                                    <option value="False">Non-Aktif</option>
+                                </select>
+                                <div class="form-control-icon"><i class="bi bi-card-checklist"></i></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upload File -->
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>File Kontrak (PDF)</label>
+                            <div class="position-relative">
+                                <input class="form-control" type="file" name="FileKontrak" accept="application/pdf">
+                                <div class="form-control-icon"><i class="bi bi-upload"></i></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="col-12 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary me-1 mb-1">Submit</button>
+                        <button type="reset" class="btn btn-light-secondary me-1 mb-1">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- DATA KARYAWAN UNTUK JS -->
+<script>
+    const karyawanData = {
+        {% for item in datakaryawan %}
+    "{{ item.Nama|escapejs }}": {
+        id: "{{ item.id }}",
+            alamat: "{{ item.Alamat|escapejs }}",
+                kontak: "{{ item.Kontak|escapejs }}",
+                    nik: "{{ item.NIK }}",
+                        npwp: "{{ item.NPWP }}",
+                            nokk: "{{ item.NOKK }}",
+                                namaibu: "{{ item.NamaIbu|escapejs }}",
+                                    remarks: "{{ item.Remarks|escapejs }}"
+    },
+    {% endfor %}
+    };
+
+    function loadKaryawanDetail(selectElement) {
+        const nama = selectElement.value.trim();
+        const data = karyawanData[nama];
+        if (!data) return;
+
+        document.querySelector('.AlamatInput').value = data.alamat;
+        document.querySelector('.KontakInput').value = data.kontak;
+        document.querySelector('.NIKInput').value = data.nik;
+        document.querySelector('.NPWPInput').value = data.npwp;
+        document.querySelector('.NOKKInput').value = data.nokk;
+        document.querySelector('.NamaIbuInput').value = data.namaibu;
+        document.querySelector('.RemarksInput').value = data.remarks;
+        document.getElementById('id-karyawan').value = data.id;
+    }
+</script>
+
+{% endblock content %}

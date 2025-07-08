@@ -1,0 +1,266 @@
+{% extends 'HRIS/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Input Data Karyawan</h3>
+</div>
+<section class="section">
+    <div class="card">
+        <form class="form form-vertical" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card-header">
+                <h4 class="card-title">Data Diri</h4>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group has-icon-left">
+                                    <label for="first-name-icon">Nama Lengkap</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control" placeholder="Masukkan Nama lengkap"
+                                            name="Nama" id="first-name-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+
+                                <div class="form-group has-icon-left">
+                                    <label for="email-id-icon">Alamat</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control"
+                                            placeholder="Masukan Alamat Tempat Tinggal" name="Alamat"
+                                            id="email-id-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-house"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="mobile-id-icon">Kontak</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control" placeholder="Masukkan Nomor HP"
+                                            name="Kontak" id="mobile-id-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-phone"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="password-id-icon">NIK</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control" placeholder="Masukkan NIK" name="NIK"
+                                            id="password-id-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-window"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="password-id-icon">NPWP</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control" placeholder="Masukkan NPWP" name="NPWP"
+                                            id="password-id-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-wallet"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="password-id-icon">NOKK</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control" placeholder="Masukkan Nomor KK"
+                                            name="NOKK" id="password-id-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-upc"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="password-id-icon">Nama Ibu</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control" placeholder="Nama Ibu" name="NamaIbu"
+                                            id="password-id-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-person-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="password-id-icon">Remarks</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control" placeholder="Masukkan Catatan"
+                                            name="Remarks" id="password-id-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-file-text"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-header">
+                <h4 class="card-title">Foto</h4>
+            </div>
+            <div class="card-body">
+
+                {% csrf_token %}
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="fotoKTP">Foto KTP</label>
+                                <input class="form-control" type="file" name="FotoKTP" id="fotoKTP"
+                                    accept="image/jpeg,image/png">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="fotoNPWP">Foto NPWP</label>
+                                <input class="form-control" type="file" name="FotoNPWP" id="fotoNPWP"
+                                    accept="image/jpeg,image/png">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="fotoKK">Foto KK</label>
+                                <input class="form-control" type="file" name="FotoKK" id="fotoKK"
+                                    accept="image/jpeg,image/png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-header">
+                <h4 class="card-title">Pekerjaan</h4>
+            </div>
+            <div class="card-body">
+
+
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group has-icon-left">
+                                <label for="first-name-icon">Nama Proyek</label>
+
+                                <div class="position-relative">
+                                    <select name="Proyek" id="" class="form-control">
+                                        <option value="" disabled selected>Masukkan Nama Proyek</option>
+                                        {% for item in proyek %}
+                                        <option value="{{item.id}}">{{item.Nama}} - {{item.Lokasi}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-control-icon">
+                                        <i class="bi bi-bar-chart"></i>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-12">
+
+                            <div class="form-group has-icon-left">
+                                <label for="email-id-icon">Kontrak</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" name="JenisKontrak" id="lama-kontrak"
+                                        placeholder="Masukkan durasi" min="1" required>
+                                    <div class="form-control-icon">
+                                        <i class="bi bi-files"></i>
+                                    </div>
+                                    <select name="satuan_kontrak" class="form-select" required>
+                                        <option value="Hari">Hari</option>
+                                        <option value="Bulan">Bulan</option>
+                                        <option value="Tahun">Tahun</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group has-icon-left">
+                                <label for="mobile-id-icon">Tanggal Mulai</label>
+                                <div class="position-relative">
+                                    <input type="date" class="form-control" name="TanggalAwal"
+                                        placeholder="Tanggal Mulai" id="mobile-id-icon">
+                                    <div class="form-control-icon">
+                                        <i class="bi bi-calendar"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group has-icon-left">
+                                <label for="password-id-icon">Posisi</label>
+                                <div class="position-relative">
+                                    <input type="text" name="Posisi" class="form-control" placeholder="Masukkan Posisi"
+                                        id="password-id-icon">
+                                    <div class="form-control-icon">
+                                        <i class="bi bi-file-person"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group has-icon-left">
+                                <label for="password-id-icon">Keterangan</label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control" name="RemarksKontrak"
+                                        placeholder="Masukkan Keterangan" id="password-id-icon">
+                                    <div class="form-control-icon">
+                                        <i class="bi bi-card-checklist"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group has-icon-left">
+                                <label for="password-id-icon">Status Keaktifan</label>
+                                <div class="position-relative">
+                                    <select name="StatusAktif" id="" class="form-control">
+                                        <option value="True">Aktif</option>
+                                        <option value="False">Non-Aktif</option>
+                                    </select>
+                                    <div class="form-control-icon">
+                                        <i class="bi bi-card-checklist"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+                <div class="col-12 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-1 mb-1">Submit</button>
+                    <button type="reset" class="btn btn-light-secondary me-1 mb-1">Reset</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</section>
+{% endblock content %}

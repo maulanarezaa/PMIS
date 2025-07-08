@@ -1,0 +1,71 @@
+{% extends 'HRIS/base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<div class="page-heading">
+    <h3>Data Kontrak</h3>
+</div>
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+            <a href="{% url 'addkontrak' %}">
+                <button class="btn btn-primary">Tambah Data Kontrak</button>
+            </a>
+            <table class="table table-striped" id="table1">
+
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Proyek</th>
+                        <th>Nomor Kontrak</th>
+                        <th>Posisi</th>
+                        <th>StatusAktif</th>
+                        <th>File</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in data %}
+                    <tr>
+                        <td>{{item.Nama.Nama}}</td>
+                        <td>{{item.Proyek}}</td>
+                        <td>{{item.NomerKontrak}}</td>
+                        <td>{{item.Posisi}}</td>
+                        <td>{{item.StatusAktif}}</td>
+                        <td>
+                            {% if item.File %}
+                            <a href="{{ item.File.url }}" target="_blank" class="btn btn-outline-primary">
+                                📄 Lihat Kontrak (PDF)
+                            </a>{% else %}
+                            <span class="text-muted">File kontrak belum tersedia.</span>
+                            {% endif %}
+
+                        </td>
+                        <td>
+                            <a href="{% url 'info_karyawan' item.id %}">
+                                <button type="button" class="btn btn-info">
+                                    Info
+                                </button>
+                            </a>
+                            <a href="{% url 'editkontrak' item.id %}">
+                                <button type="button" class="btn btn-warning">
+                                    Edit
+                                </button>
+                            </a>
+                            <a href="{% url 'hapusdatakontrak' item.id %}">
+                                <button type="button" class="btn btn-danger">
+                                    Hapus
+
+                                </button>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+{% endblock content %}

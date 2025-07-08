@@ -1,0 +1,92 @@
+{% extends 'HRIS/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Edit Data Karyawan</h3>
+</div>
+
+<section class="section">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <!-- Kolom kiri -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Nama</label>
+                            <input type="text" class="form-control" name="Nama" value="{{ data.Nama }}">
+                        </div>
+                        <div class="form-group">
+                            <label>Kontak</label>
+                            <input type="text" class="form-control" name="Kontak" value="{{ data.Kontak }}">
+                        </div>
+                        <div class="form-group">
+                            <label>Alamat</label>
+                            <input type="text" class="form-control" name="Alamat" value="{{ data.Alamat }}">
+                        </div>
+                        <div class="form-group">
+                            <label>Keterangan</label>
+                            <input type="text" class="form-control" name="Remarks" value="{{ data.Remarks }}">
+                        </div>
+                    </div>
+
+                    <!-- Kolom kanan -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>NIK</label>
+                            <input type="text" class="form-control" name="NIK" value="{{ data.NIK }}">
+                        </div>
+                        <div class="form-group">
+                            <label>NPWP</label>
+                            <input type="text" class="form-control" name="NPWP" value="{{ data.NPWP }}">
+                        </div>
+                        <div class="form-group">
+                            <label>Nomor KK</label>
+                            <input type="text" class="form-control" name="NOKK" value="{{ data.NOKK }}">
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row mt-3">
+                    <div class="col-md-4">
+    <label>Upload Ulang KTP</label>
+    {% if data.FotoKTP %}
+        <div class="mb-2">
+            <img src="{{ data.FotoKTP.url }}" alt="KTP Lama" class="img-thumbnail" style="max-width: 200px;" >
+        </div>
+    {% endif %}
+    <input type="file" class="form-control" name="FotoKTP" accept="image/png, image/jpeg">
+</div>
+                    <div class="col-md-4">
+    <label>Upload Ulang NPWP</label>
+    {% if data.FotoNPWP %}
+        <div class="mb-2">
+            <img src="{{ data.FotoNPWP.url }}" alt="NPWP Lama" class="img-thumbnail" style="max-width: 200px;">
+        </div>
+    {% endif %}
+    <input type="file" class="form-control" name="FotoNPWP" accept="image/png, image/jpeg">
+</div>
+                    <div class="col-md-4">
+    <label>Upload Ulang KK</label>
+    {% if data.FotoKK %}
+        <div class="mb-2">
+            <img src="{{ data.FotoKK.url }}" alt="KK Lama" class="img-thumbnail" style="max-width: 200px;">
+        </div>
+    {% endif %}
+    <input type="file" class="form-control" name="FotoKK" accept="image/png, image/jpeg">
+</div>
+                </div>
+
+                <div class="text-end mt-4">
+                    <button type="submit" class="btn btn-primary">💾 Simpan Perubahan</button>
+                    <a href="{% url 'viewkaryawan' %}" class="btn btn-secondary">Batal</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock content %}
