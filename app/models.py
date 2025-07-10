@@ -46,12 +46,15 @@ class MasterKaryawan(models.Model):
     Kontak = models.IntegerField(blank=True, null=True)
     NPWP = models.CharField(max_length=256, blank=True, null=True)
     NOKK = models.CharField(max_length=256, blank=True, null=True)
+    Nama_Bank = models.CharField(max_length=256, blank=True, null=True)
+    NoRekening = models.CharField(max_length=256, blank=True, null=True)
     NamaIbu = models.CharField(max_length=256, blank=True, null=True)
     Remarks = models.CharField(max_length=256, blank=True, null=True)
     Status = models.CharField(max_length=256, blank=True, null=True)
     FotoKTP = models.ImageField(upload_to=rename_ktp, null=True, blank=True)
     FotoKK = models.ImageField(upload_to=rename_kk, null=True, blank=True)
     FotoNPWP = models.ImageField(upload_to=rename_npwp, null=True, blank=True)
+    Gender = models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.Nama)

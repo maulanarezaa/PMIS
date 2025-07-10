@@ -27,7 +27,8 @@
                 <div class="sidebar-header">
                     <div class="d-flex">
                         <div class="">
-                            <a href="index.html"><img src="{% static 'assets/images/logo/logoswt.jpg'%}" alt="Logo" srcset=""></a>
+                            <a href="index.html"><img src="{% static 'assets/images/logo/logoswt.jpg'%}" alt="Logo"
+                                    srcset=""></a>
                         </div>
                         <div class="toggler">
                             <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
@@ -49,7 +50,7 @@
             <div class="page-content">
                 {% block content %}
                 {% endblock content %}
-                
+
             </div>
 
             <footer>
@@ -65,7 +66,7 @@
             </footer>
         </div>
     </div>
-    
+
     <script src="{% static 'assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js'%}"></script>
     <script src="{% static 'assets/js/bootstrap.bundle.min.js'%}"></script>
 
@@ -79,34 +80,36 @@
         // Simple Datatable
         let table1 = document.querySelector('#table1');
         let dataTable = new simpleDatatables.DataTable(table1);
+        let table2 = document.querySelector('#table2');
+        let dataTable2 = new simpleDatatables.DataTable(table2);
     </script>
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const currentUrl = window.location.pathname;
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentUrl = window.location.pathname;
 
-        // Seleksi semua link di sidebar
-        const sidebarLinks = document.querySelectorAll(".sidebar-menu .sidebar-link");
+            // Seleksi semua link di sidebar
+            const sidebarLinks = document.querySelectorAll(".sidebar-menu .sidebar-link");
 
-        sidebarLinks.forEach(link => {
-            const linkPath = link.getAttribute("href");
+            sidebarLinks.forEach(link => {
+                const linkPath = link.getAttribute("href");
 
-            if (linkPath === currentUrl) {
-                // Tambahkan class active ke link dan parent item
-                link.classList.add("active");
+                if (linkPath === currentUrl) {
+                    // Tambahkan class active ke link dan parent item
+                    link.classList.add("active");
 
-                const sidebarItem = link.closest(".sidebar-item");
-                if (sidebarItem) sidebarItem.classList.add("active");
+                    const sidebarItem = link.closest(".sidebar-item");
+                    if (sidebarItem) sidebarItem.classList.add("active");
 
-                const submenu = link.closest(".submenu");
-                if (submenu) {
-                    submenu.classList.add("active");
-                    const parentSidebarItem = submenu.closest(".sidebar-item");
-                    if (parentSidebarItem) parentSidebarItem.classList.add("active");
+                    const submenu = link.closest(".submenu");
+                    if (submenu) {
+                        submenu.classList.add("active");
+                        const parentSidebarItem = submenu.closest(".sidebar-item");
+                        if (parentSidebarItem) parentSidebarItem.classList.add("active");
+                    }
                 }
-            }
+            });
         });
-    });
-</script>
+    </script>
 
 </body>
 

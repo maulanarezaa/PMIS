@@ -12,6 +12,9 @@
             <a href="{% url 'inputattendance' %}">
                 <button class="btn btn-primary">Input Data Absen</button>
             </a>
+            <a href="{% url 'rekapdataabsen' %}">
+                <button class="btn btn-primary">Rekap Data Absen</button>
+            </a>
             <table class="table table-striped" id="table1">
 
                 <thead>
@@ -29,6 +32,7 @@
                         <td>{{item.Karyawan.Nama}}</td>
                         <td>{{item.Tanggal}}</td>
                         <td>
+
                             {% if item.StatusHadir == True %}
                             <span class="badge bg-light-success">
                                 Hadir

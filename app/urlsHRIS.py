@@ -30,4 +30,5 @@ urlpatterns = [
         viewsHRIS.deleteattendance,
         name="deleteattendance",
     ),
+    path("datakehadiran/rekap", viewsHRIS.rekapdataabsen, name="rekapdataabsen"),
 ]

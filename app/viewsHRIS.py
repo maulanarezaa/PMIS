@@ -5,6 +5,7 @@ from django.contrib import messages
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
+from django.db.models import Count, Q
 
 # Create your views here.
 
@@ -282,9 +283,12 @@ def inputattendace(request):
 
 def editattendance(request, id):
     dataattendance = models.Absensi.objects.get(pk=id)
+    print(dataattendance.StatusHadir)
     if request.method == "POST":
         print(request.POST)
-        statushadir = bool(request.POST["statushadir"])
+        statushadir = request.POST["statushadir"]
+        print("ini status hadir", statushadir)
+        print(bool(statushadir))
         keterangan = request.POST["keterangan"]
         dataattendance.StatusHadir = statushadir
         dataattendance.Keterangan = keterangan
@@ -298,3 +302,38 @@ def deleteattendance(request, id):
     dataattendance = models.Absensi.objects.get(pk=id)
     dataattendance.delete()
     return redirect("viewattendance")
+
+
+def rekapdataabsen(request):
+    start = request.GET.get("start_date")
+    end = request.GET.get("end_date")
+    data = None
+    datarekap = None
+    total_hadir = None
+    total_tidakhadir = None
+    total_karyawan = None
+
+    if start and end:
+        data = models.Absensi.objects.filter(Tanggal__range=[start, end])
+        datarekap = (
+            data.values("Karyawan__id", "Karyawan__Nama")
+            .annotate(
+                jumlah_hadir=Count("id", filter=Q(StatusHadir=True)),
+                jumlah_tidakhadir=Count("id", filter=Q(StatusHadir=False)),
+            )
+            .order_by("Karyawan__Nama")
+        )
+        total_hadir = data.filter(StatusHadir=True).count()
+        total_tidakhadir = data.filter(StatusHadir=False).count()
+        total_karyawan = data.values("Karyawan").distinct().count()
+
+        print(datarekap)
+
+    context = {
+        "data": data,
+        "rekap": datarekap,
+        "total_hadir": total_hadir,
+        "total_tidakhadir": total_tidakhadir,
+        "total_karyawan": total_karyawan,
+    }
+    return render(request, "HRIS/rekapdataabsen.html", context)
