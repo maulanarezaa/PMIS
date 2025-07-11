@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Data Payroll Period</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+            <a href="{% url 'payrolladd' %}">
+                <button class="btn btn-primary">Tambah Payroll Period</button>
+            </a>
+            <table class="table table-striped" id="table1">
+                <thead>
+                    <tr>
+                        <th>Periode</th>
+                        <th>Tanggal Mulai</th>
+                        <th>Tanggal Akhir</th>
+                        <th>Tipe</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in data %}
+                    <tr>
+                        <td>{{ item.KodePeriode }}</td>
+                        <td>{{ item.TanggalAwal|date:"Y-m-d" }}</td>
+                        <td>{{item.TanggalAkhir |date:"Y-m-d" }}</td>
+                        <td>{{ item.JenisPayroll }}</td>
+                        <td>{{ item.Status }}</td>
+                        <td><a href="{% url 'payrolldetail' item.id %}">
+                                <button type="button" class="btn btn-success">
+                                    Info
+                                </button>
+                            </a>
+                            <a href="{% url 'payrolledit' item.id %}">
+                                <button type="button" class="btn btn-warning">
+                                    Edit
+                                </button>
+                            </a>
+                            <a href="{% url 'payrolldelete' item.id %}">
+                                <button type="button" class="btn btn-danger">
+                                    Hapus
+
+                                </button>
+                            </a>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

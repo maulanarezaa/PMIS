@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+</div>
+
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Kode Payroll : {{dataperiode.KodePeriode}}</h4>
+            <p class="card-text"> <br>Tanggal Mulai : {{dataperiode.TanggalAwal}} <br>Tanggal Akhir :
+                {{dataperiode.TanggalAkhir}} <br>Tanggal Pembayaran : {{dataperiode.TanggalPembayaran}}
+                <br>Jenis Payroll : {{dataperiode.JenisPayroll}} <br>Status : {{dataperiode.Status}}
+            </p>
+            <a href="{% url 'detailpayroll' dataperiode.pk %}">
+                <button class="btn btn-primary">Tambah Payroll Period</button>
+            </a>
+            <table class="table table-striped" id="table1">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Gaji Pokok</th>
+                        <th>Tunjangan</th>
+                        <th>Potongan</th>
+                        <th>Pajak</th>
+                        <th>Gaji Bersih</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in data %}
+                    <tr>
+                        <td>{{ item.employee.full_name }}</td>
+                        <td>Rp {{ item.basic_salary|floatformat:0 }}</td>
+                        <td>Rp {{ item.allowance_total|floatformat:0 }}</td>
+                        <td>Rp {{ item.deduction_total|floatformat:0 }}</td>
+                        <td>Rp {{ item.tax|floatformat:0 }}</td>
+                        <td><strong>Rp {{ item.net_salary|floatformat:0 }}</strong></td>
+                        <td>
+                            {% if item.status == 'draft' %}
+                            <span class="badge bg-secondary">Draft</span>
+                            {% elif item.status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                            {% elif item.status == 'paid' %}
+                            <span class="badge bg-primary">Paid</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'payroll_detail' item.id %}">
+                                <button class="btn btn-info btn-sm">Detail</button>
+                            </a>
+                            <a href="{% url 'edit_payroll' item.id %}">
+                                <button class="btn btn-warning btn-sm">Edit</button>
+                            </a>
+                            <a href="{% url 'delete_payroll' item.id %}">
+                                <button class="btn btn-danger btn-sm">Hapus</button>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

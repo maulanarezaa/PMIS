@@ -31,4 +31,16 @@ urlpatterns = [
         name="deleteattendance",
     ),
     path("datakehadiran/rekap", viewsHRIS.rekapdataabsen, name="rekapdataabsen"),
+    # Payroll section
+    path("payroll", viewsHRIS.payrolllistview, name="payroll"),
+    path("payroll/add", viewsHRIS.tambahdatapayroll, name="payrolladd"),
+    path("payroll/edit/<str:id>", viewsHRIS.editdatapayroll, name="payrolledit"),
+    path("payroll/delete/<str:id>", viewsHRIS.deletepayroll, name="payrolldelete"),
+    path("payroll/detail/<str:id>", viewsHRIS.detailpayroll, name="payrolldetail"),
+    # # Detail Payroll
+    path(
+        "payroll/detail/<str:id>/item",
+        viewsHRIS.tambahdetailpayroll,
+        name="detailpayroll",
+    ),
 ]

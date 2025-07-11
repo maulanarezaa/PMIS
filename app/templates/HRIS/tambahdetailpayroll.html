@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Input Data Detail Payroll</h3>
+</div>
+<section class="section">
+    <div class="card">
+        <form class="form form-vertical" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card-header">
+                <h4 class="card-title">Data Periode Payroll</h4>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group has-icon-left">
+                                    <label for="first-name-icon">Kode Periode</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control"
+                                            placeholder="Masukkan Kode Periode Payroll" name="KodePayroll "
+                                            id="first-name-icon" value="{{dataperiode.KodePeriode}}" readonly>
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+
+                                <div class="form-group has-icon-left">
+                                    <label for="email-id-icon">Jenis Pembayaran</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control"
+                                            placeholder="Masukkan Jenis Pembayaran (Mingguan/Bulanan/dll)"
+                                            name="JenisPembayaran" id="email-id-icon"
+                                            value="{{dataperiode.JenisPayroll}}" readonly>
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-house"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="mobile-id-icon">Tanggal Awal</label>
+                                    <div class="position-relative">
+                                        <input type="date" class="form-control" placeholder="Masukkan Nomor HP"
+                                            name="TanggalAwal" id="mobile-id-icon"
+                                            value="{{dataperiode.TanggalAwal|date:'Y-m-d'}}" readonly>
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-phone"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="password-id-icon">Tanggal Akhir</label>
+                                    <div class="position-relative">
+                                        <input type="date" class="form-control" placeholder="Masukkan NIK"
+                                            name="TanggalAkhir" id="password-id-icon"
+                                            value="{{dataperiode.TanggalAkhir|date:'Y-m-d'}}" readonly>
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-window"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="password-id-icon">Status</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control" readonly value="{{dataperiode.Status}}">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-card-checklist"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group has-icon-left">
+                                    <label for="first-name-icon">Nama Karyawan</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control"
+                                            placeholder="Masukkan Kode Periode Payroll" name="KodePayroll "
+                                            id="first-name-icon" list="listkaryawan">
+                                        <datalist id="listkaryawan">
+                                            {% for item in datakaryawan %}
+                                            <option value="{{item.id}}">{{item.Nama}}</option>
+                                            {% endfor %}
+                                        </datalist>
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+
+                                <div class="form-group has-icon-left">
+                                    <label for="email-id-icon">Upah Dasar</label>
+                                    <div class="position-relative">
+                                        <input type="number" class="form-control" placeholder="Masukkan Upah Dasar"
+                                            name="UpahDasar" id="email-id-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-cash"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group has-icon-left">
+                                    <label for="mobile-id-icon">Upah Tambahan</label>
+                                    <div class="position-relative">
+                                        <input type="number" class="form-control" placeholder="Masukkan Tambahan Upah"
+                                            name="UpahTambahan" id="mobile-id-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-phone"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group has-icon-left">
+                                    <label for="password-id-icon">Potongan</label>
+                                    <div class="position-relative">
+                                        <input type="number" class="form-control" placeholder="Masukkan total potongan"
+                                            name="Potongan" id="password-id-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-window"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group has-icon-left">
+                                    <label for="password-id-icon">Tax</label>
+                                    <div class="position-relative">
+                                        <input type="number" class="form-control" name="Tax">
+                                        <div class=" form-control-icon">
+                                            <i class="bi bi-card-checklist"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="password-id-icon">Keterangan</label>
+                                    <div class="position-relative">
+                                        <textarea class="form-control" name="keterangan" maxlength="250"
+                                            id=""></textarea>
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-card-checklist"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="password-id-icon">Status</label>
+                                    <div class="position-relative">
+                                        <select name="Status" class="form-control" id="">
+                                            <option value="Draft">Draft</option>
+                                            <option value="Approved">Approved</option>
+                                            <option value="Paid">Paid</option>
+                                        </select>
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-card-checklist"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12  justify-content-end">
+                <button type="submit" class="btn btn-primary me-1 mb-1">Submit</button>
+                <button type="reset" class="btn btn-light-secondary me-1 mb-1">Reset</button>
+            </div>
+        </form>
+    </div>
+
+</section>
+{% endblock content %}

@@ -1,72 +1,72 @@
-{% extends 'HRIS/base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
 {% block content %}
-            <div class="page-heading">
-                <h3>Data Karyawan</h3>
-            </div>
+<div class="page-heading">
+    <h3>Data Karyawan</h3>
+</div>
 <section class="section">
-                    <div class="card">
-                        <div class="card-body">
-                            <a href="{% url 'tambahdatakaryawan' %}">
-                                <button class="btn btn-primary" >Tambah Data Karyawan</button>
+    <div class="card">
+        <div class="card-body">
+            <a href="{% url 'tambahdatakaryawan' %}">
+                <button class="btn btn-primary">Tambah Data Karyawan</button>
+            </a>
+            <table class="table table-striped" id="table1">
+
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Alamat</th>
+                        <th>Kontak</th>
+                        <th>NIK</th>
+                        <th>NPWP</th>
+                        <th>Remarks</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in data %}
+                    <tr>
+                        <td>{{item.Nama}}</td>
+                        <td>{{item.Alamat}}</td>
+                        <td>{{item.Kontak}}</td>
+                        <td>{{item.NIK}}</td>
+                        <td>{{item.NPWP}}</td>
+                        <td>{{item.Remarks}}</td>
+                        <td>
+                            {% if item.Status == "True" %}
+                            <span class="btn btn-success">Aktif</span>
+                            {% elif item.Status == "False" or item.Status == None%}
+                            <span class="btn btn-secondary">Non Aktif</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'info_karyawan' item.id %}">
+                                <button type="button" class="btn btn-info">
+                                    Info
+
+                                </button>
                             </a>
-                            <table class="table table-striped" id="table1">
-                                
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Alamat</th>
-                                        <th>Kontak</th>
-                                        <th>NIK</th>
-                                        <th>NPWP</th>
-                                        <th>Remarks</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for item in data %}
-                                    <tr>
-                                        <td>{{item.Nama}}</td>
-                                        <td>{{item.Alamat}}</td>
-                                        <td>{{item.Kontak}}</td>
-                                        <td>{{item.NIK}}</td>
-                                        <td>{{item.NPWP}}</td>
-                                        <td>{{item.Remarks}}</td>
-                                        <td>
-                                            {% if item.Status == "True" %}
-                                            <span class="btn btn-success">Aktif</span>
-                                            {% elif item.Status == "False"  or item.Status == None%}
-                                            <span class="btn btn-secondary">Non Aktif</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <a href="{% url 'info_karyawan' item.id %}">
-                                                <button type="button" class="btn btn-info" >
-                                                    Info
+                            <a href="{% url 'edit_karyawan' item.id %}">
+                                <button type="button" class="btn btn-warning">
+                                    Edit
 
-                                                </button>
-                                            </a>
-                                            <a href="{% url 'edit_karyawan' item.id %}">
-                                                <button type="button" class="btn btn-warning" >
-                                                    Edit
+                                </button>
+                            </a>
+                            <a href="{% url 'hapusdatakaryawan' item.id %}">
+                                <button type="button" class="btn btn-danger">
+                                    Hapus
 
-                                                </button>
-                                            </a>
-                                            <a href="{% url 'hapusdatakaryawan' item.id %}">
-                                                <button type="button" class="btn btn-danger" >
-                                                    Hapus
+                                </button>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-                                                </button>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </section>
+</section>
 {% endblock content %}

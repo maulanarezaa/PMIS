@@ -1,0 +1,59 @@
+{% load static %}
+<div class="sidebar-menu">
+    <ul class="menu">
+        <li class="sidebar-title">Menu</li>
+
+        <li class="sidebar-item ">
+            <a href="index.html" class='sidebar-link'>
+                <i class="bi bi-grid-fill"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <li class="sidebar-item  has-sub">
+            <a href="#" class='sidebar-link'>
+                <i class="bi bi-people-fill"></i>
+                <span>Human Resource</span>
+            </a>
+            <ul class="submenu ">
+                <li class="submenu-item ">
+                    <a href="{% url 'viewkaryawan' %}">Data Karyawan</a>
+                </li>
+                <li class="submenu-item">
+                    <a href="{% url 'viewkontrak' %} ">Manage Karyawan</a>
+                </li>
+                <li class="submenu-item">
+                    <a href="{% url 'viewattendance' %} ">Kehadiran</a>
+                </li>
+                <li class="submenu-item">
+                    <a href="{% url 'payroll' %} ">Payroll</a>
+                </li>
+
+            </ul>
+        </li>
+        <li class="sidebar-item  has-sub">
+            <a href="#" class='sidebar-link'>
+                <i class="bi bi-stack"></i>
+                <span>Inventory</span>
+            </a>
+            <ul class="submenu ">
+                <li class="submenu-item ">
+                    <a href="">Material Masuk</a>
+                </li>
+                <li class="submenu-item">
+                    <a href="">Material Keluar</a>
+                </li>
+                <li class="submenu-item">
+                    <a href=" ">Database Material</a>
+                </li>
+                <li class="submenu-item">
+                    <a href=" ">Stock Opname</a>
+                </li>
+
+            </ul>
+        </li>
+
+
+
+    </ul>
+</div>

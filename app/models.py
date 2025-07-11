@@ -85,3 +85,79 @@ class Absensi(models.Model):
 
     def __str__(self):
         return str(f"{self.Karyawan} - {self.Tanggal}")
+
+
+# Payroll
+class PeriodePayroll(models.Model):
+    STATUS_CHOICES = [
+        ("draft", "Draft"),
+        ("approved", "Approved"),
+        ("paid", "Paid"),
+    ]
+    KodePeriode = models.CharField(max_length=256)
+    TanggalAwal = models.DateField()
+    TanggalAkhir = models.DateField()
+    TanggalPembayaran = models.DateField(null=True, blank=True)
+    JenisPayroll = models.CharField(max_length=25)
+    Status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+
+    def __str__(self):
+        return self.KodePeriode
+
+
+class detailpayroll(models.Model):
+    STATUS_CHOICES = [
+        ("draft", "Draft"),
+        ("approved", "Approved"),
+        ("paid", "Paid"),
+    ]
+
+    Karyawan = models.ForeignKey(MasterKaryawan, on_delete=models.CASCADE)
+    PeriodePayroll = models.ForeignKey(PeriodePayroll, on_delete=models.CASCADE)
+    BasicSalary = models.DecimalField(max_digits=12, decimal_places=2)
+    AllowanceTotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    DeductionTotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    Tax = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    Status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+    Keterangan = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.Karyawan} - {self.PeriodePayroll}"
+
+
+class AllowanceType(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class PayrollAllowance(models.Model):
+    payroll_item = models.ForeignKey(
+        detailpayroll, on_delete=models.CASCADE, related_name="allowances"
+    )
+    allowance_type = models.ForeignKey(AllowanceType, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.allowance_type.name} - {self.amount}"
+
+
+class DeductionType(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class PayrollDeduction(models.Model):
+    payroll_item = models.ForeignKey(
+        detailpayroll, on_delete=models.CASCADE, related_name="deductions"
+    )
+    deduction_type = models.ForeignKey(DeductionType, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.deduction_type.name} - {self.amount}"

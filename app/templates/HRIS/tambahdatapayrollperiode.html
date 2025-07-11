@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Input Data Karyawan</h3>
+</div>
+<section class="section">
+    <div class="card">
+        <form class="form form-vertical" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card-header">
+                <h4 class="card-title">Data Payroll</h4>
+            </div>
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group has-icon-left">
+                                    <label for="first-name-icon">Kode Periode</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control"
+                                            placeholder="Masukkan Kode Periode Payroll" name="KodePayroll"
+                                            id="first-name-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+
+                                <div class="form-group has-icon-left">
+                                    <label for="email-id-icon">Jenis Pembayaran</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control"
+                                            placeholder="Masukkan Jenis Pembayaran (Mingguan/Bulanan/dll)"
+                                            name="JenisPembayaran" id="email-id-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-house"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="mobile-id-icon">Tanggal Awal</label>
+                                    <div class="position-relative">
+                                        <input type="date" class="form-control" placeholder="Masukkan Nomor HP"
+                                            name="TanggalAwal" id="mobile-id-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-phone"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="password-id-icon">Tanggal Akhir</label>
+                                    <div class="position-relative">
+                                        <input type="date" class="form-control" placeholder="Masukkan NIK"
+                                            name="TanggalAkhir" id="password-id-icon">
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-window"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group has-icon-left">
+                                    <label for="password-id-icon">Status</label>
+                                    <div class="position-relative">
+                                        <select name="Status" id="" class="form-control">
+                                            <option value="Draft">Draft</option>
+                                            <option value="Approved">Approved</option>
+                                            <option value="Paid">Paid</option>
+                                        </select>
+                                        <div class="form-control-icon">
+                                            <i class="bi bi-card-checklist"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12  justify-content-end">
+                <button type="submit" class="btn btn-primary me-1 mb-1">Submit</button>
+                <button type="reset" class="btn btn-light-secondary me-1 mb-1">Reset</button>
+            </div>
+        </form>
+    </div>
+
+</section>
+{% endblock content %}

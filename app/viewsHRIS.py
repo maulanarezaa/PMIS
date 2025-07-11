@@ -337,3 +337,80 @@ def rekapdataabsen(request):
         "total_karyawan": total_karyawan,
     }
     return render(request, "HRIS/rekapdataabsen.html", context)
+
+
+def payrolllistview(request):
+    data = models.PeriodePayroll.objects.all().order_by("-TanggalAwal")
+    return render(request, "HRIS/payrollperiodelist.html", {"data": data})
+
+
+def tambahdatapayroll(request):
+    if request.method == "POST":
+        print(request.POST)
+        kodepayroll = request.POST["KodePayroll"]
+        jenis = request.POST["JenisPembayaran"]
+        tanggalawal = request.POST["TanggalAwal"]
+        tanggalakhir = request.POST["TanggalAkhir"]
+        status = request.POST["Status"]
+
+        payrollobj = models.PeriodePayroll(
+            KodePeriode=kodepayroll,
+            TanggalAwal=tanggalawal,
+            TanggalAkhir=tanggalakhir,
+            JenisPayroll=jenis,
+            Status=status,
+        ).save()
+        return redirect("payroll")
+    return render(request, "HRIS/tambahdatapayrollperiode.html")
+
+
+def editdatapayroll(request, id):
+    data = models.PeriodePayroll.objects.get(pk=id)
+    if request.method == "POST":
+        print(request.POST)
+        kode = request.POST["KodePayroll"]
+        jenis = request.POST["JenisPembayaran"]
+        tanggalawal = request.POST["TanggalAwal"]
+        tanggalakhir = request.POST["TanggalAkhir"]
+        status = request.POST["Status"]
+        data.KodePeriode = kode
+        data.JenisPayroll = jenis
+        data.TanggalAwal = tanggalawal
+        data.TanggalAkhir = tanggalakhir
+        data.Status = status
+        data.save()
+        return redirect("payroll")
+    return render(request, "HRIS/editdatapayrollperiode.html", {"data": data})
+
+
+def deletepayroll(requet, id):
+    data = models.PeriodePayroll.objects.get(pk=id)
+    data.delete()
+    return redirect("payroll")
+
+
+def detailpayroll(request, id):
+    data = models.detailpayroll.objects.filter(PeriodePayroll__pk=id)
+    data_periode = models.PeriodePayroll.objects.get(pk=id)
+    return render(
+        request,
+        "HRIS/payrollitemlist.html",
+        {"data": data, "dataperiode": data_periode},
+    )
+
+
+"""
+Section Detail Payroll
+"""
+
+
+def tambahdetailpayroll(request, id):
+    dataperiode = models.PeriodePayroll.objects.get(pk=id)
+    datakaryawan = models.MasterKaryawan.objects.all()
+    if request.method == "POST":
+        return redirect("payrolldetail", id=id)
+    return render(
+        request,
+        "HRIS/tambahdetailpayroll.html",
+        {"datakaryawan": datakaryawan, "dataperiode": dataperiode},
+    )
