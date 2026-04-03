@@ -1,0 +1,123 @@
+{% extends 'base.html' %}{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Edit Data Material</h3>
+</div>
+
+<section class="section">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Kode Item</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="Nama" value="{{data.KodeItem}}">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Nama Item</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="Alamat" value="{{data.NamaItem}}">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-house"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Spesifikasi</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="Kontak" value="{{data.SpesifikasiItem}}">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-phone"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Stok</label>
+                            <div class="position-relative">
+                                <input type="number" step="any" class="form-control" name="NIK" value="{{data.Stock}}">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-window"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="form-group has-icon-left">
+                            <label>Aset</label>
+                            <div class="position-relative">
+                                <select name="StatusAset" class="form-control">
+                                    {% if data.IsAset == True %}
+                                    <option value="True" selected>Aset</option>
+                                    <option value="False">Non-Aset</option>
+                                    {% else %}
+                                    <option value="True">Aset</option>
+                                    <option value="False" selected>Non-Aset</option>
+                                    {% endif %}
+                                </select>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-wallet"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="form-group has-icon-left">
+                            <label>Aktif</label>
+                            <div class="position-relative">
+                                <select name="StatusAktif" class="form-control">
+                                    {% if data.IsAktif == True %}
+                                    <option value="True" selected>Aktif</option>
+                                    <option value="False">Non-Aktif</option>
+                                    {% else %}
+                                    <option value="True">Aktif</option>
+                                    <option value="False" selected>Non-Aktif</option>
+                                    {% endif %}
+                                </select>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-upc"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div class="col-6">
+                    <label>Foto Barang</label>
+                    {% if data.Foto %}
+                    <div class="mb-2">
+                        <img src="{{ data.Foto.url }}" alt="KTP Lama" class="img-thumbnail" style="max-width: 200px;">
+                    </div>
+                    {% endif %}
+                    <input type="file" class="form-control" name="FotoKTP" accept="image/png, image/jpeg">
+                </div>
+                <div class="col-12 d-flex justify-content-start mt-3">
+                    <button type="submit" class="btn btn-primary me-2">Save</button>
+                    <button type="reset" class="btn btn-primary me-2">reset</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock content %}

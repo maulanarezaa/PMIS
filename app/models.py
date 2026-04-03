@@ -6,6 +6,10 @@ from django.utils.text import slugify
 # HRIS Project
 # Data Master Proyek
 
+"""
+HRIS MODELS
+"""
+
 
 def rename_ktp(instance, filename):
     ext = filename.split(".")[-1]
@@ -39,6 +43,13 @@ class Proyek(models.Model):
 
 
 # Data Master Karyawan
+class MasterJenisKaryawan(models.Model):
+    JenisKaryawan = models.CharField(max_length=25)
+
+    def __str__(self):
+        return str(self.JenisKaryawan)
+
+
 class MasterKaryawan(models.Model):
     Nama = models.CharField(max_length=256)
     NIK = models.CharField(max_length=256, blank=True, null=True)
@@ -55,6 +66,9 @@ class MasterKaryawan(models.Model):
     FotoKK = models.ImageField(upload_to=rename_kk, null=True, blank=True)
     FotoNPWP = models.ImageField(upload_to=rename_npwp, null=True, blank=True)
     Gender = models.BooleanField(default=True)
+    JenisKaryawan = models.ForeignKey(
+        MasterJenisKaryawan, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     def __str__(self):
         return str(self.Nama)
@@ -161,3 +175,68 @@ class PayrollDeduction(models.Model):
 
     def __str__(self):
         return f"{self.deduction_type.name} - {self.amount}"
+
+
+"""
+INVENTORY MODELS
+"""
+
+
+def rename_fotomaterial(instance, filename):
+    ext = filename.split(".")[-1]
+    nama = slugify(instance.NamaItem)  # agar rapi dan bebas spasi
+    filename = f"Foto_{nama}.{ext}"
+    return os.path.join("Inventory/Material_images", filename)
+
+
+class MasterMaterial(models.Model):
+    KodeItem = models.CharField(max_length=50, unique=True)
+    NamaItem = models.CharField(max_length=128)
+    Satuan = models.CharField(max_length=25, null=True, blank=True)
+    SpesifikasiItem = models.CharField(max_length=256)
+    Stock = models.FloatField()
+    IsAset = models.BooleanField()
+    IsAktif = models.BooleanField()
+    Foto = models.ImageField(upload_to=rename_fotomaterial, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.KodeItem} - {self.NamaItem}"
+
+
+class SuratJalan(models.Model):
+    Tanggal = models.DateField()
+    NoSuratJalan = models.CharField(max_length=72, unique=True)
+    GoodReceiveNoted = models.FileField(
+        upload_to="File/Inventory/TransaksiMasuk", null=True, blank=True
+    )
+
+
+class MaterialMasuk(models.Model):
+    NamaItem = models.ForeignKey(MasterMaterial, on_delete=models.CASCADE)
+    Jumlah = models.FloatField()
+    Remarks = models.CharField(max_length=256, null=True, blank=True)
+    SuratJalan = models.ForeignKey(
+        SuratJalan, on_delete=models.CASCADE, null=True, blank=True
+    )
+
+    def __str__(self):
+        return f"{self.NamaItem}"
+
+
+class MaterialIssueSlip(models.Model):
+    Tanggal = models.DateField()
+    NoMIS = models.CharField(max_length=72, unique=True)
+    FileMIS = models.FileField(upload_to="File/Inventory/MIS", null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.NoMIS}"
+
+
+class MaterialKeluar(models.Model):
+    NamaItem = models.ForeignKey(MasterMaterial, on_delete=models.CASCADE)
+    Jumlah = models.FloatField()
+    Remarks = models.CharField(max_length=50)
+    NoMIS = models.ForeignKey(MaterialIssueSlip, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.NoMIS.NoMIS} - {self.NamaItem}"

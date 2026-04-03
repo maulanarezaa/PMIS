@@ -84,6 +84,7 @@ def tambahdatakaryawan(request):
     proyek = models.Proyek.objects.all()
     if request.method == "POST":
         print(request.POST)
+        print(asdasds)
         # Manajemen Data Karyawan
         NamaKaryawan = request.POST["Nama"]
         AlamatKaryawan = request.POST["Alamat"]

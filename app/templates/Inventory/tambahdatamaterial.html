@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Input Data Material</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <form class="form form-vertical" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- ================= DATA DIRI ================= -->
+            <div class="card-header">
+                <h4 class="card-title">Data Material</h4>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Kode Item</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="Kode" placeholder="Masukkan Kode Item"
+                                    required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Nama Item</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="Nama" placeholder="Masukan Nama Item"
+                                    required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-house"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Spesifikasi</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="Spesifikasi"
+                                    placeholder="Masukkan Spesifikasi" required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-phone"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Stok</label>
+                            <div class="position-relative">
+                                <input type="number" step="any" class="form-control" name="Stok"
+                                    placeholder="Masukkan Stok" required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-window"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="form-group has-icon-left">
+                            <label>Aset</label>
+                            <div class="position-relative">
+                                <select name="StatusAset" class="form-control" required>
+                                    <option value="" disabled selected>Pilih Opsi</option>
+                                    <option value="True">Aset</option>
+                                    <option value="False">Non-Aset</option>
+                                </select>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-wallet"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="form-group has-icon-left">
+                            <label>Aktif</label>
+                            <div class="position-relative">
+                                <select name="StatusAktif" class="form-control" required>
+                                    <option value="" disabled selected>Pilih Opsi</option>
+                                    <option value="True">Aktif</option>
+                                    <option value="False">Non-Aktif</option>
+                                </select>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-upc"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <label>Foto Barang</label>
+                        <input class="form-control" type="file" name="FotoMaterial" accept="image/jpeg,image/png">
+                    </div>
+
+
+                </div>
+                <div class="col-12 d-flex justify-content-start mt-3">
+                    <button type="submit" class="btn btn-primary me-2">Submit</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const modeProyek = document.getElementById("modeProyek");
+        const modeOffice = document.getElementById("modeOffice");
+        const selectProyek = document.getElementById("selectProyek");
+        const inputOffice = document.getElementById("inputOffice");
+
+        function toggleMode() {
+            if (modeProyek.checked) {
+                selectProyek.disabled = false;
+                selectProyek.classList.remove("d-none");
+
+                inputOffice.classList.add("d-none");
+            } else {
+                selectProyek.disabled = true;
+                selectProyek.classList.add("d-none");
+
+                inputOffice.classList.remove("d-none");
+            }
+        }
+
+        modeProyek.addEventListener("change", toggleMode);
+        modeOffice.addEventListener("change", toggleMode);
+
+        toggleMode();
+    });
+</script>
+
+{% endblock content %}

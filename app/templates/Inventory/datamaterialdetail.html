@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="page-heading">
+    <h3>Edit Data Material <i>{{data.NamaItem}}</i></h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+
+            <!-- ================= TAB NAV ================= -->
+            <ul class="nav nav-tabs mb-3">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active tab-link" data-target="info">Info</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link tab-link" data-target="masuk">Material Masuk</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link tab-link" data-target="keluar">Material Keluar</a>
+                </li>
+            </ul>
+
+            <!-- ================= TAB INFO ================= -->
+            <div class="tab-pane-custom" id="tab-info">
+                <div class="row">
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Kode Item</label>
+                            <div class="position-relative">
+                                <input type="text" disabled class="form-control" value="{{data.KodeItem}}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Nama Item</label>
+                            <div class="position-relative">
+                                <input type="text" disabled class="form-control" value="{{data.NamaItem}}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Spesifikasi</label>
+                            <div class="position-relative">
+                                <input type="text" disabled class="form-control" value="{{data.SpesifikasiItem}}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Stok</label>
+                            <div class="position-relative">
+                                <input type="number" disabled class="form-control" value="{{data.Stock}}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <label>Aset</label>
+                        <select disabled class="form-control">
+                            {% if data.IsAset %}
+                            <option selected>Aset</option>
+                            <option>Non-Aset</option>
+                            {% else %}
+                            <option>Aset</option>
+                            <option selected>Non-Aset</option>
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <div class="col-4">
+                        <label>Aktif</label>
+                        <select disabled class="form-control">
+                            {% if data.IsAktif %}
+                            <option selected>Aktif</option>
+                            <option>Non-Aktif</option>
+                            {% else %}
+                            <option>Aktif</option>
+                            <option selected>Non-Aktif</option>
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <div class="col-6 mt-3">
+                        <label>Foto Barang</label>
+                        {% if data.Foto %}
+                        <div>
+                            <img src="{{ data.Foto.url }}" class="img-thumbnail" style="max-width: 200px;">
+                        </div>
+                        {% else %}
+                        <p class="text-muted">Tidak ada foto</p>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================= TAB MASUK ================= -->
+            <div class="tab-pane-custom d-none" id="tab-masuk">
+                <h5>Material Masuk</h5>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>No Surat Jalan</th>
+                            <th>Jumlah</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data.materialmasuk %}
+                        <tr>
+                            <td>{{ item.SuratJalan.Tanggal|date:'Y-m-d' }}</td>
+                            <td>
+                                {% if item.SuratJalan %}
+                                <a
+                                    href="{% url 'detailsuratjalan' item.SuratJalan.id %}">{{item.SuratJalan.NoSuratJalan}}</a>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.Jumlah }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">Tidak ada data</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ================= TAB KELUAR ================= -->
+            <div class="tab-pane-custom d-none" id="tab-keluar">
+                <h5>Material Keluar</h5>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>NoMIS</th>
+                            <th>Jumlah</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data.materialkeluar %}
+                        <tr>
+                            <td>{{ item.NoMIS.Tanggal|date:'Y-m-d' }}</td>
+                            <td>
+                                {% if item.NoMIS %}
+                                <a href="{% url 'detailmis' item.NoMIS.id %}">{{item.NoMIS.NoMIS}}</a>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.Jumlah }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">Tidak ada data</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+<script>
+    $(document).ready(function () {
+
+        $(".tab-link").click(function (e) {
+            e.preventDefault();
+
+            let target = $(this).data("target");
+
+            // aktifkan tab
+            $(".tab-link").removeClass("active");
+            $(this).addClass("active");
+
+            // sembunyikan semua konten
+            $(".tab-pane-custom").addClass("d-none");
+
+            // tampilkan target
+            $("#tab-" + target).removeClass("d-none");
+        });
+
+    });
+</script>
+
+{% endblock content %}

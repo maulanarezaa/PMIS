@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Material Keluar</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+
+            <!-- BUTTON TAMBAH -->
+            <a href="{% url 'tambahmaterialkeluar' %}">
+                <button class="btn btn-primary mb-3">Tambah Data Transaksi Material</button>
+            </a>
+
+            <!-- TABLE -->
+            <table class="table table-striped" id="table1">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>No MIS</th>
+                        <th>Item</th>
+                        <th>File</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in data %}
+                    <tr>
+                        <td>{{item.Tanggal}}</td>
+                        <td>{{item.NoMIS}}</td>
+                        <td>
+                            {% for i in item.detail %}
+                            <ul>
+                                <li>{{i.NamaItem}} - {{i.Jumlah}}</li>
+                            </ul>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% if item.FileMIS %}
+                            <a href="{{ item.FileMIS.url }}">Lihat File</a>
+                            {% else %}
+                            Tidak ada file
+                            {% endif %}
+                        </td>
+
+                        <!-- ASET -->
+
+
+
+                        <!-- ACTION -->
+                        <td>
+                            <a href="{% url 'detailmis' item.id %}">
+                                <button type="button" class="btn btn-info btn-sm">Info</button>
+                            </a>
+
+                            <a href="{% url 'edit_materialmasuk' item.id %}">
+                                <button type="button" class="btn btn-warning btn-sm">Edit</button>
+                            </a>
+
+                            <!-- BUTTON HAPUS (MODAL) -->
+                            <button type="button" class="btn btn-danger btn-sm btn-hapus" data-id="{{item.id}}"
+                                data-nama="{{item.NamaItem}}" data-bs-toggle="modal" data-bs-target="#modalHapus">
+                                Hapus
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</section>
+
+<!-- ================= MODAL HAPUS ================= -->
+<div class="modal fade" id="modalHapus" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Konfirmasi Hapus</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus data berikut?</p>
+
+                <h5 id="namaItemHapus" class="text-danger"></h5>
+
+                <p class="text-muted">
+                    Data yang dihapus tidak dapat dikembalikan.
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Batal
+                </button>
+
+                <a href="#" id="btnConfirmHapus" class="btn btn-danger">
+                    Ya, Hapus
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ================= JS ================= -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const buttons = document.querySelectorAll(".btn-hapus");
+        const namaItem = document.getElementById("namaItemHapus");
+        const btnConfirm = document.getElementById("btnConfirmHapus");
+
+        buttons.forEach(button => {
+            button.addEventListener("click", function () {
+
+                const id = this.getAttribute("data-id");
+                const nama = this.getAttribute("data-nama");
+
+                // tampilkan nama
+                namaItem.textContent = nama;
+
+                // set URL delete (sesuaikan dengan urls.py)
+                btnConfirm.href = `datamaterial/delete/${id}`;
+
+            });
+        });
+
+    });
+</script>
+
+{% endblock content %}

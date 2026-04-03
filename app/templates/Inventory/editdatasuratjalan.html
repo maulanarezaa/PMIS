@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="page-heading">
+    <h3>Edit Detail Surat Jalan</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="card-body">
+
+                <!-- HEADER -->
+                <div class="row">
+                    <div class="col-5">
+                        <div class="form-group">
+                            <label>Nomor Surat Jalan</label>
+                            <input type="text" class="form-control" value="{{ data.NoSuratJalan }}" name="NoSuratJalan"
+                                required>
+                            <input type="hidden" name="idsuratjalan" value="{{data.id}}">
+                        </div>
+                    </div>
+
+                    <div class="col-5">
+                        <div class="form-group">
+                            <label>Tanggal</label>
+                            <input type="date" class="form-control" value="{{ data.Tanggal|date:'Y-m-d'}}"
+                                name="Tanggal" required>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- TABLE -->
+                <table class="table table-bordered" id="table-input">
+                    <thead>
+                        <tr>
+                            <th>Nama Material</th>
+                            <th>Kode Item</th>
+                            <th>Spesifikasi</th>
+                            <th>Satuan</th>
+                            <th>Jumlah</th>
+                            <th>Remarks</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="table-body">
+
+                        {% for item in datadetail %}
+                        <tr>
+                            <!-- ID DETAIL -->
+                            <input type="hidden" name="detail_id[]" value="{{ item.id }}">
+
+                            <!-- ITEM AUTOCOMPLETE -->
+                            <td style="position: relative;">
+                                <input type="text" class="form-control item-search" value="{{ item.NamaItem.NamaItem }}"
+                                    autocomplete="off" required>
+
+                                <input type="hidden" name="item_id[]" class="item-id" value="{{ item.NamaItem.id }}">
+
+                                <div class="list-group item-result"
+                                    style="position:absolute; width:100%; z-index:1000;"></div>
+                            </td>
+
+                            <!-- KODE ITEM -->
+                            <td>
+                                <input type="text" class="form-control kode-item" value="{{ item.NamaItem.KodeItem }}"
+                                    readonly>
+                            </td>
+
+                            <!-- SPESIFIKASI -->
+                            <td>
+                                <input type="text" class="form-control spesifikasi"
+                                    value="{{ item.NamaItem.SpesifikasiItem }}" readonly>
+                            </td>
+
+                            <!-- SATUAN -->
+                            <td>
+                                <input type="text" class="form-control satuan" value="{{ item.NamaItem.Satuan }}"
+                                    readonly>
+                            </td>
+
+                            <!-- JUMLAH -->
+                            <td>
+                                <input type="number" name="jumlah[]" class="form-control" value="{{ item.Jumlah }}"
+                                    min="0">
+                            </td>
+
+                            <!-- REMARKS -->
+                            <td>
+                                <input type="text" name="remarks[]" class="form-control" value="{{ item.Remarks }}">
+                            </td>
+
+                            <!-- AKSI -->
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+                <!-- BUTTON -->
+                </button>
+                <button type="button" class="btn btn-secondary" id="add-row">
+                    + Tambah Baris
+                </button>
+
+                <button type="submit" class="btn btn-primary">
+                    Update Data
+                </button>
+
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+<script>
+
+    // TEMPLATE ROW BARU
+    function getNewRow() {
+        return `
+        <tr>
+            <input type="hidden" name="detail_id[]">
+
+            <td style="position: relative;">
+                <input type="text" class="form-control item-search" placeholder="Cari Item..." autocomplete="off">
+                <input type="hidden" name="item_id[]" class="item-id">
+                <div class="list-group item-result" style="position:absolute; width:100%; z-index:1000;"></div>
+            </td>
+
+            <td><input type="text" class="form-control kode-item" readonly></td>
+            <td><input type="text" class="form-control spesifikasi" readonly></td>
+            <td><input type="text" class="form-control satuan" readonly></td>
+
+            <td><input type="number" name="jumlah[]" class="form-control" min="0"></td>
+            <td><input type="text" name="remarks[]" class="form-control"></td>
+
+            <td>
+                <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
+            </td>
+        </tr>
+        `;
+    }
+
+    // TAMBAH BARIS
+    $("#add-row").click(function () {
+        $("#table-body").append(getNewRow());
+    });
+
+    // HAPUS BARIS
+    $(document).on("click", ".remove-row", function () {
+        if ($("#table-body tr").length > 1) {
+            $(this).closest("tr").remove();
+        }
+    });
+
+    // AUTOCOMPLETE
+    $(document).on('keyup', '.item-search', function () {
+        let input = $(this);
+        let query = input.val();
+        let resultBox = input.siblings('.item-result');
+
+        if (query.length > 1) {
+            $.ajax({
+                url: "{% url 'search_item' %}",
+                data: { 'q': query },
+                success: function (data) {
+                    resultBox.empty();
+
+                    data.forEach(function (item) {
+                        resultBox.append(`
+                            <a href="#"
+                               class="list-group-item list-group-item-action select-item"
+                               data-id="${item.id}"
+                               data-name="${item.NamaItem}"
+                               data-kode="${item.KodeItem}"
+                               data-spesifikasi="${item.SpesifikasiItem}"
+                               data-satuan="${item.Satuan}">
+                               ${item.NamaItem}
+                            </a>
+                        `);
+                    });
+                }
+            });
+        } else {
+            resultBox.empty();
+        }
+    });
+
+    // PILIH ITEM
+    $(document).on('click', '.select-item', function (e) {
+        e.preventDefault();
+
+        let selected = $(this);
+        let container = selected.closest("tr");
+
+        container.find('.item-search').val(selected.data('name'));
+        container.find('.item-id').val(selected.data('id'));
+
+        container.find('.kode-item').val(selected.data('kode'));
+        container.find('.spesifikasi').val(selected.data('spesifikasi'));
+        container.find('.satuan').val(selected.data('satuan'));
+
+        container.find('.item-result').empty();
+    });
+
+</script>
+
+{% endblock %}

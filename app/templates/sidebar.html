@@ -38,13 +38,34 @@
             </a>
             <ul class="submenu ">
                 <li class="submenu-item ">
-                    <a href="">Material Masuk</a>
+                    <a href="{% url 'viewmaterialmasuk' %}">Material Masuk</a>
                 </li>
                 <li class="submenu-item">
-                    <a href="">Material Keluar</a>
+                    <a href="{% url 'viewmaterialkeluar' %}">Material Keluar</a>
                 </li>
                 <li class="submenu-item">
-                    <a href=" ">Database Material</a>
+                    <a href="{% url 'viewmaterial' %}">Database Material</a>
+                </li>
+                <li class="submenu-item">
+                    <a href=" ">Stock Opname</a>
+                </li>
+
+            </ul>
+        </li>
+        <li class="sidebar-item  has-sub">
+            <a href="#" class='sidebar-link'>
+                <i class="bi bi-stack"></i>
+                <span>Project</span>
+            </a>
+            <ul class="submenu ">
+                <li class="submenu-item ">
+                    <a href="{% url 'viewmaterialmasuk' %}">Job Order</a>
+                </li>
+                <li class="submenu-item">
+                    <a href="{% url 'viewmaterialkeluar' %}">Work Completion</a>
+                </li>
+                <li class="submenu-item">
+                    <a href="{% url 'viewmaterial' %}">Material Requests</a>
                 </li>
                 <li class="submenu-item">
                     <a href=" ">Stock Opname</a>
