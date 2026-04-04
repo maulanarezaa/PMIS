@@ -11,6 +11,20 @@
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
+            <label for="">Foto</label>
+            {% if data.PasFoto %}
+            <div>
+              <img src="{{ data.PasFoto.url }}" class="img-thumbnail" style="max-width: 200px;">
+            </div>
+            {% else %}
+            <p class="text-muted">Tidak ada foto</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
             <label for="basicInput">Nama</label>
             <input type="text" class="form-control" id="basicInput" placeholder="Enter email" value="{{data.Nama}}"
               disabled>
@@ -86,7 +100,7 @@
             {% for item in datakontrak %}
             <tr>
               <td>{{item.NomerKontrak}}</td>
-              <td>{{item.Proyek}}</td>
+              <td>{{item.JobOrder}}</td>
               <td>{{item.JenisKontrak}}</td>
               <td>
                 {% if item.File %}

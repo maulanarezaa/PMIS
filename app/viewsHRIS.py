@@ -82,9 +82,10 @@ def is_valid_image(file):
 
 def tambahdatakaryawan(request):
     proyek = models.Proyek.objects.all()
+    JobOrder = models.JobOrder.objects.all()
     if request.method == "POST":
         print(request.POST)
-        print(asdasds)
+        # print(asdasds)
         # Manajemen Data Karyawan
         NamaKaryawan = request.POST["Nama"]
         AlamatKaryawan = request.POST["Alamat"]
@@ -105,27 +106,32 @@ def tambahdatakaryawan(request):
         foto_npwp = request.FILES.get("FotoNPWP")
         foto_kk = request.FILES.get("FotoKK")
         print(request.FILES)
-
-        karyawanobj = models.MasterKaryawan(
-            Nama=NamaKaryawan,
-            NIK=NIKKaryawan,
-            Alamat=AlamatKaryawan,
-            Kontak=KontakKaryawan,
-            NPWP=NPWPKaryawan,
-            NOKK=NOKKKaryawan,
-            NamaIbu=NamaIbu,
-            Remarks=RemarksKaryawan,
-            FotoKTP=foto_ktp,
-            FotoNPWP=foto_npwp,
-            FotoKK=foto_kk,
-            Status=StatusAktif,
-        ).save()
-        # Manajemen Kontrak
-        NamaKaryawanobj = models.MasterKaryawan.objects.last()
+        if not models.MasterKaryawan.objects.filter(NIK=NIKKaryawan).exists():
+            karyawanobj = models.MasterKaryawan(
+                Nama=NamaKaryawan,
+                NIK=NIKKaryawan,
+                Alamat=AlamatKaryawan,
+                Kontak=KontakKaryawan,
+                NPWP=NPWPKaryawan,
+                NOKK=NOKKKaryawan,
+                NamaIbu=NamaIbu,
+                Remarks=RemarksKaryawan,
+                FotoKTP=foto_ktp,
+                FotoNPWP=foto_npwp,
+                FotoKK=foto_kk,
+                Status=StatusAktif,
+            ).save()
+            # Manajemen Kontrak
+            NamaKaryawanobj = models.MasterKaryawan.objects.last()
+        else:
+            NamaKaryawanobj = models.MasterKaryawan.objects.get(NIK=NIKKaryawan)
+            messages.warning(
+                request, "NIK Telah terdaftar di sistem, mendaftarkan kontrak"
+            )
         satuankontrak = request.POST["satuan_kontrak"]
         durasikontrak = int(request.POST["JenisKontrak"])
         TanggalAwal = request.POST["TanggalAwal"]
-        ProyekOBJ = models.Proyek.objects.get(pk=request.POST["Proyek"])
+        JobOrderobj = models.JobOrder.objects.get(pk=request.POST["Proyek"])
         Posisi = request.POST["Posisi"]
         RemarksKontrak = request.POST["RemarksKontrak"]
 
@@ -151,11 +157,13 @@ def tambahdatakaryawan(request):
             TanggalAkhir=tanggal_akhir,
             Remarks=RemarksKontrak,
             StatusAktif=StatusAktif,
-            Proyek=ProyekOBJ,
             Posisi=Posisi,
+            JobOrder=JobOrderobj,
         ).save()
+        messages.success(request, "Data Berhasil Disimpan")
+        return redirect("viewkaryawan")
 
-    return render(request, "HRIS/tambahdatakaryawan.html", {"proyek": proyek})
+    return render(request, "HRIS/tambahdatakaryawan.html", {"proyek": JobOrder})
 
 
 def deletekaryawan(request, id):
@@ -223,7 +231,31 @@ def addkontrak(request):
 def editkontrak(request, id):
     datakontrak = models.Kontrak.objects.get(pk=id)
     datakontrak.TanggalAwal = datakontrak.TanggalAwal.strftime("%Y-%m-%d")
-    dataproyek = models.Proyek.objects.all()
+    dataproyek = models.JobOrder.objects.all()
+    if request.method == "POST":
+        print(request.POST)
+        print(request.FILES)
+        Nomorkontrak = request.POST["NomorKontrak"]
+        JenisKontrak = request.POST["JenisKontrak"]
+        Durasi = request.POST["DurasiKontrak"]
+        Tanggalawal = request.POST["TanggalAwal"]
+        Remarks = request.POST["RemarksKontrak"]
+        StatusAktif = request.POST["StatusAktif"]
+        Posisi = request.POST["Posisi"]
+        JobOrder = models.JobOrder.objects.get(id=request.POST["Proyek"])
+
+        kontrakobj = models.Kontrak.objects.get(id=id)
+        kontrakobj.NomerKontrak = Nomorkontrak
+        kontrakobj.JenisKontrak = JenisKontrak
+        kontrakobj.Durasi = Durasi
+        kontrakobj.TanggalAwal = Tanggalawal
+        kontrakobj.Remarks = Remarks
+        kontrakobj.StatusAktif = StatusAktif
+        kontrakobj.Posisi = Posisi
+        kontrakobj.JobOrder = JobOrder
+        kontrakobj.save()
+        messages.success(request, "Data Berhasil disimpan")
+        return redirect("editkontrak", id)
     return render(
         request,
         "HRIS/datakontrakedit.html",

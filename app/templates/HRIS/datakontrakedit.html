@@ -129,11 +129,12 @@
                             <label>Nama Proyek</label>
                             <div class="position-relative">
                                 <select name="Proyek" class="form-control" required>
-                                    <option value="{{data.Proyek.id}}" disabled selected>{{data.Proyek}}</option>
                                     {% for item in dataproyek %}
-                                    {% if item.id == data.Proyek.id %}
+                                    {% if item.id == data.JobOrder.id %}
+                                    <option value="{{ item.id }}" selected>{{ item.NomorJO }} - {{ item.Deskripsi }}
+                                    </option>
                                     {% else %}
-                                    <option value="{{ item.id }}">{{ item.Nama }} - {{ item.Lokasi }}</option>
+                                    <option value="{{ item.id }}">{{ item.NomorJO }} - {{ item.Deskripsi }}</option>
                                     {% endif %}
 
                                     {% endfor %}
@@ -148,12 +149,22 @@
                         <div class="form-group has-icon-left">
                             <label>Kontrak</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" name="DurasiKontrak" placeholder="Durasi"
-                                    min="1" required>
+                                <input type="number" class="form-control" value="{{data.Durasi}}" name="DurasiKontrak"
+                                    placeholder="Durasi" min="1" required>
                                 <select name="JenisKontrak" class="form-select" required>
-                                    <option value="Hari">Hari</option>
+                                    {% if data.JenisKontrak == "Hari" %}
+                                    <option value="Hari" selected>Hari</option>
                                     <option value="Bulan">Bulan</option>
                                     <option value="Tahun">Tahun</option>
+                                    {% elif data.JenisKontrak == "Bulan" %}
+                                    <option value="Hari">Hari</option>
+                                    <option value="Bulan" selected>Bulan</option>
+                                    <option value="Tahun">Tahun</option>
+                                    {% else %}
+                                    <option value="Hari">Hari</option>
+                                    <option value="Bulan" selected>Bulan</option>
+                                    <option value="Tahun">Tahun</option>
+                                    {% endif %}
                                 </select>
                                 <div class="form-control-icon"><i class="bi bi-files"></i></div>
                             </div>
@@ -165,8 +176,13 @@
                         <div class="form-group has-icon-left">
                             <label>Nomor Kontrak</label>
                             <div class="position-relative">
+                                {% if data.NomerKontrak == None %}
                                 <input type="text" class="form-control" name="NomorKontrak"
-                                    value="{{data.NomerKontrak}}" required>
+                                    placeholder="Belum ada Nomor Kontrak">
+                                {% else %}
+                                <input type="text" class="form-control" name="NomorKontrak"
+                                    value="{{data.NomerKontrak}}">
+                                {% endif %}
                                 <div class="form-control-icon"><i class="bi bi-file"></i></div>
                             </div>
                         </div>
@@ -224,9 +240,14 @@
                         <div class="form-group has-icon-left">
                             <label>File Kontrak (PDF)</label>
                             <div class="position-relative">
-                                <input class="form-control" type="file" name="FileKontrak" accept="application/pdf">
+                                <input class="form-control" type="file" name="FileKontrak" accept="application/pdf"
+                                    value="{{data.File.path}}">
                                 <div class="form-control-icon"><i class="bi bi-upload"></i></div>
                             </div>
+                            {% if data.File %}
+                            <a href="{{ data.File.url }}">Lihat File</a>
+
+                            {% endif %}
                         </div>
                     </div>
 

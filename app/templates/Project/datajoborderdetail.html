@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="page-heading">
+    <h3>Info Data Job Order <i>{{data.NomorJO}}</i></h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+
+            <!-- ================= TAB NAV ================= -->
+            <ul class="nav nav-tabs mb-3">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active tab-link" data-target="info">Info</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link tab-link" data-target="manpower">Manpower</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link tab-link" data-target="masuk">Work Completion </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link tab-link" data-target="keluar">Expense Report</a>
+                </li>
+            </ul>
+
+            <!-- ================= TAB INFO ================= -->
+            <div class="tab-pane-custom" id="tab-info">
+                <div class="row">
+
+                    <div class="col-4">
+                        <div class="form-group has-icon-left">
+                            <label>Nomor Job Order</label>
+                            <div class="position-relative">
+                                <input type="text" disabled class="form-control" value="{{data.NomorJO}}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="form-group has-icon-left">
+                            <label>Deskripsi Pekerjaan</label>
+                            <div class="position-relative">
+                                <input type="text" disabled class="form-control" value="{{data.Deskripsi}}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="form-group has-icon-left">
+                            <label>Nomor Sales Order</label>
+                            <div class="position-relative">
+                                <input type="text" disabled class="form-control" value="{{data.SalesOrder}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        <div class="form-group has-icon-left">
+                            <label>Client</label>
+                            <div class="position-relative">
+                                <input type="text" disabled class="form-control" value="{{data.Client}}">
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-3">
+                        <label>Nilai</label>
+                        <div class="position-relative">
+                            <input type="text" disabled class="form-control" value="{{data.Nilai}}">
+                        </div>
+                    </div>
+
+                    <div class="col-3">
+                        <label>Start Work</label>
+                        <div class="position-relative">
+                            <input type="date" disabled class="form-control" value="{{data.StartWork|date:'Y-m-d'}}">
+                        </div>
+
+                    </div>
+                    <div class="col-3">
+                        <label>End Work</label>
+                        <div class="position-relative">
+                            <input type="date" disabled class="form-control" value="{{data.EndWork|date:'Y-m-d'}}">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-6 mt-3">
+                    <label>File Kontrak</label>
+                    {% if data.FileKontrak %}
+                    <div>
+                        <a href="{{ data.FileKontrak.url }}" class="btn btn-primary" target="_blank">Lihat File</a>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">Tidak ada foto</p>
+                    {% endif %}
+                </div>
+
+
+            </div>
+
+            <!-- ================= TAB MANPOWER ================= -->
+            <div class="tab-pane-custom d-none" id="tab-manpower">
+                <h5>Man Power List</h5>
+
+                <table class="table table-striped" id="table1">
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Posisi</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data.manpower %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'info_karyawan' item.Nama.id %}">
+
+                                    {{item.Nama}}
+                                </a>
+                            </td>
+                            <td>{{item.Posisi}}</td>
+                            <td>{{item.Remarks}}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">Tidak ada data</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+
+            </div>
+
+            <!-- ================= TAB MASUK ================= -->
+            <div class="tab-pane-custom d-none" id="tab-masuk">
+                <h5>Work Completion List</h5>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Nomor Work Completion</th>
+                            <th>Jenis</th>
+                            <th>Remarks</th>
+                            <th>Nilai</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data.workcompletion %}
+                        <tr>
+                            <td>{{ item.Tanggal|date:'Y-m-d' }}</td>
+                            <td>
+                                <a href="">
+                                    {{item.NomorWorkCompletion}}
+                                </a>
+                            </td>
+                            <td>{{item.Jenis}}</td>
+                            <td>{{ item.Remarks }}</td>
+                            <td>{{item.Nilai}}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">Tidak ada data</td>
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td colspan="4">Total</td>
+                            <td>{{data.totalworkcompletion|intcomma}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ================= TAB KELUAR ================= -->
+            <div class="tab-pane-custom d-none" id="tab-keluar">
+                <h5>Material Keluar</h5>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>NoMIS</th>
+                            <th>Jumlah</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data.materialkeluar %}
+                        <tr>
+                            <td>{{ item.NoMIS.Tanggal|date:'Y-m-d' }}</td>
+                            <td>
+                                {% if item.NoMIS %}
+                                <a href="{% url 'detailmis' item.NoMIS.id %}">{{item.NoMIS.NoMIS}}</a>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.Jumlah }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">Tidak ada data</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+<script>
+    $(document).ready(function () {
+
+        $(".tab-link").click(function (e) {
+            e.preventDefault();
+
+            let target = $(this).data("target");
+
+            // aktifkan tab
+            $(".tab-link").removeClass("active");
+            $(this).addClass("active");
+
+            // sembunyikan semua konten
+            $(".tab-pane-custom").addClass("d-none");
+
+            // tampilkan target
+            $("#tab-" + target).removeClass("d-none");
+        });
+
+    });
+</script>
+
+{% endblock content %}

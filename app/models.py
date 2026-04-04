@@ -7,6 +7,47 @@ from django.utils.text import slugify
 # Data Master Proyek
 
 """
+PROJECT
+"""
+
+
+class JobOrder(models.Model):
+    NomorJO = models.CharField(max_length=256)
+    SalesOrder = models.CharField(max_length=256)
+    Client = models.CharField(max_length=256, null=True, blank=True)
+    Deskripsi = models.CharField(max_length=256)
+    Nilai = models.FloatField()
+    Invoice = models.FloatField()
+    Status = models.CharField(max_length=56)
+    Margin = models.FloatField()
+    Persen = models.FloatField()
+    StartWork = models.DateField()
+    EndWork = models.DateField()
+    TerminPembayaran = models.CharField(max_length=56)
+    FileKontrak = models.FileField(
+        upload_to="File/Project/JobOrder", null=True, blank=True
+    )
+
+    def __str__(self):
+        return f"{self.NomorJO} - {self.Deskripsi}"
+
+
+class WorkCompletion(models.Model):
+    NomorWorkCompletion = models.CharField(max_length=256)
+    NomorJO = models.ForeignKey(JobOrder, on_delete=models.CASCADE)
+    Tanggal = models.DateField()
+    Jenis = models.CharField(max_length=56)
+    Remarks = models.CharField(max_length=128)
+    Nilai = models.FloatField()
+    FileBA = models.FileField(
+        upload_to="File/Project/WorkCompletion", null=True, blank=True
+    )
+
+    def __str__(self):
+        return f"{self.NomorJO}-{self.NomorWorkCompletion}"
+
+
+"""
 HRIS MODELS
 """
 
@@ -29,6 +70,13 @@ def rename_kk(instance, filename):
     ext = filename.split(".")[-1]
     nama = slugify(instance.Nama)
     filename = f"KK_{nama}.{ext}"
+    return os.path.join("kk_images", filename)
+
+
+def pasfoto(instance, filename):
+    ext = filename.split(".")[-1]
+    nama = slugify(instance.Nama)
+    filename = f"Foto_{nama}.{ext}"
     return os.path.join("kk_images", filename)
 
 
@@ -69,6 +117,7 @@ class MasterKaryawan(models.Model):
     JenisKaryawan = models.ForeignKey(
         MasterJenisKaryawan, on_delete=models.CASCADE, null=True, blank=True
     )
+    PasFoto = models.ImageField(upload_to=pasfoto, null=True, blank=True)
 
     def __str__(self):
         return str(self.Nama)
@@ -79,6 +128,7 @@ class Kontrak(models.Model):
     NomerKontrak = models.CharField(max_length=256, null=True, blank=True)
     Nama = models.ForeignKey(MasterKaryawan, on_delete=models.CASCADE)
     JenisKontrak = models.CharField(max_length=250, null=True, blank=True)
+    Durasi = models.IntegerField(default=0)
     TanggalAwal = models.DateField()
     TanggalAkhir = models.DateField()
     Remarks = models.CharField(max_length=50, null=True, blank=True)
@@ -86,6 +136,9 @@ class Kontrak(models.Model):
     File = models.FileField(upload_to="File/HRIS/Kontrak", null=True, blank=True)
     Proyek = models.ForeignKey(Proyek, on_delete=models.CASCADE, null=True, blank=True)
     Posisi = models.CharField(max_length=250, null=True, blank=True)
+    JobOrder = models.ForeignKey(
+        JobOrder, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     def __str__(self):
         return str(f"{self.Nama} - {self.NomerKontrak}")
@@ -208,6 +261,9 @@ class SuratJalan(models.Model):
     NoSuratJalan = models.CharField(max_length=72, unique=True)
     GoodReceiveNoted = models.FileField(
         upload_to="File/Inventory/TransaksiMasuk", null=True, blank=True
+    )
+    JobOrder = models.ForeignKey(
+        JobOrder, on_delete=models.CASCADE, null=True, blank=True
     )
 
 

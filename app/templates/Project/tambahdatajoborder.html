@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Input Data Job Order</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <form class="form form-vertical" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- ================= DATA DIRI ================= -->
+            <div class="card-header">
+                <h4 class="card-title">Data Pekerjaan</h4>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Nomor Job Order</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="nomorjo"
+                                    placeholder="Masukkan Nomor Job Order" required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Nama Client</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="Client" placeholder="Masukan Nama Client"
+                                    required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-house"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Sales Order</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="salesorder"
+                                    placeholder="Masukan Nomor Sales Order" required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-house"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Deskripsi Pekerjaan</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="deskripsi"
+                                    placeholder="Masukkan Deskripsi Pekerjaan" required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-phone"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Nilai Pekerjaan</label>
+                            <div class="position-relative">
+                                <input type="number" step="any" class="form-control" name="nilai"
+                                    placeholder="Masukkan Nilai Pekerjaan" required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-window"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+
+                    <div class="col-4">
+                        <div class="form-group has-icon-left">
+                            <label>Mulai Pekerjaan</label>
+                            <div class="position-relative">
+                                <input type="date" name="startdate" id="" class="form-control">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-wallet"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="form-group has-icon-left">
+                            <label>Akhir Pekerjaan</label>
+                            <div class="position-relative">
+                                <input type="date" class="form-control" name="enddate" id="">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-upc"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+
+                    <div class="col-4">
+                        <label>Termin Pembayaran</label>
+                        <input class="form-control" type="text" name="termin" required>
+                    </div>
+                    <div class="col-4">
+                        <label>File Kontrak</label>
+                        <input class="form-control" type="file" name="FileKontrak">
+                    </div>
+
+
+                </div>
+                <div class="col-12 d-flex justify-content-start mt-3">
+                    <button type="submit" class="btn btn-primary me-2">Submit</button>
+                </div>
+            </div>
+
+
+        </form>
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const modeProyek = document.getElementById("modeProyek");
+        const modeOffice = document.getElementById("modeOffice");
+        const selectProyek = document.getElementById("selectProyek");
+        const inputOffice = document.getElementById("inputOffice");
+
+        function toggleMode() {
+            if (modeProyek.checked) {
+                selectProyek.disabled = false;
+                selectProyek.classList.remove("d-none");
+
+                inputOffice.classList.add("d-none");
+            } else {
+                selectProyek.disabled = true;
+                selectProyek.classList.add("d-none");
+
+                inputOffice.classList.remove("d-none");
+            }
+        }
+
+        modeProyek.addEventListener("change", toggleMode);
+        modeOffice.addEventListener("change", toggleMode);
+
+        toggleMode();
+    });
+</script>
+
+{% endblock content %}

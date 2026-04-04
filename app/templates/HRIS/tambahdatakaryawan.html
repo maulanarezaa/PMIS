@@ -177,11 +177,11 @@
                             <div class="position-relative">
 
                                 <!-- SELECT PROYEK -->
-                                <select name="Proyek" id="selectProyek" class="form-control">
+                                <select name="Proyek" required id="selectProyek" class="form-control">
                                     <option value="" disabled selected>Masukkan Nama Proyek</option>
                                     {% for item in proyek %}
                                     <option value="{{item.id}}">
-                                        {{item.Nama}} - {{item.Lokasi}}
+                                        {{item.NomorJO}} - {{item.Deskripsi}}
                                     </option>
                                     {% endfor %}
                                 </select>

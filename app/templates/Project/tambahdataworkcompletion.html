@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="page-heading">
+    <h3>Input Data Work Completion</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <form class="form form-vertical" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="card-header">
+                <h4 class="card-title">Data Pekerjaan</h4>
+            </div>
+
+            <div class="card-body">
+
+                <!-- NOMOR JO -->
+                <div class="row">
+
+                    <div class="col-6 mb-3">
+                        <label for="">Tanggal</label>
+                        <input type="date" class="form-control" name="tanggal">
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="">Nomor Work Completion</label>
+                        <input type="text" class="form-control" placeholder="Masukkan Nomor Work Completion"
+                            name="nomorworkcompletion" required>
+                    </div>
+                </div>
+                <div class="form-group position-relative" style="z-index:1000;">
+                    <label>Nomor Job Order</label>
+                    <input type="text" class="form-control jo-search" placeholder="Cari JO..." autocomplete="off">
+                    <input type="text" hidden class="form-control nomor-jo" name="idjo">
+
+                    <div class="list-group jo-result" style="position:absolute; top:100%; width:100%; display:none;">
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col-4">
+
+                        <!-- SALES ORDER (AUTO) -->
+                        <div class="form-group mt-3">
+                            <label>Nomor Sales Order</label>
+                            <input type="text" class="form-control sales-order" name="salesorder"
+                                placeholder="Auto dari JO" readonly>
+                        </div>
+                    </div>
+                    <div class="col-4">
+
+                        <!-- DESKRIPSI (AUTO) -->
+                        <div class="form-group mt-3">
+                            <label>Deskripsi Proyek</label>
+                            <input type="text" class="form-control deskripsi-proyek" name="deskripsi"
+                                placeholder="Auto dari JO" readonly>
+                        </div>
+                    </div>
+                    <div class="col-4">
+
+                        <!-- NILAI PEKERJAAN -->
+                        <div class="form-group mt-3">
+                            <label>Nilai Pekerjaan</label>
+                            <input type="text" class="form-control nilai-proyek" name="nilai"
+                                placeholder="Masukkan Nilai Pekerjaan" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <!-- Jenis Tagihan -->
+                    <div class="col-4">
+                        <label>Jenis Tagihan</label>
+                        <select name="jenistagihan" class="form-control">
+                            <option value="" disabled selected>Pilih Jenis Tagihan</option>
+                            <option value="Progress">Progress</option>
+                            <option value="Retensi">Retensi</option>
+                        </select>
+                    </div>
+
+                    <!-- Nilai Tagihan -->
+                    <div class="col-4">
+                        <label>Nilai Tagihan</label>
+                        <input type="number" class="form-control" name="nilaitagihan" required>
+                    </div>
+
+                    <!-- Remarks -->
+                    <div class="col-4">
+                        <label>Remarks</label>
+                        <input type="text" class="form-control" name="remarks">
+                    </div>
+                </div>
+
+                <!-- TERMIN & FILE KONTRAK -->
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <label>File BA</label>
+                        <input class="form-control" type="file" name="fileba">
+                    </div>
+                </div>
+
+                <div class="col-12 d-flex justify-content-start mt-3">
+                    <button type="submit" class="btn btn-primary me-2">Submit</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- ================= AJAX ================= -->
+<script>
+    $(document).ready(function () {
+
+        let delay;
+        const joResult = $('.jo-result');
+
+        $(document).on('keyup', '.jo-search', function () {
+            clearTimeout(delay);
+            let input = $(this);
+            let query = input.val();
+            joResult.hide().empty();
+
+            if (query.length < 3) return;
+
+            delay = setTimeout(function () {
+                $.ajax({
+                    url: "{% url 'search_jo' %}",
+                    data: { 'q': query },
+                    success: function (data) {
+                        joResult.empty();
+                        if (data.length > 0) {
+                            data.forEach(function (item) {
+                                joResult.append('<a href="#" class="list-group-item list-group-item-action select-jo" ' +
+                                    'data-sales="' + item.SalesOrder + '"data-nilai="' + item.Nilai + '"data-jo="' + item.idjo + '" data-deskripsi="' + item.Deskripsi + '">' +
+                                    item.NomorJO + " - " + item.Deskripsi +
+                                    '</a>');
+                            });
+                            joResult.show();
+
+                        }
+                        console.log(joResult)
+                    }
+                });
+            }, 300);
+        });
+
+        // klik hasil dropdown
+        $(document).on('click', '.select-jo', function (e) {
+            e.preventDefault();
+            console.log(this)
+            const selected = $(this);
+            $('.jo-search').val(selected.text());
+            $('.sales-order').val(selected.data('sales'));
+            $('.nilai-proyek').val(selected.data('nilai'));
+            $('.nomor-jo').val(selected.data('jo'));
+            $('.deskripsi-proyek').val(selected.data('deskripsi'));
+            joResult.hide().empty();
+        });
+
+        // klik luar dropdown → sembunyikan
+        $(document).click(function (e) {
+            if (!$(e.target).closest('.jo-search, .jo-result').length) {
+                joResult.hide();
+            }
+        });
+
+    });
+</script>
+
+{% endblock content %}
