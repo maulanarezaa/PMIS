@@ -51,4 +51,22 @@ urlpatterns = [
     path(
         "datamaterialkeluar/detail/<str:id>", viewsInventory.detailmis, name="detailmis"
     ),
+    path(
+        "stockadjustment",
+        viewsInventory.viewstockadjustment,
+        name="viewstockadjustment",
+    ),
+    path(
+        "stockadjustment/add",
+        viewsInventory.addstockadjustment,
+        name="addstockadjustment",
+    ),
+    # Warehouse
+    path("warehouse", viewsInventory.viewwarehouse, name="viewwarehouse"),
+    path("warehouse/add", viewsInventory.addwarehouse, name="tambahwarehouse"),
+    path(
+        "warehouse/detail/<str:id>",
+        viewsInventory.detailwarehouse,
+        name="detailwarehouse",
+    ),
 ]

@@ -6,6 +6,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
 from django.db.models import Count, Q
+from django.contrib.auth.decorators import login_required
 
 
 def is_valid_image(file):
@@ -15,11 +16,13 @@ def is_valid_image(file):
 # Create your views here.
 
 
+@login_required
 def viewmaterial(request):
     data = models.MasterMaterial.objects.all()
     return render(request, "Inventory/datamaterial.html", {"data": data})
 
 
+@login_required
 def viewdetailmaterial(request, id):
     data = models.MasterMaterial.objects.get(id=id)
     materialmasuk = models.MaterialMasuk.objects.filter(NamaItem=data)
@@ -29,6 +32,7 @@ def viewdetailmaterial(request, id):
     return render(request, "Inventory/datamaterialdetail.html", {"data": data})
 
 
+@login_required
 def tambahdatamaterial(request):
     proyek = models.Proyek.objects.all()
     if request.method == "POST":
@@ -72,6 +76,7 @@ def tambahdatamaterial(request):
     return render(request, "Inventory/tambahdatamaterial.html", {"proyek": proyek})
 
 
+@login_required
 def editmaterial(request, id):
     data = get_object_or_404(models.MasterMaterial, pk=id)
 
@@ -113,6 +118,7 @@ def editmaterial(request, id):
     return render(request, "Inventory/editdatamaterial.html", {"data": data})
 
 
+@login_required
 def deletekaryawan(request, id):
     materialobject = models.MasterMaterial.objects.get(pk=id)
     materialobject.delete()
@@ -122,16 +128,19 @@ def deletekaryawan(request, id):
 """ MATERIAL MASUK """
 
 
+@login_required
 def viewmaterialmasuk(request):
     data = models.MaterialMasuk.objects.all()
     return render(request, "Inventory/materialmasuk.html", {"data": data})
 
 
+@login_required
 def materialmasuk(request):
     data = models.SuratJalan.objects.all()
     return render(request, "Inventory/datamaterialmasuk.html", {"data": data})
 
 
+@login_required
 def tambahdatamaterialmasuk(request):
     if request.method == "POST":
         print(request.POST)
@@ -174,6 +183,7 @@ def tambahdatamaterialmasuk(request):
     return render(request, "Inventory/tambahdatamaterialmasuk.html")
 
 
+@login_required
 def detailsuratjalan(request, id):
     data = models.SuratJalan.objects.get(id=id)
     datadetail = models.MaterialMasuk.objects.filter(SuratJalan=data.id)
@@ -185,6 +195,7 @@ def detailsuratjalan(request, id):
     )
 
 
+@login_required
 def search_item(request):
     query = request.GET.get("q", "")
     print(query)
@@ -195,6 +206,7 @@ def search_item(request):
     return JsonResponse(data, safe=False)
 
 
+@login_required
 def editdatasuratjalan(request, id):
     datasuratjalan = models.SuratJalan.objects.get(id=id)
     datailsuratjalan = models.MaterialMasuk.objects.filter(SuratJalan=datasuratjalan)
@@ -234,6 +246,7 @@ def editdatasuratjalan(request, id):
     )
 
 
+@login_required
 def materialkeluar(request):
     data = models.MaterialIssueSlip.objects.all()
     for item in data:
@@ -248,6 +261,7 @@ def materialkeluar(request):
     )
 
 
+@login_required
 def tambahdatamaterialkeluar(request):
     if request.method == "POST":
         print(request.POST)
@@ -285,6 +299,7 @@ def tambahdatamaterialkeluar(request):
     return render(request, "Inventory/tambahdatamaterialkeluar.html")
 
 
+@login_required
 def detailmis(request, id):
     data = models.MaterialIssueSlip.objects.get(id=id)
     datadetail = models.MaterialKeluar.objects.filter(NoMIS=data.id)
@@ -294,3 +309,47 @@ def detailmis(request, id):
         "Inventory/datamaterialkeluardetail.html",
         {"data": data, "datadetail": datadetail},
     )
+
+
+"""
+STOCK ADJUSTMENT
+"""
+
+
+@login_required
+def viewstockadjustment(request):
+    data = models.StockAdjustment.objects.all()
+    return render(request, "Inventory/datastockadjustment.html", {"data": data})
+
+
+@login_required
+def addstockadjustment(request):
+    data = models.MasterMaterial.objects.all()
+    return render(request, "Inventory/tambahdatastockadjustment.html")
+
+
+"""WAREHOUSE"""
+
+
+def viewwarehouse(request):
+    data = models.Warehouse.objects.all()
+    return render(request, "Inventory/datawarehouse.html", {"data": data})
+
+
+def addwarehouse(request):
+    if request.method == "POST":
+        print(request.POST)
+        warehouseobj = models.Warehouse(
+            NamaWarehouse=request.POST["Nama"],
+            Lokasi=request.POST["lokasi"],
+            StatusPusat=request.POST["statuswarehouse"],
+            IsAktif=bool(request.POST["statusaktif"]),
+        ).save()
+        messages.success(request, "Data Berhasil disimpan")
+        return redirect("viewwarehouse")
+    return render(request, "Inventory/tambahwarehouse.html")
+
+
+def detailwarehouse(request, id):
+    data = models.Warehouse.objects.get(id=id)
+    return render(request, "Inventory/datawarehousedetail.html", {"data": data})

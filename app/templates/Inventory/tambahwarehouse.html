@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Input Warehouse</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+
+        <!-- ================= DATA DIRI ================= -->
+        <div class="card-header">
+            <h4 class="card-title">Data Warehouse</h4>
+        </div>
+
+        <div class="card-body">
+            <form class="form" method="POST">
+                {% csrf_token %}
+                <div class="row">
+
+                    <div class="col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Nama Warehouse</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="Nama"
+                                    placeholder="Masukkan Nama Warehouse" required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+
+                    <div class="col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Lokasi Warehouse</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="lokasi"
+                                    placeholder="Masukan Lokasi Warehouse" required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-house"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Status Warehouse</label>
+                            <div class="position-relative">
+                                <select name="statuswarehouse" class="form-control" id="">
+                                    <option value="" disabled selected>Pilih Status Warehouse</option>
+                                    <option value="True">Pusat</option>
+                                    <option value="False">Site</option>
+                                </select>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-phone"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Status Aktif</label>
+                            <div class="position-relative">
+                                <select name="statusaktif" class="form-control" id="">
+                                    <option value="" disabled selected>Pilih Status Warehouse</option>
+                                    <option value="True">Aktif</option>
+                                    <option value="False">Nonaktif</option>
+                                </select>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-phone"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-2">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+
+
+
+
+
+                </div>
+
+
+
+            </form>
+        </div>
+
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+
+
+{% endblock content %}

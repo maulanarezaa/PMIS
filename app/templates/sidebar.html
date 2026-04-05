@@ -1,6 +1,33 @@
 {% load static %}
 <div class="sidebar-menu">
+
     <ul class="menu">
+        <li class="sidebar-item has-sub">
+            <a href="#" class="sidebar-link">
+                <i class="bi bi-person-circle"></i>
+                <span>
+                    {% if request.user.is_authenticated %}
+                    {{ request.user.username }}
+                    {% else %}
+                    Guest
+                    {% endif %}
+                </span>
+            </a>
+
+            <ul class="submenu">
+                <li class="submenu-item">
+                    <a href="#">
+                        View Profile
+                    </a>
+                </li>
+
+                <li class="submenu-item">
+                    <a href="{% url 'logout' %}">
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </li>
         <li class="sidebar-title">Menu</li>
 
         <li class="sidebar-item ">
@@ -9,6 +36,7 @@
                 <span>Dashboard</span>
             </a>
         </li>
+
 
         <li class="sidebar-item  has-sub">
             <a href="#" class='sidebar-link'>
@@ -37,6 +65,12 @@
                 <span>Inventory</span>
             </a>
             <ul class="submenu ">
+                <li class="submenu-item">
+                    <a href="{% url 'viewmaterial' %}">Database Material</a>
+                </li>
+                <li class="submenu-item ">
+                    <a href="{% url 'viewwarehouse' %}">Warehouse</a>
+                </li>
                 <li class="submenu-item ">
                     <a href="{% url 'viewmaterialmasuk' %}">Material Masuk</a>
                 </li>
@@ -44,7 +78,7 @@
                     <a href="{% url 'viewmaterialkeluar' %}">Material Keluar</a>
                 </li>
                 <li class="submenu-item">
-                    <a href="{% url 'viewmaterial' %}">Database Material</a>
+                    <a href="{% url 'viewstockadjustment' %}">Stock Adjustment</a>
                 </li>
                 <li class="submenu-item">
                     <a href=" ">Stock Opname</a>
@@ -65,7 +99,7 @@
                     <a href="{% url 'viewworkcompletion' %}">Work Completion</a>
                 </li>
                 <li class="submenu-item">
-                    <a href="{% url 'viewmaterial' %}">Material Requests</a>
+                    <a href="">Material Requests</a>
                 </li>
                 <li class="submenu-item">
                     <a href=" ">Stock Opname</a>
@@ -78,3 +112,55 @@
 
     </ul>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        let currentUrl = window.location.pathname.replace(/\/$/, "");
+
+        let bestMatch = null;
+        let maxLength = 0;
+
+        document.querySelectorAll(".sidebar-menu a").forEach(function (link) {
+
+            let href = link.getAttribute("href");
+            if (!href || href === "#" || href.startsWith("javascript")) return;
+
+            try {
+                let url = new URL(href, window.location.origin);
+                let linkPath = url.pathname.replace(/\/$/, "");
+
+                if (currentUrl === linkPath || currentUrl.startsWith(linkPath + "/")) {
+
+                    if (linkPath.length > maxLength) {
+                        maxLength = linkPath.length;
+                        bestMatch = link;
+                    }
+                }
+
+            } catch (e) {
+                console.log("Invalid URL:", href);
+            }
+
+        });
+
+        // reset semua active
+        document.querySelectorAll(".sidebar-menu li").forEach(el => {
+            el.classList.remove("active");
+        });
+
+        if (bestMatch) {
+            let li = bestMatch.closest("li");
+            if (li) li.classList.add("active");
+
+            let parent = bestMatch.closest(".has-sub");
+            if (parent) {
+                parent.classList.add("active");
+
+                let submenu = parent.querySelector(".submenu");
+                if (submenu) submenu.style.display = "block";
+            }
+        }
+
+    });
+</script>

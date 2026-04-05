@@ -6,6 +6,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
 from django.db.models import Count, Q, Sum, Max
+from django.contrib.auth.decorators import login_required
 
 
 def is_valid_image(file):
@@ -15,11 +16,14 @@ def is_valid_image(file):
 # Create your views here.
 
 
+@login_required
 def viewjoborder(request):
     data = models.JobOrder.objects.all()
+    print(request.user)
     return render(request, "Project/datajoborder.html", {"data": data})
 
 
+@login_required
 def viewdetailjoborder(request, id):
     data = models.JobOrder.objects.get(id=id)
     workcompletion = models.WorkCompletion.objects.filter(NomorJO=data)
@@ -39,6 +43,7 @@ def viewdetailjoborder(request, id):
     return render(request, "Project/datajoborderdetail.html", {"data": data})
 
 
+@login_required
 def tambahdatajoborder(request):
     if request.method == "POST":
         print(request.POST)
@@ -77,11 +82,13 @@ def tambahdatajoborder(request):
     return render(request, "Project/tambahdatajoborder.html")
 
 
+@login_required
 def viewworkcompletion(request):
     data = models.WorkCompletion.objects.all()
     return render(request, "Project/dataworkcompletion.html", {"data": data})
 
 
+@login_required
 def tambahdataworkcompletion(request):
     dataJO = models.JobOrder.objects.all()
     if request.method == "POST":
@@ -119,6 +126,7 @@ def tambahdataworkcompletion(request):
     return render(request, "Project/tambahdataworkcompletion.html", {"datajo": dataJO})
 
 
+@login_required
 def search_jo(request):
     query = request.GET.get("q", "")
     results = models.JobOrder.objects.filter(

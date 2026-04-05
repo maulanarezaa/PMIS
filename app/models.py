@@ -1,6 +1,13 @@
 from django.db import models
 import os
 from django.utils.text import slugify
+from django.contrib.auth.models import AbstractUser
+
+
+"""
+Custom Models User
+"""
+
 
 # Create your models here.
 # HRIS Project
@@ -167,6 +174,9 @@ class PeriodePayroll(models.Model):
     TanggalPembayaran = models.DateField(null=True, blank=True)
     JenisPayroll = models.CharField(max_length=25)
     Status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+    joborder = models.ForeignKey(
+        JobOrder, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     def __str__(self):
         return self.KodePeriode
@@ -256,6 +266,38 @@ class MasterMaterial(models.Model):
         return f"{self.KodeItem} - {self.NamaItem}"
 
 
+class Warehouse(models.Model):
+    NamaWarehouse = models.CharField(max_length=56)
+    Lokasi = models.CharField(max_length=56)
+    StatusPusat = models.BooleanField()
+    IsAktif = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.NamaWarehouse}"
+
+
+class WareHouseTransaction(models.Model):
+    tanggal = models.DateField()
+    NomorTransfer = models.CharField(max_length=56, unique=True)
+    WarehouseAsal = models.ForeignKey(
+        Warehouse, on_delete=models.CASCADE, related_name="fromwh"
+    )
+    WarehouseTujuan = models.ForeignKey(
+        Warehouse, on_delete=models.CASCADE, related_name="towh"
+    )
+    Status = models.CharField(max_length=56)
+    CreatedAt = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.tanggal} - {self.WarehouseAsal}"
+
+
+class DetailWareHouseTransaction(models.Model):
+    NomorTransfer = models.ForeignKey(WareHouseTransaction, on_delete=models.CASCADE)
+    item = models.ForeignKey(MasterMaterial, on_delete=models.CASCADE)
+    Jumlah = models.FloatField()
+
+
 class SuratJalan(models.Model):
     Tanggal = models.DateField()
     NoSuratJalan = models.CharField(max_length=72, unique=True)
@@ -265,6 +307,20 @@ class SuratJalan(models.Model):
     JobOrder = models.ForeignKey(
         JobOrder, on_delete=models.CASCADE, null=True, blank=True
     )
+    WareHouse = models.ForeignKey(
+        Warehouse, on_delete=models.CASCADE, null=True, blank=True
+    )
+
+
+class StockAdjustment(models.Model):
+    Tanggal = models.DateField()
+    Warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
+    Keterangan = models.CharField(max_length=56)
+    Item = models.ForeignKey(MasterMaterial, on_delete=models.CASCADE)
+    Jumlah = models.FloatField()
+
+    def __str__(self):
+        return f"{self.Warehouse} {self.Item}"
 
 
 class MaterialMasuk(models.Model):
@@ -283,6 +339,9 @@ class MaterialIssueSlip(models.Model):
     Tanggal = models.DateField()
     NoMIS = models.CharField(max_length=72, unique=True)
     FileMIS = models.FileField(upload_to="File/Inventory/MIS", null=True, blank=True)
+    WareHouse = models.ForeignKey(
+        Warehouse, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     def __str__(self):
         return f"{self.NoMIS}"
