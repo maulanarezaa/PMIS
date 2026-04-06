@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<style>
+    /* 🔥 KECILKAN FONT */
+    table.dataTable {
+        font-size: 8px;
+    }
+
+    /* 🔥 RAPATKAN CELL */
+    table.dataTable th,
+    table.dataTable td {
+        padding: 4px 6px !important;
+        vertical-align: middle;
+    }
+
+    /* 🔥 TINGGI ROW */
+    table.dataTable tbody tr {
+        height: 30px;
+    }
+
+    /* 🔥 HEADER LEBIH PADAT */
+    table.dataTable thead th {
+        white-space: nowrap;
+    }
+</style>
+
+<div class="page-heading">
+    <h3>Data Propose Budget</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+
+            <!-- BUTTON TAMBAH -->
+            <a href="{% url 'tambahdataproposebudget' %}">
+                <button class="btn btn-primary mb-3">Tambah Data Propose Budget</button>
+            </a>
+
+            <!-- TABLE -->
+            <div style="overflow-x:auto;">
+                <table class="table table-striped table-sm" id="table1" style="font-size: 12px;">
+                    <thead>
+                        <tr>
+                            <th >Nomor Propose Budget</th>
+                            <th >Nomor JO</th>
+                            <th >Tanggal Permintaan</th>
+                            <th>Deskripsi</th>
+                            <th>Nilai</th>
+                            <th>Status</th>
+                            <th>Approval</th>
+                            <th>Action</th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in data %}
+                        <tr>
+                            <td>{{item.NomorProposedBudget}}</td>
+                            <td>{{item.NomorJO.NomorJO}}</td>
+                            <td>{{item.Tanggal|date:"Y-m-d"}}</td>
+                            <td>{{item.Remarks}}</td>
+                            <td>Rp {{item.Nilai|intcomma}}</td>
+                            <td>{{item.Status}}</td>
+                            <td>{{item.Approvedby}}</td>
+
+                            <!-- ACTION -->
+                            <td>
+                                <a href="{% url 'detailproposebudget' item.id %}">
+                                    <button type="button" class="btn btn-info btn-sm">Info</button>
+                                </a>
+
+                                <a href="{% url 'editproposebudget' item.id %}">
+                                    <button type="button" class="btn btn-warning btn-sm">Edit</button>
+                                </a>
+
+                                <button type="button" class="btn btn-danger btn-sm btn-hapus" data-id="{{item.id}}"
+                                    data-nama="{{item.NamaItem}}" data-bs-toggle="modal" data-bs-target="#modalHapus">
+                                    Hapus
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ================= MODAL HAPUS ================= -->
+<div class="modal fade" id="modalHapus" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Konfirmasi Hapus</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus data berikut?</p>
+                <h5 id="namaItemHapus" class="text-danger"></h5>
+                <p class="text-muted">Data yang dihapus tidak dapat dikembalikan.</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Batal
+                </button>
+
+                <a href="#" id="btnConfirmHapus" class="btn btn-danger">
+                    Ya, Hapus
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ================= JS ================= -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const buttons = document.querySelectorAll(".btn-hapus");
+        const namaItem = document.getElementById("namaItemHapus");
+        const btnConfirm = document.getElementById("btnConfirmHapus");
+
+        buttons.forEach(button => {
+            button.addEventListener("click", function () {
+
+                const id = this.getAttribute("data-id");
+                const nama = this.getAttribute("data-nama");
+
+                namaItem.textContent = nama;
+                btnConfirm.href = `proposebudget/delete/${id}`;
+
+            });
+        });
+
+    });
+
+    // 🔥 OPTIONAL: AKTIFKAN DATATABLE
+    $(document).ready(function () {
+        $('#table1').DataTable({
+            scrollX: true
+        });
+    });
+</script>
+
+{% endblock content %}

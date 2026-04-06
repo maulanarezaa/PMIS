@@ -17,4 +17,10 @@ urlpatterns = [
         name="tambahdataworkcompletion",
     ),
     path("search-jo/", viewsProject.search_jo, name="search_jo"),
+    # Proposed Budget
+    path('proposebudget',viewsProject.viewproposebudget,name="proposebudget"),
+    path('proposebudget/add',viewsProject.tambahdataproposebudget,name="tambahdataproposebudget"),
+    path('proposebudget/delete/<int:id>', viewsProject.deleteproposebudget, name="deleteproposebudget"),
+    path('proposebudget/detail/<int:id>', viewsProject.detailproposebudget, name="detailproposebudget"),
+    path('proposebudget/edit/<int:id>', viewsProject.editproposebudget, name="editproposebudget"),
 ]

@@ -15,6 +15,7 @@
 
 <body>
     <div id="auth">
+        
 
         <div class="row h-100">
             <div class="col-lg-5 col-12">
@@ -58,6 +59,24 @@
                 </div>
             </div>
             <div class="col-lg-7 d-none d-lg-block">
+                {% if messages %}
+                <div class="container-fluid">
+                    {% for message in messages %}
+                    <div class="alert 
+            {% if message.tags == 'error' %}alert-danger
+            {% elif message.tags == 'success' %}alert-success
+            {% elif message.tags == 'warning' %}alert-warning
+            {% else %}alert-info
+            {% endif %}
+            alert-dismissible fade show" role="alert">
+
+                        {{ message }}
+
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
                 <div id="auth-right">
 
                 </div>
@@ -66,5 +85,38 @@
 
     </div>
 </body>
+<script>
+        setTimeout(function () {
+            let alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                let bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 3000);
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentUrl = window.location.pathname;
 
+            // Seleksi semua link di sidebar
+            const sidebarLinks = document.querySelectorAll(".sidebar-menu .sidebar-link");
+
+            sidebarLinks.forEach(link => {
+                const linkPath = link.getAttribute("href");
+
+                if (linkPath === currentUrl) {
+                    // Tambahkan class active ke link dan parent item
+                    link.classList.add("active");
+
+                    const sidebarItem = link.closest(".sidebar-item");
+                    if (sidebarItem) sidebarItem.classList.add("active");
+
+                    const submenu = link.closest(".submenu");
+                    if (submenu) {
+                        submenu.classList.add("active");
+                        const parentSidebarItem = submenu.closest(".sidebar-item");
+                        if (parentSidebarItem) parentSidebarItem.classList.add("active");
+                    }
+                }
+            });
+        });
+    </script>
 </html>

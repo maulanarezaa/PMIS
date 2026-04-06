@@ -144,3 +144,103 @@ def search_jo(request):
             }
         )
     return JsonResponse(data, safe=False)
+
+@login_required
+def viewproposebudget(request):
+    data = models.ProposedBudget.objects.all()
+    return render(request,"Project/dataproposebudget.html", {"data": data})
+
+@login_required
+def tambahdataproposebudget(request):
+    datajo = models.JobOrder.objects.all()
+
+    if request.method == "POST":
+        print(request.POST)
+        print(request.FILES)
+
+        # save object
+        nomorproposebudget = request.POST["nomorproposebudget"]
+        tanggal = request.POST["tanggal"]
+        file = request.FILES.get("fileproposebudget")
+        item = request.POST.getlist("item")
+        jumlah = request.POST.getlist("jumlah")
+        satuan = request.POST.getlist("satuan")
+        harga   = request.POST.getlist("harga")
+        total_harga = request.POST.getlist("total_harga")
+        catatan = request.POST.getlist("catatan")
+
+        try:
+            dataobj = models.ProposedBudget(
+                NomorProposedBudget=nomorproposebudget,
+                NomorJO = models.JobOrder.objects.get(id=request.POST["joborder"]),
+                Tanggal=tanggal,
+                Remarks = request.POST["remarks"],
+                Nilai = sum(int(h) for h in total_harga),
+                FileProposedBudget=file,
+                Submittedby=request.user.username,
+                Status = "Submitted",
+                
+            ).save()
+        except Exception as e:
+            messages.error(request, e)
+            return redirect("tambahdataproposebudget")
+        try:
+            for item in zip(item, jumlah, satuan, harga, total_harga, catatan):
+                models.ItemProposedBudget(
+                    NomorProposedBudget=models.ProposedBudget.objects.last(),
+                    Item=item[0],
+                    Jumlah=item[1],
+                    Satuan=item[2],
+                    Harga=item[3],
+                    TotalHarga=item[4],
+                    Remarks=item[5],
+                ).save()
+        except Exception as e:
+            messages.error(request, e)
+            return redirect("tambahdataproposebudget")
+        messages.success(request, "Data Berhasil disimpan")
+        return redirect("proposebudget")
+
+    return render(request, "Project/tambahdataproposebudget.html", {"datajo": datajo})
+
+def deleteproposebudget(request, id):
+        data = get_object_or_404(models.ProposedBudget, id=id)
+        data.delete()
+        messages.success(request, "Data Berhasil dihapus")
+        return redirect("proposebudget")
+
+def detailproposebudget(request, id):
+    data = get_object_or_404(models.ProposedBudget, id=id)
+    items = models.ItemProposedBudget.objects.filter(NomorProposedBudget=data)
+
+    return render(request, "Project/dataproposebudgetdetail.html", {"data": data, "items": items})
+
+def editproposebudget(request, id):
+    data = get_object_or_404(models.ProposedBudget, id=id)
+    datajo = models.JobOrder.objects.all()
+    items = models.ItemProposedBudget.objects.filter(NomorProposedBudget=data)
+    if request.method == "POST":
+        print(request.POST)
+        print(request.FILES)
+        print(asd)
+
+        # update object
+        nomorproposebudget = request.POST["nomorproposebudget"]
+        tanggal = request.POST["tanggal"]
+        file = request.FILES.get("fileproposebudget")
+        catatan = request.POST["remarks"]
+
+        try:
+            data.NomorProposedBudget = nomorproposebudget
+            data.Tanggal = tanggal
+            data.Remarks = catatan
+            if file:
+                data.FileProposedBudget = file
+            data.save()
+            messages.success(request, "Data Berhasil diupdate")
+            return redirect("proposebudget")
+        except Exception as e:
+            messages.error(request, e)
+            return redirect("editproposebudget", id=id)
+
+    return render(request, "Project/editproposebudget.html", {"data": data, "datajo": datajo, "items": items})

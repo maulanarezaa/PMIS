@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="page-heading">
+    <h3>Input Propose Budget</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card-header">
+                <h4 class="card-title">Data Propose Budget</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Tanggal</label>
+                            <div class="position-relative">
+                                <input type="date" class="form-control" name="tanggal" placeholder="Piih Tanggal"
+                                    required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <div class="form-group has-icon-left">
+                            <label>No Propose Budget</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="nomorproposebudget" placeholder="Piih Tanggal"
+                                    required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <div class="form-group has-icon-left">
+                            <label>No Job Order</label>
+                            <div class="position-relative">
+                                <select class="form-control" name="joborder" id="">
+                                    <option value="" selected disabled>Pilih Nomor JO</option>
+                                    {% for item in datajo %}
+                                    <option value="{{item.id}}">{{item.NomorJO}} - {{item.Deskripsi}}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                                        <div class="col-md-6 col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Catatan</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="remarks" placeholder="Masukkan Catatan"
+                                    required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Upload File Lampiran</label>
+                            <div class="position-relative">
+                                <input class="form-control" type="file" name="fileproposebudget">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="card-title">Item Proposed Budget</h4>
+
+                <table class="table table-bordered" id="table-input">
+                    <thead>
+                        <tr>
+                            <th >Nama Item</th>
+                            <th >Jumlah</th>
+                            <th>Satuan</th>
+                            <th >Harga</th>
+                            <th >Total Harga</th>
+                            <th >Catatan</th>
+
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="table-body">
+
+                        <!-- ROW TEMPLATE -->
+                        <tr>
+                            <!-- ITEM AUTOCOMPLETE -->
+                            <td >
+                                <input type="text" class="form-control item-search"  required name="item" ></td>
+
+
+                            <!-- JUMLAH -->
+                            <td>
+                                <input type="text" name="jumlah" class="form-control" >
+                            </td>
+
+                            <!-- SATUAN -->
+                            <td>
+                                <input type="text" name="satuan" class="form-control spesifikasi" >
+                            </td>
+                            <!-- Harga -->
+                            <td>
+                                <input type="text" name="harga" class="form-control harga" >
+                            </td>
+
+                            <!-- TOTAL HARGA -->
+                            <td>
+                                <input type="text" name="total_harga" class="form-control total-harga" >
+                            </td>
+
+                            <!-- CATATAN -->
+                            <!-- Jumlah -->
+                            <td>
+                                <input type="text" name="catatan" class="form-control kode-item" placeholder="" >
+                            </td>
+                            <!-- Aksi -->
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- BUTTON -->
+            <button type="button" class="btn btn-secondary" id="add-row">+ Tambah Baris</button>
+            <button type="submit" class="btn btn-primary">Simpan Semua</button>
+
+
+
+        </form>
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+<script>
+    // Tambah Baris
+    $("#add-row").click(function () {
+        let row = $("#table-body tr:first").clone();
+        row.find("input").val("");
+        row.find(".item-id").val("");
+        row.find(".item-result").empty();
+        $("#table-body").append(row);
+    });
+
+    // Hapus Baris
+    $(document).on("click", ".remove-row", function () {
+        if ($("#table-body tr").length > 1) {
+            $(this).closest("tr").remove();
+        }
+    });
+
+    // AUTOCOMPLETE
+    $(document).on('keyup', '.item-search', function () {
+        let input = $(this);
+        let query = input.val();
+        let resultBox = input.siblings('.item-result');
+
+        if (query.length > 1) {
+            $.ajax({
+                url: "{% url 'search_item' %}",
+                data: { 'q': query },
+                success: function (data) {
+                    resultBox.empty();
+                    data.forEach(function (item) {
+                        resultBox.append(`
+                        <a href="#" 
+                           class="list-group-item list-group-item-action select-item"
+                           data-id="${item.id}" 
+                           data-name="${item.NamaItem}"
+                           data-kode="${item.KodeItem}"
+                           data-spesifikasi="${item.SpesifikasiItem}"
+                           data-satuan="${item.Satuan}">
+                           ${item.NamaItem}
+                        </a>
+                        `);
+                        console.log(item)
+                    });
+                }
+            });
+        } else {
+            resultBox.empty();
+        }
+    });
+
+    // PILIH ITEM
+    $(document).on('click', '.select-item', function (e) {
+        e.preventDefault();
+
+        let selected = $(this);
+        let container = selected.closest("tr");
+
+        // isi nama item dan id
+        container.find('.item-search').val(selected.data('name'));
+        container.find('.item-id').val(selected.data('id'));
+
+        // isi kode item & spesifikasi otomatis
+        container.find('.kode-item').val(selected.data('kode'));
+        container.find('.spesifikasi').val(selected.data('spesifikasi'));
+        container.find('.satuan').val(selected.data('satuan'));
+
+        // kosongkan hasil suggestion
+        container.find('.item-result').empty();
+        console.log(container)
+    });
+</script>
+
+{% endblock %}
