@@ -2,32 +2,6 @@
 <div class="sidebar-menu">
 
     <ul class="menu">
-        <li class="sidebar-item has-sub">
-            <a href="#" class="sidebar-link">
-                <i class="bi bi-person-circle"></i>
-                <span>
-                    {% if request.user.is_authenticated %}
-                    {{ request.user.username }}
-                    {% else %}
-                    Guest
-                    {% endif %}
-                </span>
-            </a>
-
-            <ul class="submenu">
-                <li class="submenu-item">
-                    <a href="#">
-                        View Profile
-                    </a>
-                </li>
-
-                <li class="submenu-item">
-                    <a href="{% url 'logout' %}">
-                        Logout
-                    </a>
-                </li>
-            </ul>
-        </li>
         <li class="sidebar-title">Menu</li>
 
         <li class="sidebar-item ">

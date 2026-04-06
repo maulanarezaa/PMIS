@@ -4,11 +4,6 @@ from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
 
 
-"""
-Custom Models User
-"""
-
-
 # Create your models here.
 # HRIS Project
 # Data Master Proyek
@@ -355,3 +350,16 @@ class MaterialKeluar(models.Model):
 
     def __str__(self):
         return f"{self.NoMIS.NoMIS} - {self.NamaItem}"
+
+
+"""
+Custom Models User
+"""
+
+
+class User(AbstractUser):
+    role = models.CharField(max_length=20, blank=True, null=True)
+    photo = models.ImageField(upload_to="profile/", blank=True, null=True)
+    Karyawan = models.OneToOneField(
+        MasterKaryawan, on_delete=models.SET_NULL, null=True, blank=True
+    )

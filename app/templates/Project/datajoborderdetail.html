@@ -33,7 +33,7 @@
             <div class="tab-pane-custom" id="tab-info">
                 <div class="row">
 
-                    <div class="col-4">
+                    <div class="col-12 col-md-4 ">
                         <div class="form-group has-icon-left">
                             <label>Nomor Job Order</label>
                             <div class="position-relative">
@@ -42,7 +42,7 @@
                         </div>
                     </div>
 
-                    <div class="col-4">
+                    <div class="col-12 col-md-4 ">
                         <div class="form-group has-icon-left">
                             <label>Deskripsi Pekerjaan</label>
                             <div class="position-relative">
@@ -51,7 +51,7 @@
                         </div>
                     </div>
 
-                    <div class="col-4">
+                    <div class="col-12 col-md-4 ">
                         <div class="form-group has-icon-left">
                             <label>Nomor Sales Order</label>
                             <div class="position-relative">
@@ -61,7 +61,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-3">
+                    <div class="col-12 col-md-3  ">
                         <div class="form-group has-icon-left">
                             <label>Client</label>
                             <div class="position-relative">
@@ -72,21 +72,21 @@
 
 
 
-                    <div class="col-3">
+                    <div class="col-12 col-md-3 ">
                         <label>Nilai</label>
                         <div class="position-relative">
                             <input type="text" disabled class="form-control" value="{{data.Nilai}}">
                         </div>
                     </div>
 
-                    <div class="col-3">
+                    <div class="col-12 col-md-3 ">
                         <label>Start Work</label>
                         <div class="position-relative">
                             <input type="date" disabled class="form-control" value="{{data.StartWork|date:'Y-m-d'}}">
                         </div>
 
                     </div>
-                    <div class="col-3">
+                    <div class="col-12 col-md-3 ">
                         <label>End Work</label>
                         <div class="position-relative">
                             <input type="date" disabled class="form-control" value="{{data.EndWork|date:'Y-m-d'}}">
@@ -148,7 +148,7 @@
             <div class="tab-pane-custom d-none" id="tab-masuk">
                 <h5>Work Completion List</h5>
 
-                <table class="table table-bordered">
+                <table class="table table-striped" id="table2">
                     <thead>
                         <tr>
                             <th>Tanggal</th>
@@ -169,7 +169,7 @@
                             </td>
                             <td>{{item.Jenis}}</td>
                             <td>{{ item.Remarks }}</td>
-                            <td>{{item.Nilai}}</td>
+                            <td>{{item.Nilai|intcomma}}</td>
                         </tr>
                         {% empty %}
                         <tr>
@@ -188,7 +188,7 @@
             <div class="tab-pane-custom d-none" id="tab-keluar">
                 <h5>Material Keluar</h5>
 
-                <table class="table table-bordered">
+                <table class="table table-striped" id="table3">
                     <thead>
                         <tr>
                             <th>Tanggal</th>
@@ -207,10 +207,11 @@
                                 {% endif %}
                             </td>
                             <td>{{ item.Jumlah }}</td>
+                            <td></td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="3" class="text-center">Tidak ada data</td>
+                            <td colspan="4" class="text-center">Tidak ada data</td>
                         </tr>
                         {% endfor %}
                     </tbody>
