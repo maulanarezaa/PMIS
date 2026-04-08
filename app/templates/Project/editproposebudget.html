@@ -3,6 +3,19 @@
 {% load humanize %}
 
 {% block content %}
+
+<style>
+#jo-list {
+    position: absolute;
+    z-index: 9999;
+    width: 100%;
+    background: white;
+    border: 1px solid #ddd;
+    max-height: 200px;
+    overflow-y: auto;
+}
+</style>
+
 <div class="page-heading">
     <h3>Detail Propose Budget</h3>
 </div>
@@ -10,91 +23,66 @@
 <section class="section">
     <div class="card">
         <div class="card-body">
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
             <div class="row">
-                <div class="col-md-4 col-12">
-                    <div class="form-group has-icon-left">
-                        <label>Nomor Propose Budget </label>
-                        <div class="position-relative">
-                            <input type="text" class="form-control" name="nomorproposebudget" placeholder="Masukan Nama Item"
-                                value="{{data.NomorProposedBudget}}" >
-                            <div class="form-control-icon">
-                                <i class="bi bi-house"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 col-12">
-                    <div class="form-group has-icon-left">
-                        <label>Tanggal</label>
-                        <div class="position-relative">
-                            <input type="text" class="form-control" name="tanggal" placeholder="Masukan Nama Item"
-                                value="{{data.Tanggal}}" >
-                            <div class="form-control-icon">
-                                <i class="bi bi-house"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                                <div class="col-md-4 col-12">
-                    <div class="form-group has-icon-left">
-                        <label>Nomor Job Order </label>
-                        <div class="position-relative">
-                            <input type="text" class="form-control" name="NomorJO" placeholder="Masukan Nama Item"
-                                value="{{data.NomorJO.NomorJO}}" >
-                            <div class="form-control-icon">
-                                <i class="bi bi-house"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                                <div class="col-md-4 col-12">
-                    <div class="form-group has-icon-left">
-                        <label>Catatan </label>
-                        <div class="position-relative">
-                            <input type="text" class="form-control" name="remarks" placeholder="Masukan Nama Item"
-                                value="{{data.Remarks}}" >
-                            <div class="form-control-icon">
-                                <i class="bi bi-house"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 col-12">
-                    <div class="form-group has-icon-left">
-                        <label>Status</label>
-                        <div class="position-relative">
-                            <input type="text" class="form-control" name="status" placeholder="Masukan Nama Item"
-                                value="{{data.Status}}" >
-                            <div class="form-control-icon">
-                                <i class="bi bi-house"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 col-12">
-                    <div class="form-group has-icon-left">
-                        <label>File Lampiran</label>
-                        <div class="position-relative">
-                            <input type="file" class="form-control" name="file" placeholder="Masukan Nama Item"
-                                value="{{data.FileProposedBudget.url}}" >
-                            <div class="form-control-icon">
-                                <i class="bi bi-house"></i>
 
-                            </div>
-                        </div>
+                <!-- NOMOR PROPOSE -->
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label>Nomor Propose Budget</label>
+                        <input type="text" class="form-control" name="nomorproposebudget"
+                               value="{{data.NomorProposedBudget}}">
+                    </div>
+                </div>
+
+                <!-- TANGGAL -->
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label>Tanggal</label>
+                        <input type="date" class="form-control" name="tanggal"
+                               value="{{data.Tanggal|date:'Y-m-d'}}">
+                    </div>
+                </div>
+
+                <!-- JOB ORDER -->
+                <div class="form-group position-relative" style="z-index:1000;">
+                    <label>Nomor Job Order</label>
+                    <input type="text" class="form-control jo-search" value="{{data.NomorJO.NomorJO}} - {{data.NomorJO.Deskripsi}}" placeholder="Cari JO..." autocomplete="off">
+                    <input type="text" hidden class="form-control nomor-jo" name="idjo" value="{{data.NomorJO.id}}">
+
+                    <div class="list-group jo-result" style="position:absolute; top:100%; width:100%; display:none;">
+                    </div>
+                </div>
+
+                <!-- REMARKS -->
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label>Catatan</label>
+                        <input type="text" class="form-control" name="remarks"
+                               value="{{data.Remarks}}">
+                    </div>
+                </div>
+
+
+                <!-- FILE -->
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label>File Lampiran</label>
+                        <input type="file" class="form-control" name="file">
+
                         {% if data.FileProposedBudget %}
-                        <a href="{{ data.FileProposedBudget.url }}">Lihat File</a>
+                            <a href="{{ data.FileProposedBudget.url }}">Lihat File</a>
                         {% else %}
-                        Tidak ada file
+                            Tidak ada file
                         {% endif %}
                     </div>
                 </div>
+
             </div>
 
             <!-- TABLE -->
-            <table class="table table-striped" id="table1">
+            <table class="table  mt-3" id="table1">
                 <thead>
                     <tr>
                         <th>Nama Item</th>
@@ -105,145 +93,167 @@
                         <th>Remarks</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     {% for item in items %}
                     <tr>
                         <td>
-                            <input type="text" class="form-control" name="Nama" placeholder="Masukan Nama Item"
-                                value="{{item.Item}}" >
-                            </td>
-                            <input type="text" hidden name="iditem" id="" value="{{item.id}}">
-                        <td>
-                            <input type="number" class="form-control" name="Jumlah" placeholder="Masukan Jumlah"
-                                value="{{item.Jumlah}}" >
-
+                            <input type="text" class="form-control" name="Nama" value="{{item.Item}}">
+                            <input type="hidden" name="iditem" value="{{item.id}}">
                         </td>
-                        <td>
-                            <input type="text" class="form-control" name="Satuan" placeholder="Masukan Satuan"
-                                value="{{item.Satuan}}" >
-                        </td>
-                        <td>
-                            <input type="number" class="form-control" name="Harga" placeholder="Masukan Harga"
-                                value="{{item.Harga}}" >
-                        </td>
-                        <td>
-                            <input type="number" class="form-control" name="TotalHarga" placeholder="Masukan Total Harga"
-                                value="{{item.TotalHarga}}" >
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" name="Remarks" placeholder="Masukan Remarks"
-                                value="{{item.Remarks}}" >
-                        </td>
-
+                        <td><input type="number" class="form-control" name="Jumlah" value="{{item.Jumlah}}"></td>
+                        <td><input type="text" class="form-control" name="Satuan" value="{{item.Satuan}}"></td>
+                        <td><input type="number" class="form-control" name="Harga" value="{{item.Harga}}"></td>
+                        <td><input type="number" class="form-control" name="TotalHarga" value="{{item.TotalHarga}}"></td>
+                        <td><input type="text" class="form-control" name="Remarks" value="{{item.Remarks}}"></td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+
             <button type="button" class="btn btn-secondary" id="add-row">+ Tambah Baris</button>
             <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-</form>
-        </div>
-        
-    </div>
-</section>
 
-<!-- ================= MODAL HAPUS ================= -->
-<div class="modal fade" id="modalHapus" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Konfirmasi Hapus</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus data berikut?</p>
-
-                <h5 id="namaItemHapus" class="text-danger"></h5>
-
-                <p class="text-muted">
-                    Data yang dihapus tidak dapat dikembalikan.
-                </p>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    Batal
-                </button>
-
-                <a href="#" id="btnConfirmHapus" class="btn btn-danger">
-                    Ya, Hapus
-                </a>
-            </div>
-
-        </div>
+        </form>
     </div>
 </div>
+```
+
+</section>
 
 <!-- ================= JS ================= -->
+
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+// ADD ROW
+document.getElementById("add-row").addEventListener("click", function () {
+    let row = `
+    <tr>
+        <td>
+            <input type="text" class="form-control" name="Nama">
+            <input type="hidden" name="iditem">
+        </td>
+        <td><input type="number" class="form-control" name="Jumlah"></td>
+        <td><input type="text" class="form-control" name="Satuan"></td>
+        <td><input type="number" class="form-control" name="Harga"></td>
+        <td><input type="number" class="form-control" name="TotalHarga"></td>
+        <td><input type="text" class="form-control" name="Remarks"></td>
+    </tr>`;
+    document.querySelector("#table1 tbody").insertAdjacentHTML("beforeend", row);
+});
+</script>
 
-        const buttons = document.querySelectorAll(".btn-hapus");
-        const namaItem = document.getElementById("namaItemHapus");
-        const btnConfirm = document.getElementById("btnConfirmHapus");
+<script>
+    $(document).ready(function () {
 
-        buttons.forEach(button => {
-            button.addEventListener("click", function () {
+        let delay;
+        const joResult = $('.jo-result');
 
-                const id = this.getAttribute("data-id");
-                const nama = this.getAttribute("data-nama");
+        $(document).on('keyup', '.jo-search', function () {
+            clearTimeout(delay);
+            let input = $(this);
+            let query = input.val();
+            joResult.hide().empty();
 
-                // tampilkan nama
-                namaItem.textContent = nama;
+            if (query.length < 3) return;
 
-                // set URL delete (sesuaikan dengan urls.py)
-                btnConfirm.href = `datamaterial/delete/${id}`;
+            delay = setTimeout(function () {
+                $.ajax({
+                    url: "{% url 'search_jo' %}",
+                    data: { 'q': query },
+                    success: function (data) {
+                        joResult.empty();
+                        if (data.length > 0) {
+                            data.forEach(function (item) {
+                                joResult.append('<a href="#" class="list-group-item list-group-item-action select-jo" ' +
+                                    'data-sales="' + item.SalesOrder + '"data-nilai="' + item.Nilai + '"data-jo="' + item.idjo + '" data-deskripsi="' + item.Deskripsi + '">' +
+                                    item.NomorJO + " - " + item.Deskripsi +
+                                    '</a>');
+                            });
+                            joResult.show();
 
-            });
+                        }
+                        console.log(joResult)
+                    }
+                });
+            }, 300);
+        });
+
+        // klik hasil dropdown
+        $(document).on('click', '.select-jo', function (e) {
+            e.preventDefault();
+            console.log(this)
+            const selected = $(this);
+            $('.jo-search').val(selected.text());
+            $('.sales-order').val(selected.data('sales'));
+            $('.nilai-proyek').val(selected.data('nilai'));
+            $('.nomor-jo').val(selected.data('jo'));
+            $('#deskripsiJO').val(selected.data('deskripsi'));
+            joResult.hide().empty();
+        });
+
+        // klik luar dropdown → sembunyikan
+        $(document).click(function (e) {
+            if (!$(e.target).closest('.jo-search, .jo-result').length) {
+                joResult.hide();
+            }
+        });
+
+    });
+    $(document).ready(function () {
+
+        let delay;
+        const joResult = $('.jo-result');
+
+        $(document).on('keyup', '.jo-search', function () {
+            clearTimeout(delay);
+            let input = $(this);
+            let query = input.val();
+            joResult.hide().empty();
+
+            if (query.length < 3) return;
+
+            delay = setTimeout(function () {
+                $.ajax({
+                    url: "{% url 'search_jo' %}",
+                    data: { 'q': query },
+                    success: function (data) {
+                        joResult.empty();
+                        if (data.length > 0) {
+                            data.forEach(function (item) {
+                                joResult.append('<a href="#" class="list-group-item list-group-item-action select-jo" ' +
+                                    'data-sales="' + item.SalesOrder + '"data-nilai="' + item.Nilai + '"data-jo="' + item.idjo + '" data-deskripsi="' + item.Deskripsi + '">' +
+                                    item.NomorJO + " - " + item.Deskripsi +
+                                    '</a>');
+                            });
+                            joResult.show();
+
+                        }
+                        console.log(joResult)
+                    }
+                });
+            }, 300);
+        });
+
+        // klik hasil dropdown
+        $(document).on('click', '.select-jo', function (e) {
+            e.preventDefault();
+            console.log(this)
+            const selected = $(this);
+            $('.jo-search').val(selected.text());
+            $('.sales-order').val(selected.data('sales'));
+            $('.nilai-proyek').val(selected.data('nilai'));
+            $('.nomor-jo').val(selected.data('jo'));
+            $('.deskripsi-proyek').val(selected.data('deskripsi'));
+            joResult.hide().empty();
+        });
+
+        // klik luar dropdown → sembunyikan
+        $(document).click(function (e) {
+            if (!$(e.target).closest('.jo-search, .jo-result').length) {
+                joResult.hide();
+            }
         });
 
     });
 </script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
 
-    const addRowBtn = document.getElementById("add-row");
-    const tableBody = document.querySelector("#table1 tbody");
-
-    addRowBtn.addEventListener("click", function () {
-
-        const newRow = `
-            <tr>
-                <td>
-                    <input type="text" class="form-control" name="Nama" placeholder="Masukan Nama Item">
-                                                <input type="text" hidden name="iditem" id="" value="">
-
-                </td>
-                <td>
-                    <input type="number" class="form-control" name="Jumlah" placeholder="Masukan Jumlah">
-                </td>
-                <td>
-                    <input type="text" class="form-control" name="Satuan" placeholder="Masukan Satuan">
-                </td>
-                <td>
-                    <input type="number" class="form-control harga" name="Harga" placeholder="Masukan Harga">
-                </td>
-                <td>
-                    <input type="number" class="form-control total" name="TotalHarga" placeholder="Total Harga">
-                </td>
-                <td>
-                    <input type="text" class="form-control" name="Remarks" placeholder="Masukan Remarks">
-                </td>
-            </tr>
-        `;
-
-        tableBody.insertAdjacentHTML('beforeend', newRow);
-    });
-
-});
-</script>
-
-{% endblock content %}
+{% endblock %}

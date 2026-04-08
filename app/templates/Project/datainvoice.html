@@ -29,7 +29,7 @@
 </style>
 
 <div class="page-heading">
-    <h3>Data Propose Budget</h3>
+    <h3>Data Invoice</h3>
 </div>
 
 <section class="section">
@@ -37,8 +37,8 @@
         <div class="card-body">
 
             <!-- BUTTON TAMBAH -->
-            <a href="{% url 'tambahdataproposebudget' %}">
-                <button class="btn btn-primary mb-3">Tambah Data Propose Budget</button>
+            <a href="{% url 'tambahdatainvoice' %}">
+                <button class="btn btn-primary mb-3">Tambah Data Invoice</button>
             </a>
 
             <!-- TABLE -->
@@ -46,38 +46,42 @@
                 <table class="table table-striped table-sm" id="table1" style="font-size: 12px;">
                     <thead>
                         <tr>
-                            <th >Nomor Propose Budget</th>
-                            <th >Nomor JO</th>
+                            <th>Tanggal</th>
+                            <th>Nomor Invoice</th>
+                            <th>Nomor JO</th>
                             <th>Pekerjaan</th>
-                            <th >Tanggal Permintaan</th>
-                            <th>Deskripsi</th>
+                            <th>Work Completion</th>
                             <th>Nilai</th>
                             <th>Status</th>
-                            <th>Approval</th>
                             <th>Action</th>
-
                         </tr>
                     </thead>
 
                     <tbody>
                         {% for item in data %}
                         <tr>
-                            <td>{{item.NomorProposedBudget}}</td>
-                            <td>{{item.NomorJO.NomorJO}}</td>
-                            <td>{{item.NomorJO.Deskripsi}}</td>
                             <td>{{item.Tanggal|date:"Y-m-d"}}</td>
-                            <td>{{item.Remarks}}</td>
+                            <td>{{item.NomorInvoice}}</td>
+                            <td>{{item.NomorWorkCompletion.NomorJO.NomorJO}}</td>
+                            <td>{{item.NomorWorkCompletion.NomorJO.Deskripsi}}</td>
+                            <td>{{item.NomorWorkCompletion.NomorWorkCompletion}}</td>
                             <td>Rp {{item.Nilai|intcomma}}</td>
-                            <td>{{item.Status}}</td>
-                            <td>{{item.Approvedby}}</td>
-
+                            <td>
+                                {%if item.Status == "Unpaid"%}
+                                    <span class="badge bg-danger">Unpaid</span>
+                                {% elif item.Status == "Paid"%}
+                                    <span class="badge bg-success">Paid</span>
+                                {% else %}
+                                    {{item.Status}}
+                                {% endif %}
+                            </td>
                             <!-- ACTION -->
                             <td>
-                                <a href="{% url 'detailproposebudget' item.id %}">
+                                <a href="{% url 'detailinvoice' item.id %}">
                                     <button type="button" class="btn btn-info btn-sm">Info</button>
                                 </a>
 
-                                <a href="{% url 'editproposebudget' item.id %}">
+                                <a href="{% url 'editinvoice' item.id %}">
                                     <button type="button" class="btn btn-warning btn-sm">Edit</button>
                                 </a>
 
@@ -141,7 +145,7 @@
                 const nama = this.getAttribute("data-nama");
 
                 namaItem.textContent = nama;
-                btnConfirm.href = `proposebudget/delete/${id}`;
+                btnConfirm.href = `invoice/delete/${id}`;
 
             });
         });

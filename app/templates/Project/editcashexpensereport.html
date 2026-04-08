@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<style>
+.jo-result {
+    position: absolute;
+    z-index: 9999;
+    width: 100%;
+    background: white;
+    border: 1px solid #ddd;
+    max-height: 200px;
+    overflow-y: auto;
+}
+</style>
+
+<div class="page-heading">
+    <h3>Edit Cash Expense Report</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+
+<form method="post" enctype="multipart/form-data">
+{% csrf_token %}
+
+<div class="row">
+
+    <!-- NOMOR EXPENSE -->
+    <div class="col-md-4">
+        <label>Nomor Expense Report</label>
+        <input type="text" class="form-control" name="nomorexpensereport"
+               value="{{data.NomorCashReport}}">
+    </div>
+
+    <!-- PROPOSE BUDGET AUTOCOMPLETE -->
+    <div class="col-md-4 position-relative">
+        <label>Nomor Propose Budget</label>
+
+        <input type="text"
+               class="form-control propose-search"
+               value="{{data.NomorProposedBudget.NomorProposedBudget}}"
+               placeholder="Cari Nomor / JO / Deskripsi..."
+               autocomplete="off">
+
+        <!-- hidden id -->
+        <input type="hidden" name="idproposebudget"
+               class="propose-id"
+               value="{{data.NomorProposedBudget.id}}">
+
+        <div class="list-group jo-result"></div>
+    </div>
+
+    <!-- TANGGAL -->
+    <div class="col-md-4">
+        <label>Tanggal</label>
+        <input type="date" class="form-control" name="tanggal"
+               value="{{data.Tanggal|date:'Y-m-d'}}">
+    </div>
+
+    <!-- REMARKS -->
+    <div class="col-md-4">
+        <label>Remarks</label>
+        <input type="text" class="form-control" name="remarks"
+               value="{{data.Remarks}}">
+    </div>
+
+    <!-- FILE -->
+    <div class="col-md-4">
+        <label>File</label>
+        <input type="file" class="form-control" name="file">
+
+        {% if data.FileCashReport %}
+            <a href="{{ data.FileCashReport.url }}">Lihat File</a>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- ================= TABLE ================= -->
+<table class="table mt-3" id="table1">
+<thead>
+<tr>
+    <th>Nama Item</th>
+    <th>Jumlah</th>
+    <th>Satuan</th>
+    <th>Harga</th>
+    <th>Total</th>
+    <th>Remarks</th>
+    <th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+{% for item in items %}
+<tr>
+    <td>
+        <input type="text" class="form-control" name="Nama" value="{{item.Item}}">
+        <input type="hidden" name="iditem" value="{{item.id}}">
+    </td>
+    <td><input type="number" class="form-control" name="Jumlah" value="{{item.Jumlah}}"></td>
+    <td><input type="text" class="form-control" name="Satuan" value="{{item.Satuan}}"></td>
+    <td><input type="number" class="form-control" name="Harga" value="{{item.Harga}}"></td>
+    <td><input type="number" class="form-control" name="TotalHarga" value="{{item.TotalHarga}}"></td>
+    <td><input type="text" class="form-control" name="Remarksitem" value="{{item.Remarks}}" required></td>
+    <td>
+        <button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button>
+        <input type="hidden" name="delete_item" value="0" class="delete-flag">
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+<button type="button" class="btn btn-secondary" id="add-row">+ Tambah Baris</button>
+<button type="submit" class="btn btn-primary">Simpan</button>
+
+</form>
+
+        </div>
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+// ================= ADD ROW =================
+$('#add-row').click(function () {
+    let row = `
+    <tr>
+        <td>
+            <input type="text" class="form-control" name="Nama">
+            <input type="hidden" name="iditem">
+        </td>
+        <td><input type="number" class="form-control" name="Jumlah" value="" required></td>
+        <td><input type="text" class="form-control" name="Satuan" value=""required></td>
+        <td><input type="number" class="form-control" name="Harga" value=""required></td>
+        <td><input type="number" class="form-control" name="TotalHarga" value=""required></td>
+        <td><input type="text" class="form-control" name="Remarksitem" value="" required></td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button>
+            <input type="hidden" name="delete_item" value="0" class="delete-flag">
+        </td>
+    </tr>`;
+    $('#table1 tbody').append(row);
+});
+
+// ================= DELETE ROW =================
+$(document).on('click', '.delete-row', function () {
+    let row = $(this).closest('tr');
+    let iditem = row.find('input[name="iditem"]').val();
+
+    if (iditem) {
+        row.hide();
+        row.find('.delete-flag').val('1');
+    } else {
+        row.remove();
+    }
+});
+
+// ================= AUTOCOMPLETE =================
+$(document).ready(function () {
+
+    let delay;
+    const resultBox = $('.jo-result');
+
+    $('.propose-search').keyup(function () {
+
+        clearTimeout(delay);
+        let query = $(this).val();
+        resultBox.hide().empty();
+
+        if (query.length < 2) return;
+
+        delay = setTimeout(function () {
+
+            $.ajax({
+                url: "{% url 'search_proposebudget' %}",
+                data: { q: query },
+                success: function (data) {
+
+                    if (data.length === 0) {
+                        resultBox.append('<div class="list-group-item">Tidak ditemukan</div>');
+                        resultBox.show();
+                        return;
+                    }
+
+                    data.forEach(function (item) {
+
+                        resultBox.append(`
+                            <a href="#" class="list-group-item list-group-item-action select-item"
+                               data-id="${item.idproposebudget}"
+                               data-nomor="${item.NomorProposedBudget}"
+                               data-jo="${item.NomorJO}">
+                               ${item.NomorProposedBudget} - ${item.NomorJO}
+                            </a>
+                        `);
+                    });
+
+                    resultBox.show();
+                }
+            });
+
+        }, 300);
+    });
+
+    // SELECT
+    $(document).on('click', '.select-item', function (e) {
+        e.preventDefault();
+
+        let selected = $(this);
+
+        $('.propose-search').val(
+            selected.data('nomor') + " - " + selected.data('jo')
+        );
+
+        $('.propose-id').val(selected.data('id'));
+
+        resultBox.hide().empty();
+    });
+
+    // CLICK OUTSIDE
+    $(document).click(function (e) {
+        if (!$(e.target).closest('.propose-search, .jo-result').length) {
+            resultBox.hide();
+        }
+    });
+
+});
+</script>
+
+{% endblock %}

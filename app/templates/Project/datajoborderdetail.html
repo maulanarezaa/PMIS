@@ -22,10 +22,16 @@
                     <a href="#" class="nav-link tab-link" data-target="manpower">Manpower</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link tab-link" data-target="masuk">Work Completion </a>
+                    <a href="#" class="nav-link tab-link" data-target="proposebudget">Propose Budget </a>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link tab-link" data-target="keluar">Expense Report</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link tab-link" data-target="masuk">Work Completion </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link tab-link" data-target="invoice">Invoice </a>
                 </li>
             </ul>
 
@@ -217,7 +223,75 @@
                     </tbody>
                 </table>
             </div>
+            
+            <!-- ================= TAB proposebudget ================= -->
+            <div class="tab-pane-custom d-none" id="tab-proposebudget">
+                <h5>Propose Budget</h5>
 
+                <table class="table table-striped" id="table3">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>NoMIS</th>
+                            <th>Jumlah</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data.materialkeluar %}
+                        <tr>
+                            <td>{{ item.NoMIS.Tanggal|date:'Y-m-d' }}</td>
+                            <td>
+                                {% if item.NoMIS %}
+                                <a href="{% url 'detailmis' item.NoMIS.id %}">{{item.NoMIS.NoMIS}}</a>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.Jumlah }}</td>
+                            <td></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">Tidak ada data</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- ================= TAB invoice ================= -->
+            <div class="tab-pane-custom d-none" id="tab-invoice">
+                <h5>Invoice</h5>
+
+                <table class="table table-striped" id="table3">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Nomor Invoice</th>
+                            <th>Nomor Work Completion</th>
+                            <th>Nilai</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data.invoice %}
+                        <tr>
+                            <td>{{ item.Tanggal|date:'Y-m-d' }}</td>
+                            <td>
+                                {% if item.NomorInvoice %}
+                                <a href="{% url 'detailinvoice' item.id %}">{{item.NomorInvoice}}</a>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.NomorWorkCompletion.NomorWorkCompletion }}</td>
+                            <td>{{item.Nilai|intcomma}}</td>
+                            <td>{{item.Status}}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">Tidak ada data</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </section>

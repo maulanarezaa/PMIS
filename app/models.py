@@ -82,6 +82,7 @@ class ItemProposedBudget(models.Model):
     Harga = models.FloatField()
     TotalHarga = models.FloatField()
     Remarks = models.CharField(max_length=128, blank=True,null=True)
+    
 
     def __str__(self):
         return f"{self.proposed_budget.NomorProposedBudget} - {self.Item}"
@@ -93,15 +94,20 @@ class CashExpenseReport(models.Model):
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
     ]
-    NomorCashReport = models.CharField(max_length=256)
+    NomorCashReport = models.CharField(max_length=256, unique=True)
     NomorProposedBudget = models.ForeignKey(ProposedBudget, on_delete=models.CASCADE)
     Tanggal = models.DateField()
-    Jenis = models.CharField(max_length=56)
     Remarks = models.CharField(max_length=128)
     Nilai = models.FloatField()
     FileCashReport = models.FileField(
         upload_to="File/Project/CashReport", null=True, blank=True
     )
+        # Approval fields
+    Submittedby = models.CharField(max_length=56,null=True, blank=True)
+    Status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
+    Approvedby = models.CharField(max_length=56,null=True, blank=True)
+    approved_date = models.DateTimeField(null=True, blank=True)
+    approval_comments = models.TextField(blank=True)
 
     def __str__(self):
         return f"{self.NomorJO}-{self.NomorCashReport}"
@@ -111,13 +117,26 @@ class ItemCashExpenseReport(models.Model):
     Item = models.CharField(max_length=256)
     Jumlah = models.FloatField()
     Harga = models.FloatField()
-    satuan = models.CharField(max_length=25, null=True, blank=True)
+    Satuan = models.CharField(max_length=25, null=True, blank=True)
 
     TotalHarga = models.FloatField()
     Remarks = models.CharField(max_length=128, blank=True,null=True)
 
     def __str__(self):
         return f"{self.cash_report.NomorCashReport} - {self.Item}"
+
+class Invoice(models.Model):
+    Tanggal = models.DateField()
+    NomorInvoice = models.CharField(max_length=256, unique=True)
+    NomorWorkCompletion = models.ForeignKey(WorkCompletion, on_delete=models.CASCADE)
+    Nilai = models.FloatField()
+    FileInvoice = models.FileField(
+        upload_to="File/Project/Invoice", null=True, blank=True
+    )
+    Status = models.CharField(max_length=56)
+
+    def __str__(self):
+        return f"{self.NomorWorkCompletion}-{self.NomorInvoice}"
 
 """
 HRIS MODELS
