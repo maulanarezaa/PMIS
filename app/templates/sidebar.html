@@ -11,7 +11,7 @@
             </a>
         </li>
 
-
+<!-- Human Resource -->
         <li class="sidebar-item  has-sub">
             <a href="#" class='sidebar-link'>
                 <i class="bi bi-people-fill"></i>
@@ -30,9 +30,17 @@
                 <li class="submenu-item">
                     <a href="{% url 'payroll' %} ">Payroll</a>
                 </li>
+                <li class="submenu-item">
+                    <a href="{% url 'role_list' %} ">Role</a>
+                </li>
+                <li class="submenu-item">
+                    <a href="{% url 'permission_list' %} ">Permission</a>
+                </li>
 
             </ul>
         </li>
+
+        <!-- Inventory -->
         <li class="sidebar-item  has-sub">
             <a href="#" class='sidebar-link'>
                 <i class="bi bi-stack"></i>
@@ -60,6 +68,9 @@
 
             </ul>
         </li>
+
+        <!-- Project -->
+         
         <li class="sidebar-item  has-sub">
             <a href="#" class='sidebar-link'>
                 <i class="bi bi-stack"></i>

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Form Permission</h3>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Nama</label>
+                {{ form.nama }}
+            </div>
+
+            <div class="form-group">
+                <label>Kode</label>
+                {{ form.kode }}
+            </div>
+
+            <button class="btn btn-success mt-3">Simpan</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

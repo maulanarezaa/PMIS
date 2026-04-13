@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Role Management</h3>
+    <a href="{% url 'role_create' %}" class="btn btn-primary">+ Tambah Role</a>
+</div>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <table class="table table-bordered" id="table-role">
+            <thead>
+                <tr>
+                    <th>Nama Role</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in roles %}
+                <tr>
+                    <td>{{ r.nama }}</td>
+                    <td>
+                        <a href="{% url 'role_edit' r.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{% url 'role_delete' r.id %}" class="btn btn-sm btn-danger">Hapus</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

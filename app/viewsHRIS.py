@@ -6,6 +6,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
 from django.db.models import Count, Q
+from .formAccount import RoleForm, PermissionForm
 
 # Create your views here.
 
@@ -21,6 +22,7 @@ def viewdashboard(request):
 
 def viewkaryawan(request):
     data = models.MasterKaryawan.objects.all()
+    
     return render(request, "HRIS/datakaryawan.html", {"data": data})
 
 
@@ -447,3 +449,132 @@ def tambahdetailpayroll(request, id):
         "HRIS/tambahdetailpayroll.html",
         {"datakaryawan": datakaryawan, "dataperiode": dataperiode},
     )
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import MasterKaryawan, Role, Project
+from .viewsService import create_user_from_karyawan
+
+def create_user_view(request, id):
+    karyawan = get_object_or_404(MasterKaryawan, id=id)
+    roles = Role.objects.all()
+    projects = Project.objects.all()
+
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        selected_roles = request.POST.getlist("roles")
+        selected_projects = request.POST.getlist("projects")
+
+        roles_obj = Role.objects.filter(id__in=selected_roles)
+        projects_obj = Project.objects.filter(id__in=selected_projects)
+
+        create_user_from_karyawan(
+            karyawan,
+            username,
+            password,
+            roles_obj,
+            projects_obj
+        )
+
+        return redirect("karyawan_list")
+
+    return render(request, "Account/create_user.html", {
+        "karyawan": karyawan,
+        "roles": roles,
+        "projects": projects
+    })
+
+
+# ================= ROLE =================
+
+def role_list(request):
+    roles = Role.objects.all()
+    return render(request, 'Account/role_list.html', {'roles': roles})
+
+
+def role_create(request):
+    form = RoleForm(request.POST or None)
+    permissions = models.Permission.objects.all()
+
+    if request.method == "POST":
+        if form.is_valid():
+            role = form.save()
+
+            selected_permissions = request.POST.getlist('permissions')
+            for p in selected_permissions:
+                models.RolePermission.objects.create(role=role, permission_id=p)
+
+            return redirect('role_list')
+
+    return render(request, 'Account/role_form.html', {
+        'form': form,
+        'permissions': permissions
+    })
+
+
+def role_edit(request, id):
+    role = get_object_or_404(Role, id=id)
+    form = RoleForm(request.POST or None, instance=role)
+    permissions = models.Permission.objects.all()
+
+    selected_permissions = models.RolePermission.objects.filter(role=role).values_list('permission_id', flat=True)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+
+            # reset permission
+            models.RolePermission.objects.filter(role=role).delete()
+
+            new_permissions = request.POST.getlist('permissions')
+            for p in new_permissions:
+                models.RolePermission.objects.create(role=role, permission_id=p)
+
+            return redirect('role_list')
+
+    return render(request, 'Account/role_form.html', {
+        'form': form,
+        'permissions': permissions,
+        'selected_permissions': selected_permissions
+    })
+
+
+def role_delete(request, id):
+    role = get_object_or_404(Role, id=id)
+    role.delete()
+    return redirect('role_list')
+
+
+# ================= PERMISSION =================
+
+def permission_list(request):
+    permissions = models.Permission.objects.all()
+    return render(request, 'Account/permission_list.html', {'permissions': permissions})
+
+
+def permission_create(request):
+    form = PermissionForm(request.POST or None)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            return redirect('permission_list')
+
+    return render(request, 'Account/permission_form.html', {'form': form})
+
+
+def permission_edit(request, id):
+    permission = get_object_or_404(models.Permission, id=id)
+    form = PermissionForm(request.POST or None, instance=permission)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            return redirect('permission_list')
+
+    return render(request, 'Account/permission_form.html', {'form': form})
+
+def permission_delete(request, id):
+    permission = get_object_or_404(models.Permission, id=id)
+    permission.delete()
+    return redirect('permission_list')

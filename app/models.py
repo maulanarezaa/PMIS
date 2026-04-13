@@ -1,7 +1,8 @@
 from django.db import models
 import os
 from django.utils.text import slugify
-from django.contrib.auth.models import AbstractUser,User
+from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 
 
@@ -210,6 +211,8 @@ class MasterKaryawan(models.Model):
         MasterJenisKaryawan, on_delete=models.CASCADE, null=True, blank=True
     )
     PasFoto = models.ImageField(upload_to=pasfoto, null=True, blank=True)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,related_name='karyawan_profile')
 
     def __str__(self):
         return str(self.Nama)
@@ -442,6 +445,54 @@ class MaterialKeluar(models.Model):
         return f"{self.NoMIS.NoMIS} - {self.NamaItem}"
 
 
+'''
+Account Management
+'''
+class Role(models.Model):
+    nama = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nama
+
+
+# ================= PERMISSION =================
+class Permission(models.Model):
+    nama = models.CharField(max_length=100)
+    kode = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.nama
+
+
+class RolePermission(models.Model):
+    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
+
+
+class UserRole(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+
+
+# ================= PROJECT ACCESS =================
+class Project(models.Model):
+    nama = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.nama
+
+
+class UserProjectAccess(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+
+# ================= AUDIT LOG =================
+class AuditLog(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    aksi = models.CharField(max_length=255)
+    waktu = models.DateTimeField(auto_now_add=True)
+    keterangan = models.TextField(null=True, blank=True)
+
 """
 Custom Models User
 """
@@ -450,6 +501,3 @@ Custom Models User
 class User(AbstractUser):
     role = models.CharField(max_length=20, blank=True, null=True)
     photo = models.ImageField(upload_to="profile/", blank=True, null=True)
-    Karyawan = models.OneToOneField(
-        MasterKaryawan, on_delete=models.SET_NULL, null=True, blank=True
-    )
