@@ -46,12 +46,13 @@
                 <table class="table table-striped table-sm" id="table1" style="font-size: 12px;">
                     <thead>
                         <tr>
+                            <th >Tanggal Permintaan</th>
                             <th >Nomor Propose Budget</th>
                             <th >Nomor JO</th>
                             <th>Pekerjaan</th>
-                            <th >Tanggal Permintaan</th>
                             <th>Deskripsi</th>
                             <th>Nilai</th>
+                            <th>Total CER</th>
                             <th>Status</th>
                             <th>Approval</th>
                             <th>Action</th>
@@ -62,12 +63,13 @@
                     <tbody>
                         {% for item in data %}
                         <tr>
+                            <td>{{item.Tanggal|date:"Y-m-d"}}</td>
                             <td>{{item.NomorProposedBudget}}</td>
                             <td>{{item.NomorJO.NomorJO}}</td>
                             <td>{{item.NomorJO.Deskripsi}}</td>
-                            <td>{{item.Tanggal|date:"Y-m-d"}}</td>
                             <td>{{item.Remarks}}</td>
                             <td>Rp {{item.Nilai|intcomma}}</td>
+                            <td>Rp {{item.totalcer|intcomma}}</td>
                             <td>{{item.Status}}</td>
                             <td>{{item.Approvedby}}</td>
 
@@ -151,9 +153,11 @@
     // 🔥 OPTIONAL: AKTIFKAN DATATABLE
     $(document).ready(function () {
         $('#table1').DataTable({
-            scrollX: true
+            scrollX: true,
+            order: [[2, 'desc']]
         });
     });
+
 </script>
 
 {% endblock content %}

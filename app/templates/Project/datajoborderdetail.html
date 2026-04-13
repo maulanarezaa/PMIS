@@ -194,7 +194,7 @@
             <div class="tab-pane-custom d-none" id="tab-keluar">
                 <h5>Material Keluar</h5>
 
-                <table class="table table-striped" id="table3">
+                <table class="table table-striped" id="table4">
                     <thead>
                         <tr>
                             <th>Tanggal</th>
@@ -232,22 +232,22 @@
                     <thead>
                         <tr>
                             <th>Tanggal</th>
-                            <th>NoMIS</th>
-                            <th>Jumlah</th>
-                            <th>Remarks</th>
+                            <th>Nomor Propose Budget</th>
+                            <th>Nilai</th>
+                            <th>Nilai Report</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for item in data.materialkeluar %}
+                        {% for item in data.proposebudget %}
                         <tr>
-                            <td>{{ item.NoMIS.Tanggal|date:'Y-m-d' }}</td>
+                            <td>{{ item.Tanggal|date:'Y-m-d' }}</td>
                             <td>
-                                {% if item.NoMIS %}
-                                <a href="{% url 'detailmis' item.NoMIS.id %}">{{item.NoMIS.NoMIS}}</a>
-                                {% endif %}
+                                <a href="{% url 'detailproposebudget' item.id %}">{{item.NomorProposedBudget}}</a>
                             </td>
-                            <td>{{ item.Jumlah }}</td>
-                            <td></td>
+                            <td>{{ item.Nilai|intcomma }}</td>
+                            <td>{{ item.cer|intcomma }}</td>
+                            <td>{{ item.Status }}</td>
                         </tr>
                         {% empty %}
                         <tr>
@@ -261,7 +261,7 @@
             <div class="tab-pane-custom d-none" id="tab-invoice">
                 <h5>Invoice</h5>
 
-                <table class="table table-striped" id="table3">
+                <table class="table table-striped" id="table11">
                     <thead>
                         <tr>
                             <th>Tanggal</th>

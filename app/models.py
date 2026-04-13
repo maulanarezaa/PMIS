@@ -1,7 +1,8 @@
 from django.db import models
 import os
 from django.utils.text import slugify
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser,User
+
 
 
 # Create your models here.
@@ -110,7 +111,7 @@ class CashExpenseReport(models.Model):
     approval_comments = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.NomorJO}-{self.NomorCashReport}"
+        return f"{self.NomorProposedBudget}-{self.NomorCashReport}"
     
 class ItemCashExpenseReport(models.Model):
     NomorCashReport = models.ForeignKey(CashExpenseReport, on_delete=models.CASCADE, related_name='items')

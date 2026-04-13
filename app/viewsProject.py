@@ -40,7 +40,18 @@ def viewdetailjoborder(request, id):
     data.manpower = models.Kontrak.objects.filter(id__in=subquery).select_related(
         "Nama"
     )
-    print(data.manpower)
+    proposebudget = models.ProposedBudget.objects.filter(NomorJO=data)
+
+    for item in proposebudget:
+        cer = models.CashExpenseReport.objects.filter(NomorProposedBudget=item)
+        totalcer = cer.aggregate(Total=Sum("Nilai"))["Total"] or 0
+        item.cer = totalcer
+    
+    data.proposebudget = proposebudget
+   
+
+
+    # print(data.manpower)
     return render(request, "Project/datajoborderdetail.html", {"data": data})
 
 
@@ -81,6 +92,51 @@ def tambahdatajoborder(request):
         messages.success(request, "Data Berhasil disimpan")
         return redirect("viewjoborder")
     return render(request, "Project/tambahdatajoborder.html")
+
+def deletejoborder(request, id):
+        data = get_object_or_404(models.JobOrder, id=id)
+        data.delete()
+        messages.success(request, "Data Berhasil dihapus")
+        return redirect("viewjoborder")
+
+def editjoborder(request, id):
+    data = get_object_or_404(models.JobOrder, id=id)
+    if request.method == "POST":
+        print(request.POST)
+        print(request.FILES)
+        # print(asd)
+        nomorjo = request.POST["nomorjo"]
+        if models.JobOrder.objects.filter(NomorJO=nomorjo).exclude(id=id).exists():
+            messages.error(request, "Kode Job Order telah digunakan")
+            return redirect("editjoborder", id=id)
+        client = request.POST["Client"]
+        salesorder = request.POST["salesorder"]
+        deskripsi = request.POST["deskripsi"]
+        nilai = request.POST["nilai"]
+        startdate = request.POST["startdate"]
+        enddate = request.POST["enddate"]
+        termin = request.POST["termin"]
+        filekontrak = request.FILES.get("FileKontrak")
+        
+        try:
+            data.NomorJO = nomorjo
+            data.Client = client
+            data.SalesOrder = salesorder
+            data.Deskripsi = deskripsi
+            data.Nilai = nilai
+            data.StartWork = startdate
+            data.EndWork = enddate
+            data.TerminPembayaran = termin
+            if filekontrak:
+                data.FileKontrak = filekontrak
+            data.save()
+            messages.success(request, "Data Berhasil diupdate")
+            return redirect("viewjoborder")
+        except Exception as e:
+            messages.error(request, e)
+            return redirect("editjoborder", id=id)
+
+    return render(request, "Project/editdatajoborder.html", {"data": data})
 
 
 @login_required
@@ -168,6 +224,8 @@ def search_proposebudget(request):
 @login_required
 def viewproposebudget(request):
     data = models.ProposedBudget.objects.all()
+    for item in data:
+        item.totalcer = models.CashExpenseReport.objects.filter(NomorProposedBudget=item).aggregate(Total=Sum("Nilai"))["Total"] or 0
     return render(request,"Project/dataproposebudget.html", {"data": data})
 
 @login_required
@@ -232,74 +290,102 @@ def deleteproposebudget(request, id):
 def detailproposebudget(request, id):
     data = get_object_or_404(models.ProposedBudget, id=id)
     items = models.ItemProposedBudget.objects.filter(NomorProposedBudget=data)
+    cashexpensereport = models.CashExpenseReport.objects.filter(NomorProposedBudget=data)
+    cashexpensereport.totalcer = cashexpensereport.aggregate(Total=Sum("Nilai"))["Total"] or 0
 
-    return render(request, "Project/dataproposebudgetdetail.html", {"data": data, "items": items})
+    return render(request, "Project/dataproposebudgetdetail.html", {"data": data, "items": items, "cashexpensereport": cashexpensereport})
 
 def editproposebudget(request, id):
     data = get_object_or_404(models.ProposedBudget, id=id)
     datajo = models.JobOrder.objects.all()
     items = models.ItemProposedBudget.objects.filter(NomorProposedBudget=data)
+
     if request.method == "POST":
         print(request.POST)
-        print(request.FILES)
         # print(asd)
+        # ================= HEADER =================
+        nomorproposebudget = request.POST.get("nomorproposebudget")
+        tanggal = request.POST.get("tanggal")
+        file = request.FILES.get("file")
+        catatan = request.POST.get("remarks")
+        idjo = request.POST.get("idjo")
+        totalnilai = 0
 
-        # update object
-        nomorproposebudget = request.POST["nomorproposebudget"]
-        tanggal = request.POST["tanggal"]
-        file = request.FILES.get("fileproposebudget")
-        catatan = request.POST["remarks"]
-        
-        # Item propose budget
-        iditem = request.POST.getlist("iditem")
-        item = request.POST.getlist("Nama")
-        Satuan = request.POST.getlist("Satuan")
-        Harga = request.POST.getlist("Harga")
-        totalharga = request.POST.getlist("TotalHarga")
-        Jumlah = request.POST.getlist("Jumlah")
-        Remarks = request.POST.getlist("Remarks")
+        # ================= VALIDASI =================
         if models.ProposedBudget.objects.filter(NomorProposedBudget=nomorproposebudget).exclude(id=id).exists():
             messages.error(request, "Kode Propose Budget telah digunakan")
             return redirect("editproposebudget", id=id)
 
-
         try:
-            data.NomorProposedBudget =  nomorproposebudget
-            data.NomorJO = models.JobOrder.objects.get(id=request.POST["idjo"])
-
+            # ================= UPDATE HEADER =================
+            data.NomorProposedBudget = nomorproposebudget
+            data.NomorJO = models.JobOrder.objects.get(id=idjo)
             data.Tanggal = tanggal
             data.Remarks = catatan
+            totalharga = request.POST.getlist("TotalHarga")
+
+            for dataharga in totalharga:
+                totalnilai += float(dataharga)
+
             if file:
                 data.FileProposedBudget = file
-            
-            for item in zip(iditem, item, Jumlah, Satuan, Harga, totalharga, Remarks):
-                if item[0]: # jika iditem ada, update item
-                    itemobj = models.ItemProposedBudget.objects.get(id=item[0])
-                    itemobj.Item = item[1]
-                    itemobj.Jumlah = item[2]
-                    itemobj.Satuan = item[3]
-                    itemobj.Harga = item[4]
-                    itemobj.TotalHarga = item[5]
-                    itemobj.Remarks = item[6]
-                    itemobj.save()
-                else: # jika iditem tidak ada, buat item baru
-                    models.ItemProposedBudget(
-                        NomorProposedBudget=data,
-                        Item=item[1],
-                        Jumlah=item[2],
-                        Satuan=item[3],
-                        Harga=item[4],
-                        TotalHarga=item[5],
-                        Remarks=item[6],
-                    ).save()
+            data.Nilai = totalnilai
             data.save()
+
+            # ================= DETAIL =================
+            iditems = request.POST.getlist("iditem")
+            namas = request.POST.getlist("Nama")
+            jumlahs = request.POST.getlist("Jumlah")
+            satuans = request.POST.getlist("Satuan")
+            hargas = request.POST.getlist("Harga")
+            totals = request.POST.getlist("TotalHarga")
+            remarks_list = request.POST.getlist("Remarks")
+            delete_flags = request.POST.getlist("delete_flag")
+
+            
+            for i in range(len(namas)):
+
+                iditem = iditems[i]
+                nama = namas[i]
+                jumlah = jumlahs[i]
+                satuan = satuans[i]
+                harga = hargas[i]
+                total = totals[i]
+                remark = remarks_list[i]
+                delete_flag = delete_flags[i]
+
+                # ================= DELETE =================
+                if delete_flag == "1":
+                    if iditem:
+                        models.ItemProposedBudget.objects.filter(id=iditem).delete()
+                    continue
+
+                # ================= UPDATE =================
+                if iditem:
+                    itemobj = models.ItemProposedBudget.objects.get(id=iditem)
+                else:
+                    itemobj = models.ItemProposedBudget(NomorProposedBudget=data)
+
+                itemobj.Item = nama
+                itemobj.Jumlah = jumlah or 0
+                itemobj.Satuan = satuan
+                itemobj.Harga = harga or 0
+                itemobj.TotalHarga = total or 0
+                itemobj.Remarks = remark
+                itemobj.save()
+
             messages.success(request, "Data Berhasil diupdate")
             return redirect("proposebudget")
+
         except Exception as e:
-            messages.error(request, e)
+            messages.error(request, f"Error: {str(e)}")
             return redirect("editproposebudget", id=id)
 
-    return render(request, "Project/editproposebudget.html", {"data": data, "datajo": datajo, "items": items})
+    return render(request, "Project/editproposebudget.html", {
+        "data": data,
+        "datajo": datajo,
+        "items": items
+    })
 
 '''
 Cash Expense Report
@@ -372,6 +458,7 @@ def deletecashexpensereport(request, id):
 def detailcashexpensereport(request, id):
     data = get_object_or_404(models.CashExpenseReport, id=id)
     items = models.ItemCashExpenseReport.objects.filter(NomorCashReport=data)
+    
 
     return render(request, "Project/datacashexpensereportdetail.html", {"data": data, "items": items})
 
@@ -382,7 +469,6 @@ def editcashexpensereport(request, id):
     if request.method == "POST":
         print(request.POST)
         print(request.FILES)
-        # print(asd)
 
         # update object
         nomorcer = request.POST["nomorexpensereport"]
@@ -397,6 +483,7 @@ def editcashexpensereport(request, id):
         Harga = request.POST.getlist("Harga")
         Nama = request.POST.getlist('Nama')
         Totalharga = request.POST.getlist('TotalHarga')
+        nilaitotal = 0
         print(iditem, jumlah, Satuan, Harga, Totalharga, catatan,Nama)
         if models.CashExpenseReport.objects.filter(NomorCashReport=nomorcer).exclude(id=id).exists():
             messages.error(request, "Kode Cash Expense Report telah digunakan")

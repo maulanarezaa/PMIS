@@ -5,15 +5,15 @@
 {% block content %}
 
 <style>
-#jo-list {
-    position: absolute;
-    z-index: 9999;
-    width: 100%;
-    background: white;
-    border: 1px solid #ddd;
-    max-height: 200px;
-    overflow-y: auto;
-}
+    .jo-result {
+        position: absolute;
+        z-index: 9999;
+        width: 100%;
+        background: white;
+        border: 1px solid #ddd;
+        max-height: 200px;
+        overflow-y: auto;
+    }
 </style>
 
 <div class="page-heading">
@@ -23,190 +23,187 @@
 <section class="section">
     <div class="card">
         <div class="card-body">
+
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-            <div class="row">
 
-                <!-- NOMOR PROPOSE -->
-                <div class="col-md-4 col-12">
-                    <div class="form-group">
+                <div class="row">
+
+                    <div class="col-md-4">
                         <label>Nomor Propose Budget</label>
                         <input type="text" class="form-control" name="nomorproposebudget"
-                               value="{{data.NomorProposedBudget}}">
+                            value="{{data.NomorProposedBudget}}">
                     </div>
-                </div>
 
-                <!-- TANGGAL -->
-                <div class="col-md-4 col-12">
-                    <div class="form-group">
+                    <div class="col-md-4">
                         <label>Tanggal</label>
-                        <input type="date" class="form-control" name="tanggal"
-                               value="{{data.Tanggal|date:'Y-m-d'}}">
+                        <input type="date" class="form-control" name="tanggal" value="{{data.Tanggal|date:'Y-m-d'}}">
                     </div>
-                </div>
 
-                <!-- JOB ORDER -->
-                <div class="form-group position-relative" style="z-index:1000;">
-                    <label>Nomor Job Order</label>
-                    <input type="text" class="form-control jo-search" value="{{data.NomorJO.NomorJO}} - {{data.NomorJO.Deskripsi}}" placeholder="Cari JO..." autocomplete="off">
-                    <input type="text" hidden class="form-control nomor-jo" name="idjo" value="{{data.NomorJO.id}}">
+                    <div class="col-md-4 position-relative">
+                        <label>Nomor Job Order</label>
+                        <input type="text" class="form-control jo-search"
+                            value="{{data.NomorJO.NomorJO}} - {{data.NomorJO.Deskripsi}}" placeholder="Cari JO..."
+                            autocomplete="off">
 
-                    <div class="list-group jo-result" style="position:absolute; top:100%; width:100%; display:none;">
+                        <input type="hidden" class="nomor-jo" name="idjo" value="{{data.NomorJO.id}}">
+
+                        <div class="list-group jo-result" style="display:none;"></div>
                     </div>
-                </div>
 
-                <!-- REMARKS -->
-                <div class="col-md-4 col-12">
-                    <div class="form-group">
+                    <div class="col-md-4 mt-2">
                         <label>Catatan</label>
-                        <input type="text" class="form-control" name="remarks"
-                               value="{{data.Remarks}}">
+                        <input type="text" class="form-control" name="remarks" value="{{data.Remarks}}">
                     </div>
-                </div>
 
-
-                <!-- FILE -->
-                <div class="col-md-4 col-12">
-                    <div class="form-group">
+                    <div class="col-md-4 mt-2">
                         <label>File Lampiran</label>
                         <input type="file" class="form-control" name="file">
 
                         {% if data.FileProposedBudget %}
-                            <a href="{{ data.FileProposedBudget.url }}">Lihat File</a>
+                        <a href="{{ data.FileProposedBudget.url }}" target="_blank">Lihat File</a>
                         {% else %}
-                            Tidak ada file
+                        <small>Tidak ada file</small>
                         {% endif %}
                     </div>
+                    <div class="col-md-4 mt-2">
+                        <label>Total Keseluruhan</label>
+                        <input type="text" id="grand-total" name="totalkeseluruhan" class="form-control" disabled>
+                    </div>
+
                 </div>
 
-            </div>
+                <!-- ================= TABLE ================= -->
+                <table class="table mt-3" id="table1">
+                    <thead>
+                        <tr>
+                            <th>Nama Item</th>
+                            <th>Jumlah</th>
+                            <th>Satuan</th>
+                            <th>Harga</th>
+                            <th>Total Harga</th>
+                            <th>Remarks</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-            <!-- TABLE -->
-            <table class="table  mt-3" id="table1">
-                <thead>
-                    <tr>
-                        <th>Nama Item</th>
-                        <th>Jumlah</th>
-                        <th>Satuan</th>
-                        <th>Harga</th>
-                        <th>Total Harga</th>
-                        <th>Remarks</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td>
-                            <input type="text" class="form-control" name="Nama" value="{{item.Item}}">
-                            <input type="hidden" name="iditem" value="{{item.id}}">
-                        </td>
-                        <td><input type="number" class="form-control" name="Jumlah" value="{{item.Jumlah}}"></td>
-                        <td><input type="text" class="form-control" name="Satuan" value="{{item.Satuan}}"></td>
-                        <td><input type="number" class="form-control" name="Harga" value="{{item.Harga}}"></td>
-                        <td><input type="number" class="form-control" name="TotalHarga" value="{{item.TotalHarga}}"></td>
-                        <td><input type="text" class="form-control" name="Remarks" value="{{item.Remarks}}"></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        {% for item in items %}
+                        <tr>
+                            <td>
+                                <input type="text" class="form-control" name="Nama" value="{{item.Item}}">
+                                <input type="hidden" name="iditem" value="{{item.id}}">
+                                <input type="hidden" name="delete_flag" value="0" class="delete-flag">
+                            </td>
 
-            <button type="button" class="btn btn-secondary" id="add-row">+ Tambah Baris</button>
-            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                            <td><input type="number" class="form-control jumlah" name="Jumlah" value="{{item.Jumlah}}">
+                            </td>
+                            <td><input type="text" class="form-control" name="Satuan" value="{{item.Satuan}}"></td>
+                            <td><input type="number" class="form-control harga" name="Harga" value="{{item.Harga}}">
+                            </td>
+                            <td><input type="number" class="form-control total" name="TotalHarga"
+                                    value="{{item.TotalHarga}}" readonly></td>
+                            <td><input type="text" class="form-control" name="Remarks" value="{{item.Remarks}}"></td>
 
-        </form>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+                <button type="button" class="btn btn-secondary" id="add-row">+ Tambah Baris</button>
+
+                <button type="submit" class="btn btn-primary mt-2">Simpan Perubahan</button>
+
+            </form>
+
+        </div>
     </div>
-</div>
-```
-
 </section>
 
 <!-- ================= JS ================= -->
-
-<script>
-// ADD ROW
-document.getElementById("add-row").addEventListener("click", function () {
-    let row = `
-    <tr>
-        <td>
-            <input type="text" class="form-control" name="Nama">
-            <input type="hidden" name="iditem">
-        </td>
-        <td><input type="number" class="form-control" name="Jumlah"></td>
-        <td><input type="text" class="form-control" name="Satuan"></td>
-        <td><input type="number" class="form-control" name="Harga"></td>
-        <td><input type="number" class="form-control" name="TotalHarga"></td>
-        <td><input type="text" class="form-control" name="Remarks"></td>
-    </tr>`;
-    document.querySelector("#table1 tbody").insertAdjacentHTML("beforeend", row);
-});
-</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
     $(document).ready(function () {
 
-        let delay;
-        const joResult = $('.jo-result');
-
-        $(document).on('keyup', '.jo-search', function () {
-            clearTimeout(delay);
-            let input = $(this);
-            let query = input.val();
-            joResult.hide().empty();
-
-            if (query.length < 3) return;
-
-            delay = setTimeout(function () {
-                $.ajax({
-                    url: "{% url 'search_jo' %}",
-                    data: { 'q': query },
-                    success: function (data) {
-                        joResult.empty();
-                        if (data.length > 0) {
-                            data.forEach(function (item) {
-                                joResult.append('<a href="#" class="list-group-item list-group-item-action select-jo" ' +
-                                    'data-sales="' + item.SalesOrder + '"data-nilai="' + item.Nilai + '"data-jo="' + item.idjo + '" data-deskripsi="' + item.Deskripsi + '">' +
-                                    item.NomorJO + " - " + item.Deskripsi +
-                                    '</a>');
-                            });
-                            joResult.show();
-
-                        }
-                        console.log(joResult)
-                    }
-                });
-            }, 300);
+        /* ================= ADD ROW ================= */
+        $('#add-row').click(function () {
+            let row = `
+        <tr>
+            <td>
+                <input type="text" class="form-control" name="Nama">
+                <input type="hidden" name="iditem">
+                <input type="hidden" name="delete_flag" value="0" class="delete-flag">
+            </td>
+            <td><input type="number" class="form-control jumlah" name="Jumlah"></td>
+            <td><input type="text" class="form-control" name="Satuan"></td>
+            <td><input type="number" class="form-control harga" name="Harga"></td>
+            <td><input type="number" class="form-control total" name="TotalHarga" readonly></td>
+            <td><input type="text" class="form-control" name="Remarks"></td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button>
+            </td>
+        </tr>`;
+            $('#table1 tbody').append(row);
         });
 
-        // klik hasil dropdown
-        $(document).on('click', '.select-jo', function (e) {
-            e.preventDefault();
-            console.log(this)
-            const selected = $(this);
-            $('.jo-search').val(selected.text());
-            $('.sales-order').val(selected.data('sales'));
-            $('.nilai-proyek').val(selected.data('nilai'));
-            $('.nomor-jo').val(selected.data('jo'));
-            $('#deskripsiJO').val(selected.data('deskripsi'));
-            joResult.hide().empty();
-        });
+        /* ================= DELETE ================= */
+        $(document).on('click', '.delete-row', function () {
+            let row = $(this).closest('tr');
+            let iditem = row.find('input[name="iditem"]').val();
 
-        // klik luar dropdown → sembunyikan
-        $(document).click(function (e) {
-            if (!$(e.target).closest('.jo-search, .jo-result').length) {
-                joResult.hide();
+            if (iditem) {
+                row.find('.delete-flag').val('1');
+                row.hide();
+            } else {
+                row.remove();
             }
+
+            hitungGrandTotal();
         });
 
-    });
-    $(document).ready(function () {
+        /* ================= HITUNG ================= */
+        function hitungTotalRow(row) {
+            let jumlah = parseFloat(row.find('.jumlah').val()) || 0;
+            let harga = parseFloat(row.find('.harga').val()) || 0;
+            let total = jumlah * harga;
+            row.find('.total').val(total);
+        }
 
+        function hitungGrandTotal() {
+            let grandTotal = 0;
+
+            $('#table1 tbody tr:visible').each(function () {
+                let total = parseFloat($(this).find('.total').val()) || 0;
+                grandTotal += total;
+            });
+
+            $('#grand-total').val("Rp " + grandTotal.toLocaleString('id-ID'));
+        }
+
+        $(document).on('keyup change', '.jumlah, .harga', function () {
+            let row = $(this).closest('tr');
+            hitungTotalRow(row);
+            hitungGrandTotal();
+        });
+
+        /* ================= LOAD AWAL ================= */
+        $('#table1 tbody tr').each(function () {
+            hitungTotalRow($(this));
+        });
+        hitungGrandTotal();
+
+        /* ================= AUTOCOMPLETE ================= */
         let delay;
         const joResult = $('.jo-result');
 
         $(document).on('keyup', '.jo-search', function () {
             clearTimeout(delay);
-            let input = $(this);
-            let query = input.val();
+            let query = $(this).val();
             joResult.hide().empty();
 
             if (query.length < 3) return;
@@ -214,39 +211,33 @@ document.getElementById("add-row").addEventListener("click", function () {
             delay = setTimeout(function () {
                 $.ajax({
                     url: "{% url 'search_jo' %}",
-                    data: { 'q': query },
+                    data: { q: query },
                     success: function (data) {
                         joResult.empty();
+
                         if (data.length > 0) {
                             data.forEach(function (item) {
-                                joResult.append('<a href="#" class="list-group-item list-group-item-action select-jo" ' +
-                                    'data-sales="' + item.SalesOrder + '"data-nilai="' + item.Nilai + '"data-jo="' + item.idjo + '" data-deskripsi="' + item.Deskripsi + '">' +
-                                    item.NomorJO + " - " + item.Deskripsi +
-                                    '</a>');
+                                joResult.append(`
+                                <a href="#" class="list-group-item list-group-item-action select-jo"
+                                   data-jo="${item.idjo}">
+                                   ${item.NomorJO} - ${item.Deskripsi}
+                                </a>
+                            `);
                             });
                             joResult.show();
-
                         }
-                        console.log(joResult)
                     }
                 });
             }, 300);
         });
 
-        // klik hasil dropdown
         $(document).on('click', '.select-jo', function (e) {
             e.preventDefault();
-            console.log(this)
-            const selected = $(this);
-            $('.jo-search').val(selected.text());
-            $('.sales-order').val(selected.data('sales'));
-            $('.nilai-proyek').val(selected.data('nilai'));
-            $('.nomor-jo').val(selected.data('jo'));
-            $('.deskripsi-proyek').val(selected.data('deskripsi'));
-            joResult.hide().empty();
+            $('.jo-search').val($(this).text());
+            $('.nomor-jo').val($(this).data('jo'));
+            joResult.hide();
         });
 
-        // klik luar dropdown → sembunyikan
         $(document).click(function (e) {
             if (!$(e.target).closest('.jo-search, .jo-result').length) {
                 joResult.hide();
