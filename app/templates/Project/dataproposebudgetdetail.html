@@ -29,7 +29,7 @@
                         <label>Tanggal</label>
                         <div class="position-relative">
                             <input type="text" class="form-control" name="Nama" placeholder="Masukan Nama Item"
-                                value="{{data.Tanggal}}" disabled>
+                                value="{{data.Tanggal|date:'Y-m-d'}}" disabled>
                             <div class="form-control-icon">
                                 <i class="bi bi-house"></i>
                             </div>
@@ -96,6 +96,18 @@
                         <div class="position-relative">
                             <input type="text" class="form-control" name="Nama" placeholder="Masukan Nama Item"
                                 value="{{data.Nilai|intcomma}}" disabled>
+                            <div class="form-control-icon">
+                                <i class="bi bi-house"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="form-group has-icon-left">
+                        <label>Balance </label>
+                        <div class="position-relative">
+                            <input type="text" class="form-control" name="Nama" placeholder="Masukan Nama Item"
+                                value="{{data.balance|intcomma}}" disabled>
                             <div class="form-control-icon">
                                 <i class="bi bi-house"></i>
                             </div>

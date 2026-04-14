@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
-
+{% load group_tags %}
 {% block content %}
 
 <style>
@@ -64,7 +64,11 @@
                             <td>{{item.NomorJO}}</td>
                             <td>{{item.SalesOrder}}</td>
                             <td>{{item.Deskripsi}}</td>
+                            {% if request.user|has_any_group:"Project Manager" %}
                             <td>Rp {{item.Nilai|intcomma}}</td>
+                            {% else %}
+                            <td>kosong</td>
+                            {% endif %}
                             <td>{{item.Invoice}}</td>
                             <td>{{item.Status}}</td>
                             <td>{{item.Margin}}</td>

@@ -1,7 +1,7 @@
 from django.db import models
 import os
 from django.utils.text import slugify
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, User
 from django.conf import settings
 
 
@@ -212,7 +212,7 @@ class MasterKaryawan(models.Model):
     )
     PasFoto = models.ImageField(upload_to=pasfoto, null=True, blank=True)
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,related_name='karyawan_profile')
+        User, on_delete=models.SET_NULL, null=True, blank=True,related_name='karyawan_profile')
 
     def __str__(self):
         return str(self.Nama)
@@ -469,10 +469,6 @@ class RolePermission(models.Model):
     permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
 
 
-class UserRole(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
-
 
 # ================= PROJECT ACCESS =================
 class Project(models.Model):
@@ -483,12 +479,12 @@ class Project(models.Model):
 
 
 class UserProjectAccess(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
 # ================= AUDIT LOG =================
 class AuditLog(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     aksi = models.CharField(max_length=255)
     waktu = models.DateTimeField(auto_now_add=True)
     keterangan = models.TextField(null=True, blank=True)
@@ -498,6 +494,3 @@ Custom Models User
 """
 
 
-class User(AbstractUser):
-    role = models.CharField(max_length=20, blank=True, null=True)
-    photo = models.ImageField(upload_to="profile/", blank=True, null=True)

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
+{% load group_tags %}
 
 {% block content %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -81,7 +82,11 @@
                     <div class="col-12 col-md-3 ">
                         <label>Nilai</label>
                         <div class="position-relative">
+                                                        {% if request.user|has_any_group:"Project Manager" %}
                             <input type="text" disabled class="form-control" value="{{data.Nilai}}">
+                            {%  else%}
+                            <input type="text" disabled class="form-control" value="kosong">
+                            {% endif %}
                         </div>
                     </div>
 
@@ -175,7 +180,9 @@
                             </td>
                             <td>{{item.Jenis}}</td>
                             <td>{{ item.Remarks }}</td>
+
                             <td>{{item.Nilai|intcomma}}</td>
+                        
                         </tr>
                         {% empty %}
                         <tr>

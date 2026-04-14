@@ -12,6 +12,5 @@ admin.site.register(models.PeriodePayroll)
 admin.site.register(models.PayrollAllowance)
 admin.site.register(models.PayrollDeduction)
 admin.site.register(models.MasterMaterial)
+admin.site.register(models.JobOrder)
 
-
-admin.site.register(models.User)

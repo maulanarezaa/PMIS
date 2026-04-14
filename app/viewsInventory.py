@@ -1,4 +1,6 @@
 from django.shortcuts import render
+
+from app.templatetags.group_tags import group_required
 from . import models
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
@@ -17,12 +19,14 @@ def is_valid_image(file):
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def viewmaterial(request):
     data = models.MasterMaterial.objects.all()
     return render(request, "Inventory/datamaterial.html", {"data": data})
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def viewdetailmaterial(request, id):
     data = models.MasterMaterial.objects.get(id=id)
     materialmasuk = models.MaterialMasuk.objects.filter(NamaItem=data)
@@ -33,6 +37,7 @@ def viewdetailmaterial(request, id):
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def tambahdatamaterial(request):
     proyek = models.Proyek.objects.all()
     if request.method == "POST":
@@ -77,6 +82,7 @@ def tambahdatamaterial(request):
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def editmaterial(request, id):
     data = get_object_or_404(models.MasterMaterial, pk=id)
 
@@ -119,6 +125,7 @@ def editmaterial(request, id):
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def deletekaryawan(request, id):
     materialobject = models.MasterMaterial.objects.get(pk=id)
     materialobject.delete()
@@ -129,18 +136,21 @@ def deletekaryawan(request, id):
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def viewmaterialmasuk(request):
     data = models.MaterialMasuk.objects.all()
     return render(request, "Inventory/materialmasuk.html", {"data": data})
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def materialmasuk(request):
     data = models.SuratJalan.objects.all()
     return render(request, "Inventory/datamaterialmasuk.html", {"data": data})
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def tambahdatamaterialmasuk(request):
     if request.method == "POST":
         print(request.POST)
@@ -184,6 +194,7 @@ def tambahdatamaterialmasuk(request):
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def detailsuratjalan(request, id):
     data = models.SuratJalan.objects.get(id=id)
     datadetail = models.MaterialMasuk.objects.filter(SuratJalan=data.id)
@@ -196,6 +207,7 @@ def detailsuratjalan(request, id):
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def search_item(request):
     query = request.GET.get("q", "")
     print(query)
@@ -207,6 +219,7 @@ def search_item(request):
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def editdatasuratjalan(request, id):
     datasuratjalan = models.SuratJalan.objects.get(id=id)
     datailsuratjalan = models.MaterialMasuk.objects.filter(SuratJalan=datasuratjalan)
@@ -247,6 +260,7 @@ def editdatasuratjalan(request, id):
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def materialkeluar(request):
     data = models.MaterialIssueSlip.objects.all()
     for item in data:
@@ -262,6 +276,7 @@ def materialkeluar(request):
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def tambahdatamaterialkeluar(request):
     if request.method == "POST":
         print(request.POST)
@@ -300,6 +315,7 @@ def tambahdatamaterialkeluar(request):
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def detailmis(request, id):
     data = models.MaterialIssueSlip.objects.get(id=id)
     datadetail = models.MaterialKeluar.objects.filter(NoMIS=data.id)
@@ -317,12 +333,14 @@ STOCK ADJUSTMENT
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def viewstockadjustment(request):
     data = models.StockAdjustment.objects.all()
     return render(request, "Inventory/datastockadjustment.html", {"data": data})
 
 
 @login_required
+@group_required("Project Manager","Warehouse")
 def addstockadjustment(request):
     data = models.MasterMaterial.objects.all()
     return render(request, "Inventory/tambahdatastockadjustment.html")

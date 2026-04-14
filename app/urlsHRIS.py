@@ -14,11 +14,7 @@ urlpatterns = [
         viewsHRIS.deletekaryawan,
         name="hapusdatakaryawan",
     ),
-    path(
-        "datakaryawan/<str:id>/adduser",
-        viewsHRIS.create_user_view,
-        name="create_user_from_karyawan",
-    ),
+
     # Kontrak Section
     path("datakontrak", viewsHRIS.viewkontrak, name="viewkontrak"),
     path("tambahdatakontrak", viewsHRIS.addkontrak, name="addkontrak"),
@@ -48,15 +44,4 @@ urlpatterns = [
         viewsHRIS.tambahdetailpayroll,
         name="detailpayroll",
     ),
-    # ROLE
-    path('role/', viewsHRIS.role_list, name='role_list'),
-    path('role/add/', viewsHRIS.role_create, name='role_create'),
-    path('role/edit/<int:id>/', viewsHRIS.role_edit, name='role_edit'),
-    path('role/delete/<int:id>/', viewsHRIS.role_delete, name='role_delete'),
-
-    # PERMISSION
-    path('permission/', viewsHRIS.permission_list, name='permission_list'),
-    path('permission/add/', viewsHRIS.permission_create, name='permission_create'),
-    path('permission/edit/<int:id>/', viewsHRIS.permission_edit, name='permission_edit'),
-    path('permission/delete/<int:id>/', viewsHRIS.permission_delete, name='permission_delete'),
 ]

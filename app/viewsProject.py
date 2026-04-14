@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
 from django.db.models import Count, Q, Sum, Max
 from django.contrib.auth.decorators import login_required
+from .templatetags.group_tags import group_required 
 
 
 def is_valid_image(file):
@@ -17,6 +18,7 @@ def is_valid_image(file):
 
 
 @login_required
+@group_required("Project Manager","Admin Project")
 def viewjoborder(request):
     data = models.JobOrder.objects.all()
     print(request.user)
@@ -24,6 +26,7 @@ def viewjoborder(request):
 
 
 @login_required
+@group_required("Project Manager","Admin Project")
 def viewdetailjoborder(request, id):
     data = models.JobOrder.objects.get(id=id)
     workcompletion = models.WorkCompletion.objects.filter(NomorJO=data)
@@ -56,6 +59,7 @@ def viewdetailjoborder(request, id):
 
 
 @login_required
+@group_required("Project Manager","Admin Project")
 def tambahdatajoborder(request):
     if request.method == "POST":
         print(request.POST)
@@ -93,12 +97,13 @@ def tambahdatajoborder(request):
         return redirect("viewjoborder")
     return render(request, "Project/tambahdatajoborder.html")
 
+@group_required("Project Manager","Admin Project")
 def deletejoborder(request, id):
         data = get_object_or_404(models.JobOrder, id=id)
         data.delete()
         messages.success(request, "Data Berhasil dihapus")
         return redirect("viewjoborder")
-
+@group_required("Project Manager","Admin Project")
 def editjoborder(request, id):
     data = get_object_or_404(models.JobOrder, id=id)
     if request.method == "POST":
@@ -140,12 +145,14 @@ def editjoborder(request, id):
 
 
 @login_required
+@group_required("Project Manager","Admin Project")
 def viewworkcompletion(request):
     data = models.WorkCompletion.objects.all()
     return render(request, "Project/dataworkcompletion.html", {"data": data})
 
 
 @login_required
+@group_required("Project Manager","Admin Project")
 def tambahdataworkcompletion(request):
     dataJO = models.JobOrder.objects.all()
     if request.method == "POST":
@@ -184,6 +191,7 @@ def tambahdataworkcompletion(request):
 
 
 @login_required
+@group_required("Project Manager","Admin Project")
 def search_jo(request):
     query = request.GET.get("q", "")
     results = models.JobOrder.objects.filter(
@@ -203,6 +211,7 @@ def search_jo(request):
     return JsonResponse(data, safe=False)
 
 @login_required
+@group_required("Project Manager","Admin Project")
 def search_proposebudget(request):
     query = request.GET.get("q", "")
     results = models.ProposedBudget.objects.filter(
@@ -222,6 +231,7 @@ def search_proposebudget(request):
     return JsonResponse(data, safe=False)
 
 @login_required
+@group_required("Project Manager","Admin Project")
 def viewproposebudget(request):
     data = models.ProposedBudget.objects.all()
     for item in data:
@@ -229,6 +239,7 @@ def viewproposebudget(request):
     return render(request,"Project/dataproposebudget.html", {"data": data})
 
 @login_required
+@group_required("Project Manager","Admin Project")
 def tambahdataproposebudget(request):
     datajo = models.JobOrder.objects.all()
 
@@ -292,6 +303,7 @@ def detailproposebudget(request, id):
     items = models.ItemProposedBudget.objects.filter(NomorProposedBudget=data)
     cashexpensereport = models.CashExpenseReport.objects.filter(NomorProposedBudget=data)
     cashexpensereport.totalcer = cashexpensereport.aggregate(Total=Sum("Nilai"))["Total"] or 0
+    data.balance = data.Nilai-cashexpensereport.totalcer
 
     return render(request, "Project/dataproposebudgetdetail.html", {"data": data, "items": items, "cashexpensereport": cashexpensereport})
 
