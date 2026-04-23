@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="page-heading">
+    <h3>Input Budget {{datajo.NomorJO}} - {{datajo.Deskripsi}}</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="card-header">
+                <h4 class="card-title">Data Budget</h4>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <table class="table table-bordered" id="table-input">
+                        <thead>
+                            <tr>
+                                <th>Cost Code</th>
+                                <th>Nama</th>
+                                <th>Total Price</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="table-body">
+
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control item-search" name="costcode">
+                                </td>
+
+                                <td>
+                                    <input type="text" name="nama" class="form-control jumlah">
+                                </td>
+
+                                <td>
+                                    <input type="number" name="total" class="form-control">
+                                </td>
+                                <td>
+                                    <input type="text" name="remarks" class="form-control">
+                                </td>
+
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <button type="button" class="btn btn-secondary" id="add-row">+ Tambah Baris</button>
+                <button type="submit" class="btn btn-primary">Simpan Semua</button>
+
+        </form>
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+<script>
+
+    // ================= ADD ROW =================
+    $("#add-row").click(function () {
+        let row = $("#table-body tr:first").clone();
+        row.find("input").val("");
+        $("#table-body").append(row);
+    });
+
+    // ================= REMOVE ROW =================
+    $(document).on("click", ".remove-row", function () {
+        if ($("#table-body tr").length > 1) {
+            $(this).closest("tr").remove();
+            hitungGrandTotal();
+        }
+    });
+
+    // ================= HITUNG PER ROW =================
+    function hitungTotalRow(row) {
+        let jumlah = parseFloat(row.find('.jumlah').val()) || 0;
+        let harga = parseFloat(row.find('.harga').val()) || 0;
+        let total = jumlah * harga;
+
+        row.find('.total-harga').val(total);
+    }
+
+    // ================= HITUNG GRAND TOTAL =================
+    function hitungGrandTotal() {
+        let total = 0;
+
+        $('#table-body tr').each(function () {
+            let val = parseFloat($(this).find('.total-harga').val()) || 0;
+            total += val;
+        });
+
+        $('#grand-total').val("Rp " + total.toLocaleString('id-ID'));
+    }
+
+    // ================= TRIGGER =================
+    $(document).on('keyup change', '.jumlah, .harga', function () {
+        let row = $(this).closest('tr');
+        hitungTotalRow(row);
+        hitungGrandTotal();
+    });
+
+    // ================= LOAD AWAL =================
+    $(document).ready(function () {
+        $('#table-body tr').each(function () {
+            hitungTotalRow($(this));
+        });
+        hitungGrandTotal();
+    });
+
+</script>
+
+{% endblock %}

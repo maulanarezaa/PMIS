@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.db.models import Count, Q, Sum, Max
 from django.contrib.auth.decorators import login_required
 from .templatetags.group_tags import group_required 
+from collections import defaultdict
 
 
 def is_valid_image(file):
@@ -51,6 +52,8 @@ def viewdetailjoborder(request, id):
         item.cer = totalcer
     
     data.proposebudget = proposebudget
+
+    data.budgetitem = models.BudgetItem.objects.filter(project=data)
    
 
 
@@ -478,6 +481,7 @@ def editcashexpensereport(request, id):
     data = get_object_or_404(models.CashExpenseReport, id=id)
     dataproposedbudget = models.ProposedBudget.objects.all()
     items = models.ItemCashExpenseReport.objects.filter(NomorCashReport=data)
+    costcategory = models.BudgetItem.objects.filter(project=data.NomorProposedBudget.NomorJO)
     if request.method == "POST":
         print(request.POST)
         print(request.FILES)
@@ -494,6 +498,7 @@ def editcashexpensereport(request, id):
         Satuan = request.POST.getlist("Satuan")
         Harga = request.POST.getlist("Harga")
         Nama = request.POST.getlist('Nama')
+        costcodelist = request.POST.getlist('costcode[]')
         Totalharga = request.POST.getlist('TotalHarga')
         nilaitotal = 0
         print(iditem, jumlah, Satuan, Harga, Totalharga, catatan,Nama)
@@ -511,7 +516,7 @@ def editcashexpensereport(request, id):
                 data.FileCashReport = file
             data.save()
 
-            for item in zip(iditem, jumlah, Satuan, Harga, Totalharga, catatan,Nama):
+            for item in zip(iditem, jumlah, Satuan, Harga, Totalharga, catatan,Nama,costcodelist):
                 print(item)
                 if item[0] != "": # jika iditem ada, update item
                     itemobj = models.ItemCashExpenseReport.objects.get(id=item[0])
@@ -521,6 +526,7 @@ def editcashexpensereport(request, id):
                     itemobj.TotalHarga = item[4]
                     itemobj.Remarks = item[5]
                     itemobj.Item = item[6]
+                    itemobj.costcode = models.BudgetItem.objects.get(id=item[7]) if item[7] else None
                     itemobj.save()
                     print('itemo')
                 else: # jika iditem tidak ada, buat item baru
@@ -531,7 +537,8 @@ def editcashexpensereport(request, id):
                         Harga=item[3],
                         TotalHarga=item[4],
                         Remarks=item[5],
-                        Item = item[6]
+                        Item = item[6],
+                        costcode = models.BudgetItem.objects.get(id=item[7]) if item[7] else None
                     ).save()
                     print('Masuk')
 
@@ -543,7 +550,7 @@ def editcashexpensereport(request, id):
             messages.error(request, e)
             return redirect("editcashexpensereport", id=id)
 
-    return render(request, "Project/editcashexpensereport.html", {"data": data, "dataproposebudget": dataproposedbudget, "items": items})
+    return render(request, "Project/editcashexpensereport.html", {"data": data, "dataproposebudget": dataproposedbudget, "items": items, "costcategory": costcategory})
 
 # Invoice Management    
 def viewinvoice(request):
@@ -652,3 +659,88 @@ def get_wc_detail(request):
     return JsonResponse({
         'nilai': wc.Nilai
     })
+
+'''BUDGET'''
+
+def viewbudget(request):
+    items = models.BudgetItem.objects.all()
+    return render(request,"Project/budget.html", { "items": items})
+
+def addbudget(request, id):
+    datajo = models.JobOrder.objects.get(id=id)
+    if request.method == "POST":
+        print(request.POST)
+        listcostcode = request.POST.getlist("costcode")
+        listnama = request.POST.getlist("nama")
+        listtotal = request.POST.getlist("total")
+        listremarks = request.POST.getlist("remarks")
+
+        try:
+            for costcode, nama, total, remarks in zip(listcostcode, listnama, listtotal, listremarks):
+                models.BudgetItem(
+                    project = datajo,
+                    code = costcode,
+                    name = nama,
+                    total_price = total,
+                    remarks = remarks
+                ).save()
+            messages.success(request, "Data Berhasil disimpan")
+            return redirect("budget")
+        except Exception as e:
+            messages.error(request, e)
+            return redirect("detailjoborder", id=id)
+
+    return render(request, "Project/addbudget.html", {"datajo": datajo})
+
+def editbudget(request, id):
+    item = get_object_or_404(models.BudgetItem, id=id)
+    if request.method == "POST":
+        print(request.POST)
+        costcode = request.POST["costcode"]
+        nama = request.POST["nama"]
+        total = request.POST["total"]
+        remarks = request.POST["remarks"]
+
+        try:
+            item.code = costcode
+            item.name = nama
+            item.total_price = total
+            item.remarks = remarks
+            item.save()
+            messages.success(request, "Data Berhasil diupdate")
+            return redirect("budget")
+        except Exception as e:
+            messages.error(request, e)
+            return redirect("editbudget", id=id)
+
+    return render(request, "Project/editbudget.html", {"data": item})
+
+def deletebudget(request, id):
+    item = get_object_or_404(models.BudgetItem, id=id)
+    item.delete()
+    messages.success(request, "Data Berhasil dihapus")
+    return redirect("budget")
+
+def searchbudget(request):
+    query = request.GET.get("q", "")
+    jo = request.GET.get("jo", "")
+    hasil = models.BudgetItem.objects.filter(project__id=jo)
+    results = hasil.filter(
+        Q(name__icontains=query) | Q(code__icontains=query) | Q(project__NomorJO__icontains=query)
+    )[:10]
+    data = []
+    for item in results:
+        data.append(
+            {
+                "id": item.id,
+                "code": item.code,
+                "name": item.name,
+                "total_price": f"{int(item.total_price):,}".replace(",", "."),
+                "remarks": item.remarks,
+                "project": item.project.NomorJO,
+            }
+        )
+    
+    # print(results)
+    print(query)
+    return JsonResponse(data, safe=False)

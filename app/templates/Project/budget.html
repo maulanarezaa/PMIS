@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    .tree-toggle {
+        cursor: pointer;
+        font-weight: bold;
+        margin-right: 5px;
+    }
+
+    .hidden-row {
+        display: none;
+    }
+</style>
+
+<div class="page-heading">
+    <h3>WBS Budget - {{ budget.name }}</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th width="120">Qty</th>
+                        <th width="150">Unit Price</th>
+                        <th width="150">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for item in items %}
+                    <tr 
+                        data-id="{{ item.id }}" 
+                        data-parent="{{ item.parent.id|default:'' }}"
+                        class="tree-row"
+                    >
+                        <td>
+                            <span style="padding-left: {{ item.level|add:"-1"|add:"20" }}px;">
+                                
+                                {% if item.children.exists %}
+                                    <span class="tree-toggle" data-id="{{ item.id }}">▶</span>
+                                {% else %}
+                                    <span style="display:inline-block; width:15px;"></span>
+                                {% endif %}
+
+                                {{ item.name }}
+                            </span>
+                        </td>
+
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.unit_price|floatformat:0 }}</td>
+                        <td>{{ item.total_price|floatformat:0 }}</td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</section>
+
+<script>
+$(document).ready(function(){
+
+    // =========================
+    // INITIAL: HIDE ALL CHILDREN
+    // =========================
+    $('.tree-row').each(function(){
+        let parent = $(this).data('parent');
+        if(parent){
+            $(this).addClass('hidden-row');
+        }
+    });
+
+    // =========================
+    // TOGGLE CLICK
+    // =========================
+    $('.tree-toggle').click(function(){
+
+        let id = $(this).data('id');
+        let isOpen = $(this).text() === '▼';
+
+        if(isOpen){
+            $(this).text('▶');
+            hideChildren(id);
+        } else {
+            $(this).text('▼');
+            showChildren(id);
+        }
+
+    });
+
+    // =========================
+    // SHOW CHILDREN
+    // =========================
+    function showChildren(parentId){
+        $('tr[data-parent="'+parentId+'"]').each(function(){
+            $(this).removeClass('hidden-row');
+        });
+    }
+
+    // =========================
+    // HIDE CHILDREN (RECURSIVE)
+    // =========================
+    function hideChildren(parentId){
+        $('tr[data-parent="'+parentId+'"]').each(function(){
+            let childId = $(this).data('id');
+
+            $(this).addClass('hidden-row');
+
+            // reset toggle icon
+            $(this).find('.tree-toggle').text('▶');
+
+            hideChildren(childId);
+        });
+    }
+
+});
+</script>
+
+{% endblock %}

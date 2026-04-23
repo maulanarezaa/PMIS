@@ -38,4 +38,12 @@ urlpatterns = [
     path('invoice/edit/<int:id>', viewsProject.editinvoice, name="editinvoice"),
     path('get-workcompletion-by-jo/', viewsProject.get_workcompletion_by_jo, name='get_workcompletion_by_jo'),
     path('get-wc-detail/', viewsProject.get_wc_detail, name='get_wc_detail'),
+    # Budget
+    path('budget',viewsProject.viewbudget,name="budget"),
+    path('budget/add/<str:id>',viewsProject.addbudget,name="tambahdatabudget"),
+    path('budget/delete/<int:id>', viewsProject.deletebudget, name="deletebudget"),
+    # path('budget/detail/<int:id>', viewsProject.detailbudget, name="detailbudget"),
+    path('budget/edit/<int:id>', viewsProject.editbudget, name="editbudget"),
+    # SUPPORT
+    path("search-item/", viewsProject.searchbudget, name="searchbudet"),
 ]

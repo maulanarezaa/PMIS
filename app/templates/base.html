@@ -164,6 +164,9 @@
         let dataTable2 = new simpleDatatables.DataTable(table2);
         let table3 = document.querySelector('#table3');
         let dataTable3 = new simpleDatatables.DataTable(table3);
+        new dataTable("table1",{
+            responsive: true,
+        })
         dataTable3.order = [[3, 'asc']]; // Urutkan berdasarkan kolom pertama (ID) secara menurun
     </script>
     <script>

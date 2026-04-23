@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<style>
+    .jo-result {
+        position: absolute;
+        z-index: 9999;
+        width: 100%;
+        background: white;
+        border: 1px solid #ddd;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+</style>
+
+<div class="page-heading">
+    <h3>Detail Propose Budget</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="row">
+
+                    <div class="col-md-3">
+                        <label>Cost Code</label>
+                        <input type="text" class="form-control" name="costcode"
+                            value="{{data.code}}">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label>Nama</label>
+                        <input type="text" class="form-control" name="nama" value="{{data.name}}">
+                    </div>
+
+                    <div class="col-md-3 position-relative">
+                        <label>Total Budget</label>
+                        <input type="text" class="form-control jo-search"
+                            value="{{data.total_price}}" 
+                            name="total"
+                            autocomplete="off">
+
+                        <div class="list-group jo-result" style="display:none;"></div>
+                    </div>
+                    <div class="col-md-3 position-relative">
+                        <label>Remarks</label>
+                        <input type="text" class="form-control jo-search"
+                            value="{{data.remarks}}"
+                            autocomplete="off" name="remarks">
+
+                        <input type="hidden" class="nomor-jo" name="idjo" value="{{data.NomorJO.id}}">
+
+                        <div class="list-group jo-result" style="display:none;"></div>
+                    </div>
+
+                    
+                </div>
+                <div class="mt-2">
+
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <button type="reset" class="btn btn-secondary" >Reset</button>
+                    
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        /* ================= ADD ROW ================= */
+        $('#add-row').click(function () {
+            let row = `
+        <tr>
+            <td>
+                <input type="text" class="form-control" name="Nama">
+                <input type="hidden" name="iditem">
+                <input type="hidden" name="delete_flag" value="0" class="delete-flag">
+            </td>
+            <td><input type="number" class="form-control jumlah" name="Jumlah"></td>
+            <td><input type="text" class="form-control" name="Satuan"></td>
+            <td><input type="number" class="form-control harga" name="Harga"></td>
+            <td><input type="number" class="form-control total" name="TotalHarga" readonly></td>
+            <td><input type="text" class="form-control" name="Remarks"></td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button>
+            </td>
+        </tr>`;
+            $('#table1 tbody').append(row);
+        });
+
+        /* ================= DELETE ================= */
+        $(document).on('click', '.delete-row', function () {
+            let row = $(this).closest('tr');
+            let iditem = row.find('input[name="iditem"]').val();
+
+            if (iditem) {
+                row.find('.delete-flag').val('1');
+                row.hide();
+            } else {
+                row.remove();
+            }
+
+            hitungGrandTotal();
+        });
+
+        /* ================= HITUNG ================= */
+        function hitungTotalRow(row) {
+            let jumlah = parseFloat(row.find('.jumlah').val()) || 0;
+            let harga = parseFloat(row.find('.harga').val()) || 0;
+            let total = jumlah * harga;
+            row.find('.total').val(total);
+        }
+
+        function hitungGrandTotal() {
+            let grandTotal = 0;
+
+            $('#table1 tbody tr:visible').each(function () {
+                let total = parseFloat($(this).find('.total').val()) || 0;
+                grandTotal += total;
+            });
+
+            $('#grand-total').val("Rp " + grandTotal.toLocaleString('id-ID'));
+        }
+
+        $(document).on('keyup change', '.jumlah, .harga', function () {
+            let row = $(this).closest('tr');
+            hitungTotalRow(row);
+            hitungGrandTotal();
+        });
+
+        /* ================= LOAD AWAL ================= */
+        $('#table1 tbody tr').each(function () {
+            hitungTotalRow($(this));
+        });
+        hitungGrandTotal();
+
+        /* ================= AUTOCOMPLETE ================= */
+        let delay;
+        const joResult = $('.jo-result');
+
+        $(document).on('keyup', '.jo-search', function () {
+            clearTimeout(delay);
+            let query = $(this).val();
+            joResult.hide().empty();
+
+            if (query.length < 3) return;
+
+            delay = setTimeout(function () {
+                $.ajax({
+                    url: "{% url 'search_jo' %}",
+                    data: { q: query },
+                    success: function (data) {
+                        joResult.empty();
+
+                        if (data.length > 0) {
+                            data.forEach(function (item) {
+                                joResult.append(`
+                                <a href="#" class="list-group-item list-group-item-action select-jo"
+                                   data-jo="${item.idjo}">
+                                   ${item.NomorJO} - ${item.Deskripsi}
+                                </a>
+                            `);
+                            });
+                            joResult.show();
+                        }
+                    }
+                });
+            }, 300);
+        });
+
+        $(document).on('click', '.select-jo', function (e) {
+            e.preventDefault();
+            $('.jo-search').val($(this).text());
+            $('.nomor-jo').val($(this).data('jo'));
+            joResult.hide();
+        });
+
+        $(document).click(function (e) {
+            if (!$(e.target).closest('.jo-search, .jo-result').length) {
+                joResult.hide();
+            }
+        });
+
+    });
+</script>
+
+{% endblock %}

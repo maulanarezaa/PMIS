@@ -90,6 +90,7 @@
                             <th>Harga</th>
                             <th>Total</th>
                             <th>Remarks</th>
+                            <th>Cost Code</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -110,6 +111,20 @@
                                     value="{{item.TotalHarga}}" readonly></td>
                             <td><input type="text" class="form-control" name="Remarksitem" value="{{item.Remarks}}"
                                     required></td>
+                            <td style="position: relative;">
+
+                                <!-- INPUT AUTOCOMPLETE -->
+                                <input type="text" class="form-control cost-search" placeholder="Cari cost code..."
+                                    autocomplete="off" value="{{ item.costcode.code }} - {{ item.costcode.name }}">
+
+                                <!-- HIDDEN ID (yang dikirim ke backend) -->
+                                <input type="hidden" name="costcode[]" class="cost-id" value="{{ item.costcode.id }}">
+
+                                <!-- DROPDOWN RESULT -->
+                                <div class="list-group cost-result"
+                                    style="position:absolute; width:100%; z-index:1000;"></div>
+
+                            </td>
                             <td>
                                 <button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button>
                                 <input type="hidden" name="delete_item" value="0" class="delete-flag">
@@ -131,6 +146,88 @@
 <!-- ================= JS ================= -->
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Autocomplete -->
+<script>
+    let debounceTimer;
+
+$(document).on('keyup', '.cost-search', function () {
+
+    clearTimeout(debounceTimer);
+
+    let input = $(this);
+
+    debounceTimer = setTimeout(function () {
+
+        let query = input.val();
+        let container = input.closest('td');
+        let resultBox = container.find('.cost-result');
+
+        resultBox.hide().empty();
+
+        if (query.length < 2) return;
+
+        $.ajax({
+            url: "{% url 'searchbudet' %}",
+            data: { q: query,jo:{{data.NomorProposedBudget.NomorJO.id}} },
+            success: function (data) {
+
+                if (data.length === 0) {
+                    resultBox.append('<div class="list-group-item">Tidak ditemukan</div>');
+                    resultBox.show();
+                    return;
+                }
+
+                data.forEach(function (item) {
+                    resultBox.append(`
+                        <a href="#"
+                           class="list-group-item list-group-item-action select-cost"
+                           data-id="${item.id}"
+                           data-text="${item.code} - ${item.name}">
+                           ${item.code} - ${item.name}
+                        </a>
+                    `);
+                });
+
+                resultBox.show();
+            }
+        });
+
+    }, 300); // debounce 300ms
+});
+
+$(document).on('click', '.select-cost', function (e) {
+
+    e.preventDefault();
+
+    let selected = $(this);
+    let container = selected.closest('td');
+
+    // isi input text
+    container.find('.cost-search').val(selected.data('text'));
+
+    // isi hidden id
+    container.find('.cost-id').val(selected.data('id'));
+
+    // bersihkan dropdown
+    container.find('.cost-result').hide().empty();
+});
+
+$(document).click(function (e) {
+    if (!$(e.target).closest('.cost-search, .cost-result').length) {
+        $('.cost-result').hide();
+    }
+});
+
+$(document).on('blur', '.cost-search', function () {
+
+    let container = $(this).closest('td');
+    let id = container.find('.cost-id').val();
+
+    if (!id) {
+        $(this).val('');
+    }
+});
+</script>
 
 <script>
     // ================= ADD ROW =================
@@ -146,6 +243,20 @@
     <td><input type="number" class="form-control harga" name="Harga" required></td>
     <td><input type="number" class="form-control total" name="TotalHarga" readonly></td>
     <td><input type="text" class="form-control" name="Remarksitem" required></td>
+    <td style="position: relative;">
+
+                                <!-- INPUT AUTOCOMPLETE -->
+                                <input type="text" class="form-control cost-search" placeholder="Cari cost code..."
+                                    autocomplete="off" value="{{ item.costcode.code }} - {{ item.costcode.name }}">
+
+                                <!-- HIDDEN ID (yang dikirim ke backend) -->
+                                <input type="hidden" name="costcode[]" class="cost-id" value="{{ item.costcode.id }}">
+
+                                <!-- DROPDOWN RESULT -->
+                                <div class="list-group cost-result"
+                                    style="position:absolute; width:100%; z-index:1000;"></div>
+
+                            </td>
     <td>
         <button type="button" class="btn btn-danger btn-sm delete-row">Hapus</button>
         <input type="hidden" name="delete_item" value="0" class="delete-flag">
@@ -237,46 +348,46 @@
 
     });
     // ================= HITUNG TOTAL =================
-function hitungTotalRow(row) {
-    let jumlah = parseFloat(row.find('.jumlah').val()) || 0;
-    let harga = parseFloat(row.find('.harga').val()) || 0;
+    function hitungTotalRow(row) {
+        let jumlah = parseFloat(row.find('.jumlah').val()) || 0;
+        let harga = parseFloat(row.find('.harga').val()) || 0;
 
-    let total = jumlah * harga;
-    row.find('.total').val(total);
-}
+        let total = jumlah * harga;
+        row.find('.total').val(total);
+    }
 
-function hitungGrandTotal() {
-    let grandTotal = 0;
+    function hitungGrandTotal() {
+        let grandTotal = 0;
 
-    $('#table1 tbody tr:visible').each(function () {
-        let total = parseFloat($(this).find('.total').val()) || 0;
-        grandTotal += total;
-    });
+        $('#table1 tbody tr:visible').each(function () {
+            let total = parseFloat($(this).find('.total').val()) || 0;
+            grandTotal += total;
+        });
 
-    $('#grand-total').val("Rp " + grandTotal.toLocaleString('id-ID'));
-}
+        $('#grand-total').val("Rp " + grandTotal.toLocaleString('id-ID'));
+    }
 
-// trigger realtime
-$(document).on('keyup change', '.jumlah, .harga', function () {
-    let row = $(this).closest('tr');
-    hitungTotalRow(row);
-    hitungGrandTotal();
-});
-
-// saat delete
-$(document).on('click', '.delete-row', function () {
-    setTimeout(function () {
+    // trigger realtime
+    $(document).on('keyup change', '.jumlah, .harga', function () {
+        let row = $(this).closest('tr');
+        hitungTotalRow(row);
         hitungGrandTotal();
-    }, 100);
-});
-
-// saat load awal
-$(document).ready(function () {
-    $('#table1 tbody tr').each(function () {
-        hitungTotalRow($(this));
     });
-    hitungGrandTotal();
-});
+
+    // saat delete
+    $(document).on('click', '.delete-row', function () {
+        setTimeout(function () {
+            hitungGrandTotal();
+        }, 100);
+    });
+
+    // saat load awal
+    $(document).ready(function () {
+        $('#table1 tbody tr').each(function () {
+            hitungTotalRow($(this));
+        });
+        hitungGrandTotal();
+    });
 </script>
 
 {% endblock %}

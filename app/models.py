@@ -31,6 +31,8 @@ class JobOrder(models.Model):
     FileKontrak = models.FileField(
         upload_to="File/Project/JobOrder", null=True, blank=True
     )
+    FileBudget = models.FileField(
+        upload_to="File/Project/Budget", null=True, blank=True)
 
     def __str__(self):
         return f"{self.NomorJO} - {self.Deskripsi}"
@@ -49,6 +51,16 @@ class WorkCompletion(models.Model):
 
     def __str__(self):
         return f"{self.NomorJO}-{self.NomorWorkCompletion}"
+    
+class BudgetItem(models.Model):
+    project = models.ForeignKey(JobOrder, on_delete=models.CASCADE, related_name='budget_items',null=True, blank=True)
+    code = models.CharField(max_length=50, null=True, blank=True)
+    name = models.CharField(max_length=255)
+    total_price = models.FloatField(default=0)
+    remarks = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.project.NomorJO} - {self.name}"
 
 class ProposedBudget(models.Model):
     STATUS_CHOICES = [
@@ -123,6 +135,7 @@ class ItemCashExpenseReport(models.Model):
 
     TotalHarga = models.FloatField()
     Remarks = models.CharField(max_length=128, blank=True,null=True)
+    costcode = models.ForeignKey(BudgetItem, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f"{self.cash_report.NomorCashReport} - {self.Item}"
@@ -139,6 +152,7 @@ class Invoice(models.Model):
 
     def __str__(self):
         return f"{self.NomorWorkCompletion}-{self.NomorInvoice}"
+
 
 """
 HRIS MODELS

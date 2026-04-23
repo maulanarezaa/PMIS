@@ -34,6 +34,9 @@
                 <li class="nav-item">
                     <a href="#" class="nav-link tab-link" data-target="invoice">Invoice </a>
                 </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link tab-link" data-target="budget">Budget </a>
+                </li>
             </ul>
 
             <!-- ================= TAB INFO ================= -->
@@ -299,9 +302,105 @@
                     </tbody>
                 </table>
             </div>
+            <!-- ================= TAB Budget ================= -->
+            <div class="tab-pane-custom d-none" id="tab-budget">
+                <h5>Budget</h5>
+                <a href="{% url 'tambahdatabudget' data.id %}" class="btn btn-primary">Add Item</a>
+
+                <table class="table table-striped" id="table11">
+                    <thead>
+                        <tr>
+                            <th>Cost Code</th>
+                            <th>Nama</th>
+                            <th>Total Price</th>
+                            <th>Remarks</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data.budgetitem %}
+                        <tr>
+                            <td>{{ item.code }}</td>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.total_price|intcomma }}</td>
+                            <td>{{ item.remarks }}</td>
+                            <td>
+                                <a href="{% url 'editbudget' item.id %}" class="btn btn-sm btn-primary">Edit</a>
+                                <a  type="button" class="btn btn-danger btn-sm btn-hapus" data-id="{{item.id}}"
+                                    data-nama="{{item.NamaItem}}" data-bs-toggle="modal" data-bs-target="#modalHapus">
+                                    Hapus</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">Tidak ada data</td>
+                        </tr>
+                        {% endfor %}
+                    
+                </table>
+            </div>
         </div>
     </div>
 </section>
+<!-- ================= MODAL HAPUS ================= -->
+<div class="modal fade" id="modalHapus" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Konfirmasi Hapus</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus data berikut?</p>
+                <h5 id="namaItemHapus" class="text-danger"></h5>
+                <p class="text-muted">Data yang dihapus tidak dapat dikembalikan.</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Batal
+                </button>
+
+                <a href="#" id="btnConfirmHapus" class="btn btn-danger">
+                    Ya, Hapus
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ================= JS ================= -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const buttons = document.querySelectorAll(".btn-hapus");
+        const namaItem = document.getElementById("namaItemHapus");
+        const btnConfirm = document.getElementById("btnConfirmHapus");
+
+        buttons.forEach(button => {
+            button.addEventListener("click", function () {
+
+                const id = this.getAttribute("data-id");
+                const nama = this.getAttribute("data-nama");
+
+                namaItem.textContent = nama;
+                btnConfirm.href = `/project/budget/delete/${id}`;
+
+            });
+        });
+
+    });
+
+    // 🔥 OPTIONAL: AKTIFKAN DATATABLE
+    $(document).ready(function () {
+        $('#table1').DataTable({
+            scrollX: true
+        });
+    });
+</script>
 
 <!-- ================= JS ================= -->
 <script>
