@@ -53,6 +53,7 @@
                             <th>Deskripsi</th>
                             <th>Nilai</th>
                             <th>Total CER</th>
+                            <th>Submited By</th>
                             <th>Status</th>
                             <th>Approval</th>
                             <th>Action</th>
@@ -70,6 +71,7 @@
                             <td>{{item.Remarks}}</td>
                             <td>Rp {{item.Nilai|intcomma}}</td>
                             <td>Rp {{item.totalcer|intcomma}}</td>
+                            <td>{{item.Submittedby.karyawan_profile.Nama}}</td>
                             <td>{{item.Status}}</td>
                             <td>{{item.Approvedby}}</td>
 

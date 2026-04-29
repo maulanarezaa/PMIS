@@ -7,25 +7,34 @@ from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
 from django.db.models import Count, Q
 from .formAccount import RoleForm, PermissionForm
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .forms import RegisterKaryawanForm
+from app.templatetags.group_tags import group_required
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def viewdashboard(request):
     data = models.MasterKaryawan.objects.all()
     print(data)
     jumlahkaryawan = data.count()
+    print(request.user)
     return render(
         request, "HRIS/index.html", {"data": data, "JumlahKaryawan": jumlahkaryawan}
     )
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def viewkaryawan(request):
     data = models.MasterKaryawan.objects.all()
     
     return render(request, "HRIS/datakaryawan.html", {"data": data})
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def viewkaryawandetail(request, id):
     data = models.MasterKaryawan.objects.get(pk=id)
     historikontrak = models.Kontrak.objects.filter(Nama__id=id).order_by("-TanggalAwal")
@@ -36,7 +45,42 @@ def viewkaryawandetail(request, id):
         {"data": data, "datakontrak": historikontrak},
     )
 
+@login_required
+@group_required("Project Manager","Human Resource")
+def register_karyawan(request, id):
+    karyawan = get_object_or_404(models.MasterKaryawan, pk=id)
 
+    # cegah kalau sudah punya akun
+    if karyawan.user:
+        messages.warning(request, "Karyawan sudah memiliki akun")
+        return redirect('viewkaryawan')
+
+    if request.method == 'POST':
+        form = RegisterKaryawanForm(request.POST)
+
+        if form.is_valid():
+            user = form.save()
+
+            # link ke karyawan
+            karyawan.user = user
+            karyawan.save()
+
+            messages.success(request, "Akun berhasil dibuat")
+            return redirect('viewkaryawan')
+    else:
+        # prefill username dari nama karyawan
+        initial_data = {
+            'username': karyawan.Nama.lower().replace(' ', '')
+        }
+        form = RegisterKaryawanForm(initial=initial_data)
+
+    return render(request, 'HRIS/registerkaryawan.html', {
+        'form': form,
+        'karyawan': karyawan
+    })
+
+@login_required
+@group_required("Project Manager","Human Resource")
 def editkaryawan(request, id):
     data = get_object_or_404(models.MasterKaryawan, pk=id)
 
@@ -77,11 +121,12 @@ def editkaryawan(request, id):
 
     return render(request, "HRIS/datakaryawanedit.html", {"data": data})
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def is_valid_image(file):
     return file.content_type in ["image/jpeg", "image/png"]
 
-
+@login_required
 def tambahdatakaryawan(request):
     proyek = models.Proyek.objects.all()
     JobOrder = models.JobOrder.objects.all()
@@ -167,7 +212,7 @@ def tambahdatakaryawan(request):
 
     return render(request, "HRIS/tambahdatakaryawan.html", {"proyek": JobOrder})
 
-
+@group_required("Project Manager","Human Resource")
 def deletekaryawan(request, id):
     karyawanobj = models.MasterKaryawan.objects.get(pk=id)
     karyawanobj.delete()
@@ -175,11 +220,14 @@ def deletekaryawan(request, id):
 
 
 # Fitur Kontrak
+@login_required
+@group_required("Project Manager","Human Resource")
 def viewkontrak(request):
     data = models.Kontrak.objects.all()
     return render(request, "HRIS/datakontrak.html", {"data": data})
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def addkontrak(request):
     datakaryawan = models.MasterKaryawan.objects.all()
     dataproyek = models.Proyek.objects.all()
@@ -229,7 +277,8 @@ def addkontrak(request):
         {"datakaryawan": datakaryawan, "dataproyek": dataproyek},
     )
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def editkontrak(request, id):
     datakontrak = models.Kontrak.objects.get(pk=id)
     datakontrak.TanggalAwal = datakontrak.TanggalAwal.strftime("%Y-%m-%d")
@@ -264,7 +313,8 @@ def editkontrak(request, id):
         {"data": datakontrak, "dataproyek": dataproyek},
     )
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def ajax_detail_karyawan(request):
     nama = request.GET.get("nama")
     try:
@@ -282,20 +332,23 @@ def ajax_detail_karyawan(request):
         data = {}
     return JsonResponse(data)
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def deletekontrak(request, id):
     datakontrak = models.Kontrak.objects.get(pk=id)
     datakontrak.delete()
     return redirect("viewkontrak")
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def viewattendance(request):
     data = models.Absensi.objects.all()
     for item in data:
         item.Tanggal = item.Tanggal.strftime("%Y-%m-%d")
     return render(request, "HRIS/datakehadiran.html", {"data": data})
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def inputattendace(request):
     datamanpower = models.MasterKaryawan.objects.all()
     if request.method == "POST":
@@ -315,7 +368,8 @@ def inputattendace(request):
             ).save()
     return render(request, "HRIS/inputkehadiran.html", {"datamanpower": datamanpower})
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def editattendance(request, id):
     dataattendance = models.Absensi.objects.get(pk=id)
     print(dataattendance.StatusHadir)
@@ -332,13 +386,15 @@ def editattendance(request, id):
 
     return render(request, "HRIS/datakehadiranedit.html", {"data": dataattendance})
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def deleteattendance(request, id):
     dataattendance = models.Absensi.objects.get(pk=id)
     dataattendance.delete()
     return redirect("viewattendance")
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def rekapdataabsen(request):
     start = request.GET.get("start_date")
     end = request.GET.get("end_date")
@@ -373,12 +429,14 @@ def rekapdataabsen(request):
     }
     return render(request, "HRIS/rekapdataabsen.html", context)
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def payrolllistview(request):
     data = models.PeriodePayroll.objects.all().order_by("-TanggalAwal")
     return render(request, "HRIS/payrollperiodelist.html", {"data": data})
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def tambahdatapayroll(request):
     if request.method == "POST":
         print(request.POST)
@@ -398,7 +456,8 @@ def tambahdatapayroll(request):
         return redirect("payroll")
     return render(request, "HRIS/tambahdatapayrollperiode.html")
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def editdatapayroll(request, id):
     data = models.PeriodePayroll.objects.get(pk=id)
     if request.method == "POST":
@@ -417,13 +476,15 @@ def editdatapayroll(request, id):
         return redirect("payroll")
     return render(request, "HRIS/editdatapayrollperiode.html", {"data": data})
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def deletepayroll(requet, id):
     data = models.PeriodePayroll.objects.get(pk=id)
     data.delete()
     return redirect("payroll")
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def detailpayroll(request, id):
     data = models.detailpayroll.objects.filter(PeriodePayroll__pk=id)
     data_periode = models.PeriodePayroll.objects.get(pk=id)
@@ -438,7 +499,8 @@ def detailpayroll(request, id):
 Section Detail Payroll
 """
 
-
+@login_required
+@group_required("Project Manager","Human Resource")
 def tambahdetailpayroll(request, id):
     dataperiode = models.PeriodePayroll.objects.get(pk=id)
     datakaryawan = models.MasterKaryawan.objects.all()

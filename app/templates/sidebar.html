@@ -5,7 +5,7 @@
         <li class="sidebar-title">Menu</li>
 
         <li class="sidebar-item ">
-            <a href="index.html" class='sidebar-link'>
+            <a href="{% url 'dashboard' %}" class='sidebar-link'>
                 <i class="bi bi-grid-fill"></i>
                 <span>Dashboard</span>
             </a>
@@ -75,9 +75,9 @@
                 <li class="submenu-item">
                     <a href="{% url 'viewworkcompletion' %}">Work Completion</a>
                 </li>
-                <li class="submenu-item">
+                <!-- <li class="submenu-item">
                     <a href="">Material Requests</a>
-                </li>
+                </li> -->
                 <li class="submenu-item">
                     <a href="{% url 'proposebudget' %}">Proposed Budget </a>
                 </li>
@@ -86,9 +86,6 @@
                 </li>
                 <li class="submenu-item">
                     <a href="{% url 'invoice' %}">Invoice </a>
-                </li>
-                <li class="submenu-item">
-                    <a href="{% url 'budget' %}">budget </a>
                 </li>
 
             </ul>

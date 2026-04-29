@@ -46,4 +46,6 @@ urlpatterns = [
     path('budget/edit/<int:id>', viewsProject.editbudget, name="editbudget"),
     # SUPPORT
     path("search-item/", viewsProject.searchbudget, name="searchbudet"),
+    path('ajax/joborder/', viewsProject.ajax_joborder, name='ajax_joborder'),
+    path('ajax/proposebudget-by-jo/', viewsProject.ajax_proposebudget_by_jo, name='ajax_proposebudget_by_jo'),
 ]

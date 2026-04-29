@@ -19,7 +19,7 @@ def is_valid_image(file):
 
 
 @login_required
-@group_required("Project Manager","Admin Project")
+@group_required("Project Manager","Admin Project","Admin Finance")
 def viewjoborder(request):
     data = models.JobOrder.objects.all()
     print(request.user)
@@ -27,7 +27,7 @@ def viewjoborder(request):
 
 
 @login_required
-@group_required("Project Manager","Admin Project")
+@group_required("Project Manager","Admin Project","Admin Finance")
 def viewdetailjoborder(request, id):
     data = models.JobOrder.objects.get(id=id)
     workcompletion = models.WorkCompletion.objects.filter(NomorJO=data)
@@ -146,7 +146,7 @@ def editjoborder(request, id):
 
     return render(request, "Project/editdatajoborder.html", {"data": data})
 
-
+# WORK COMPLETION
 @login_required
 @group_required("Project Manager","Admin Project")
 def viewworkcompletion(request):
@@ -194,7 +194,7 @@ def tambahdataworkcompletion(request):
 
 
 @login_required
-@group_required("Project Manager","Admin Project")
+@group_required("Project Manager","Admin Project","Admin Finance")
 def search_jo(request):
     query = request.GET.get("q", "")
     results = models.JobOrder.objects.filter(
@@ -214,7 +214,7 @@ def search_jo(request):
     return JsonResponse(data, safe=False)
 
 @login_required
-@group_required("Project Manager","Admin Project")
+@group_required("Project Manager","Admin Project","Admin Finance")
 def search_proposebudget(request):
     query = request.GET.get("q", "")
     results = models.ProposedBudget.objects.filter(
@@ -234,7 +234,7 @@ def search_proposebudget(request):
     return JsonResponse(data, safe=False)
 
 @login_required
-@group_required("Project Manager","Admin Project")
+@group_required("Project Manager","Admin Project","Admin Finance")
 def viewproposebudget(request):
     data = models.ProposedBudget.objects.all()
     for item in data:
@@ -242,13 +242,15 @@ def viewproposebudget(request):
     return render(request,"Project/dataproposebudget.html", {"data": data})
 
 @login_required
-@group_required("Project Manager","Admin Project")
+@group_required("Project Manager","Admin Project","Admin Finance")
 def tambahdataproposebudget(request):
     datajo = models.JobOrder.objects.all()
+    users = models.User.objects.filter(groups__name__in=["Project Manager", "Finance", "Director"],karyawan_profile__isnull=False)
 
     if request.method == "POST":
         print(request.POST)
         print(request.FILES)
+        # print(asd)
 
         # save object
         nomorproposebudget = request.POST["nomorproposebudget"]
@@ -260,6 +262,8 @@ def tambahdataproposebudget(request):
         harga   = request.POST.getlist("harga")
         total_harga = request.POST.getlist("total_harga")
         catatan = request.POST.getlist("catatan")
+        idapprover = request.POST.getlist("approver[]")
+
 
         try:
             dataobj = models.ProposedBudget(
@@ -269,10 +273,17 @@ def tambahdataproposebudget(request):
                 Remarks = request.POST["remarks"],
                 Nilai = sum(int(h) for h in total_harga),
                 FileProposedBudget=file,
-                Submittedby=request.user.username,
+                Submittedby=request.user,
                 Status = "Submitted",
                 
             ).save()
+
+            for approver in idapprover:
+                dataaproval = models.ProposeBudgetApproval.objects.create(
+                    propose = models.ProposedBudget.objects.last(),
+                    approver = models.User.objects.get(id=approver),
+                    status = "Pending"
+                )
         except Exception as e:
             messages.error(request, e)
             return redirect("tambahdataproposebudget")
@@ -293,14 +304,18 @@ def tambahdataproposebudget(request):
         messages.success(request, "Data Berhasil disimpan")
         return redirect("proposebudget")
 
-    return render(request, "Project/tambahdataproposebudget.html", {"datajo": datajo})
+    return render(request, "Project/tambahdataproposebudget.html", {"datajo": datajo, "users": users})
 
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def deleteproposebudget(request, id):
         data = get_object_or_404(models.ProposedBudget, id=id)
         data.delete()
         messages.success(request, "Data Berhasil dihapus")
         return redirect("proposebudget")
 
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def detailproposebudget(request, id):
     data = get_object_or_404(models.ProposedBudget, id=id)
     items = models.ItemProposedBudget.objects.filter(NomorProposedBudget=data)
@@ -310,6 +325,8 @@ def detailproposebudget(request, id):
 
     return render(request, "Project/dataproposebudgetdetail.html", {"data": data, "items": items, "cashexpensereport": cashexpensereport})
 
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def editproposebudget(request, id):
     data = get_object_or_404(models.ProposedBudget, id=id)
     datajo = models.JobOrder.objects.all()
@@ -405,14 +422,18 @@ def editproposebudget(request, id):
 '''
 Cash Expense Report
 '''
-
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def viewcashexpensereport(request):
     data = models.CashExpenseReport.objects.all()
     return render(request,"Project/datacashexpensereport.html", {"data": data})
 
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def tambahdatacashexpensereport(request):
     datajo = models.JobOrder.objects.all()
     dataproposedbudget = models.ProposedBudget.objects.all()
+    users = models.User.objects.filter(groups__name__in=["Project Manager", "Finance", "Director"],karyawan_profile__isnull=False)
 
     if request.method == "POST":
         print(request.POST)
@@ -429,6 +450,7 @@ def tambahdatacashexpensereport(request):
         harga   = request.POST.getlist("harga")
         total_harga = request.POST.getlist("total_harga")
         catatan = request.POST.getlist("catatan")
+        approverlist = request.POST.getlist("approver[]")
 
         try:
             dataobj = models.CashExpenseReport(
@@ -438,10 +460,17 @@ def tambahdatacashexpensereport(request):
                 Remarks = request.POST["remarks"],
                 Nilai = sum(int(h) for h in total_harga),
                 FileCashReport=file,
-                Submittedby=request.user.username,
+                Submittedby=request.user,
                 Status = "Submitted",
                 
             ).save()
+
+            for approver in approverlist:
+                dataaproval = models.CashExpenseReportApproval.objects.create(
+                    cashexpensereport = models.CashExpenseReport.objects.last(),
+                    approver = models.User.objects.get(id=approver),
+                    status = "Pending"
+                )
         except Exception as e:
             messages.error(request, e)
             return redirect("tambahdatacashexpensereport")
@@ -462,14 +491,18 @@ def tambahdatacashexpensereport(request):
         messages.success(request, "Data Berhasil disimpan")
         return redirect("cashexpensereport")
 
-    return render(request, "Project/tambahdatacashexpensereport.html", {"datajo": datajo, "dataproposebudget": dataproposedbudget})
+    return render(request, "Project/tambahdatacashexpensereport.html", {"datajo": datajo, "dataproposebudget": dataproposedbudget, "users": users})
 
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def deletecashexpensereport(request, id):
         data = get_object_or_404(models.CashExpenseReport, id=id)
         data.delete()
         messages.success(request, "Data Berhasil dihapus")
         return redirect("cashexpensereport")
 
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def detailcashexpensereport(request, id):
     data = get_object_or_404(models.CashExpenseReport, id=id)
     items = models.ItemCashExpenseReport.objects.filter(NomorCashReport=data)
@@ -477,6 +510,8 @@ def detailcashexpensereport(request, id):
 
     return render(request, "Project/datacashexpensereportdetail.html", {"data": data, "items": items})
 
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def editcashexpensereport(request, id): 
     data = get_object_or_404(models.CashExpenseReport, id=id)
     dataproposedbudget = models.ProposedBudget.objects.all()
@@ -553,10 +588,14 @@ def editcashexpensereport(request, id):
     return render(request, "Project/editcashexpensereport.html", {"data": data, "dataproposebudget": dataproposedbudget, "items": items, "costcategory": costcategory})
 
 # Invoice Management    
+@login_required
+@group_required("Project Manager","Admin Project")
 def viewinvoice(request):
     data = models.Invoice.objects.all()
     return render(request,"Project/datainvoice.html", {"data": data})
 
+@login_required
+@group_required("Project Manager","Admin Project")
 def tambahdatainvoice(request):
     datajo = models.JobOrder.objects.all()
 
@@ -588,18 +627,24 @@ def tambahdatainvoice(request):
 
     return render(request, "Project/tambahdatainvoice.html", {"datajo": datajo})
 
+@login_required
+@group_required("Project Manager","Admin Project")
 def deleteinvoice(request, id):
         data = get_object_or_404(models.Invoice, id=id)
         data.delete()
         messages.success(request, "Data Berhasil dihapus")
         return redirect("invoice")
 
+@login_required
+@group_required("Project Manager","Admin Project")
 def detailinvoice(request, id):
     data = get_object_or_404(models.Invoice, id=id)
     items = models.ItemInvoice.objects.filter(NomorInvoice=data)
 
     return render(request, "Project/datainvoicedetail.html", {"data": data, "items": items})
 
+@login_required
+@group_required("Project Manager","Admin Project")
 def editinvoice(request, id):
     data = get_object_or_404(models.Invoice, id=id)
     datajo = models.JobOrder.objects.all()
@@ -639,6 +684,8 @@ def editinvoice(request, id):
 from django.http import JsonResponse
 from .models import WorkCompletion
 
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def get_workcompletion_by_jo(request):
     jo_id = request.GET.get('jo_id')
     print(jo_id)
@@ -651,6 +698,8 @@ def get_workcompletion_by_jo(request):
 
     return JsonResponse(data, safe=False)
 
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def get_wc_detail(request):
     wc_id = request.GET.get('id')
 
@@ -662,10 +711,15 @@ def get_wc_detail(request):
 
 '''BUDGET'''
 
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def viewbudget(request):
     items = models.BudgetItem.objects.all()
     return render(request,"Project/budget.html", { "items": items})
 
+
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def addbudget(request, id):
     datajo = models.JobOrder.objects.get(id=id)
     if request.method == "POST":
@@ -692,6 +746,8 @@ def addbudget(request, id):
 
     return render(request, "Project/addbudget.html", {"datajo": datajo})
 
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def editbudget(request, id):
     item = get_object_or_404(models.BudgetItem, id=id)
     if request.method == "POST":
@@ -715,12 +771,16 @@ def editbudget(request, id):
 
     return render(request, "Project/editbudget.html", {"data": item})
 
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def deletebudget(request, id):
     item = get_object_or_404(models.BudgetItem, id=id)
     item.delete()
     messages.success(request, "Data Berhasil dihapus")
     return redirect("budget")
 
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
 def searchbudget(request):
     query = request.GET.get("q", "")
     jo = request.GET.get("jo", "")
@@ -743,4 +803,41 @@ def searchbudget(request):
     
     # print(results)
     print(query)
+    return JsonResponse(data, safe=False)
+
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
+def ajax_joborder(request):
+    keyword = request.GET.get('q', '')
+
+    qs = models.JobOrder.objects.all()
+
+    if keyword:
+        qs = qs.filter(
+            Q(NomorJO__icontains=keyword) |
+            Q(Deskripsi__icontains=keyword)
+        )
+
+    data = []
+    for item in qs[:20]:
+        data.append({
+            'id': item.id,
+            'text': f"{item.NomorJO} - {item.Deskripsi}"
+        })
+
+    return JsonResponse(data, safe=False)
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
+def ajax_proposebudget_by_jo(request):
+    joborder_id = request.GET.get('joborder')
+
+    qs = models.ProposedBudget.objects.filter(NomorJO_id=joborder_id)
+
+    data = []
+    for item in qs:
+        data.append({
+            'id': item.id,
+            'text': f"{item.NomorProposedBudget}"
+        })
+
     return JsonResponse(data, safe=False)

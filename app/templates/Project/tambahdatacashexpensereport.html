@@ -3,6 +3,18 @@
 
 {% block content %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+#joborder-list {
+    position: absolute;
+    z-index: 9999;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+}
+.jo-item {
+    cursor: pointer;
+}
+</style>
 
 <div class="page-heading">
     <h3>Input Cash Expense Report</h3>
@@ -31,8 +43,21 @@
     </div>
 
     <div class="col-md-4">
+    <label>No Job Order</label>
+
+    <!-- hidden ID -->
+    <input type="hidden" name="joborder" id="joborder-id">
+
+    <!-- input search -->
+    <input type="text" id="joborder-input" class="form-control" placeholder="Cari Job Order..." autocomplete="off">
+
+    <!-- dropdown result -->
+    <div id="joborder-list" class="list-group"></div>
+</div>
+
+    <div class="col-md-4">
         <label>No Propose Budget</label>
-        <select name="proposebudget" class="form-control">
+        <select name="proposebudget" class="form-control" id="proposebudget" >
             <option disabled selected>Pilih Propose Budget</option>
             {% for item in dataproposebudget %}
             <option value="{{item.id}}">
@@ -109,15 +134,168 @@
 
 </tbody>
 </table>
+<button type="button" class="btn btn-success" id="add-row">+ Tambah Baris</button>
+<h4 class="card-title mt-3">Approval</h4>
 
+                <table class="table table-bordered" id="approval-table">
+                    <thead>
+                        <tr>
+                            <th width="50">Level</th>
+                            <th>Nama Approver</th>
+                            <th width="200">Keterangan</th>
+                            <th width="80">Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="approval-body">
+                        <tr>
+                            <td class="level">1</td>
+                            <td>
+                                <select name="approver[]" class="form-control" required>
+                                    <option value="" disabled selected>-- Pilih Approver --</option>
+                                    {% for user in users %}
+                                    <option value="{{ user.id }}">{{ user.karyawan_profile }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" name="approval_note[]" class="form-control" placeholder="Opsional">
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm remove-approver">X</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <button type="button" class="btn btn-success" id="add-approver">
+                    + Tambah Approver
+                </button>
 </div>
 
-<button type="button" class="btn btn-secondary" id="add-row">+ Tambah Baris</button>
 <button type="submit" class="btn btn-primary">Simpan Semua</button>
+
 
 </form>
 </div>
 </section>
+
+
+<script>
+
+// ================= AUTOCOMPLETE JO =================
+$("#joborder-input").keyup(function(){
+    let query = $(this).val();
+
+    if (query.length < 2){
+        $("#joborder-list").empty();
+        return;
+    }
+
+    $.ajax({
+        url: "{% url 'ajax_joborder' %}",
+        data: { q: query },
+        success: function(data){
+            let html = "";
+
+            data.forEach(function(item){
+                html += `
+                    <a href="#" class="list-group-item list-group-item-action jo-item"
+                       data-id="${item.id}"
+                       data-text="${item.text}">
+                       ${item.text}
+                    </a>
+                `;
+            });
+
+            $("#joborder-list").html(html);
+        }
+    });
+});
+
+
+// ================= PILIH JO =================
+$(document).on("click", ".jo-item", function(e){
+    e.preventDefault();
+
+    let id = $(this).data("id");
+    let text = $(this).data("text");
+
+    $("#joborder-id").val(id);
+    $("#joborder-input").val(text);
+    $("#joborder-list").empty();
+
+    // 🔥 LOAD PROPOSE BUDGET
+    loadProposeBudget(id);
+});
+
+
+// ================= LOAD PB =================
+function loadProposeBudget(joborderId){
+    $.ajax({
+        url: "{% url 'ajax_proposebudget_by_jo' %}",
+        data: { joborder: joborderId },
+        success: function(data){
+
+            let options = `<option disabled selected>Pilih Propose Budget</option>`;
+
+            data.forEach(function(item){
+                options += `<option value="${item.id}">${item.text}</option>`;
+            });
+
+            $("#proposebudget").html(options);
+        }
+    });
+}
+
+
+// ================= CLEAR PB JIKA INPUT DIUBAH =================
+$("#joborder-input").on("input", function(){
+    $("#joborder-id").val("");
+    $("#proposebudget").html(`<option disabled selected>Pilih Propose Budget</option>`);
+});
+
+
+// ================= CLICK OUTSIDE =================
+$(document).click(function(e){
+    if (!$(e.target).closest('#joborder-input').length) {
+        $("#joborder-list").empty();
+    }
+});
+
+</script>
+
+<script>
+
+    // ================= TAMBAH APPROVER =================
+    $("#add-approver").click(function () {
+        let row = $("#approval-body tr:first").clone();
+
+        // reset value
+        row.find("select").val("");
+        row.find("input").val("");
+
+        $("#approval-body").append(row);
+
+        updateLevel();
+    });
+
+    // ================= HAPUS APPROVER =================
+    $(document).on("click", ".remove-approver", function () {
+        if ($("#approval-body tr").length > 1) {
+            $(this).closest("tr").remove();
+            updateLevel();
+        }
+    });
+
+    // ================= UPDATE LEVEL =================
+    function updateLevel() {
+        $("#approval-body tr").each(function (index) {
+            $(this).find(".level").text(index + 1);
+        });
+    }
+
+</script>
 
 <!-- ================= JS ================= -->
 <script>

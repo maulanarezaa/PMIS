@@ -1,6 +1,5 @@
 from django.shortcuts import render
 
-from app.templatetags.group_tags import group_required
 from . import models
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
@@ -8,6 +7,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
 from django.db.models import Count, Q
+from app.templatetags.group_tags import group_required
 from django.contrib.auth.decorators import login_required
 
 
@@ -19,14 +19,12 @@ def is_valid_image(file):
 
 
 @login_required
-@group_required("Project Manager","Warehouse")
 def viewmaterial(request):
     data = models.MasterMaterial.objects.all()
     return render(request, "Inventory/datamaterial.html", {"data": data})
 
 
 @login_required
-@group_required("Project Manager","Warehouse")
 def viewdetailmaterial(request, id):
     data = models.MasterMaterial.objects.get(id=id)
     materialmasuk = models.MaterialMasuk.objects.filter(NamaItem=data)
@@ -126,7 +124,7 @@ def editmaterial(request, id):
 
 @login_required
 @group_required("Project Manager","Warehouse")
-def deletekaryawan(request, id):
+def deletematerial(request, id):
     materialobject = models.MasterMaterial.objects.get(pk=id)
     materialobject.delete()
     return redirect("viewmaterial")

@@ -28,7 +28,7 @@ SECRET_KEY = "django-insecure--*&@yzh1528j(l25)8b9c3(lp=)(wg+d(nn3#zyluygywdq2$d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["app.semangatwajatama.co.id","127.0.0.1"]
 
 
 # Application definition
@@ -132,3 +132,12 @@ LOGIN_REDIRECT_URL = "dashboard"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Session
+# waktu dalam detik (contoh: 30 menit)
+SESSION_COOKIE_AGE = 60*30
+
+# jika True → session akan expired saat browser ditutup
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  
+
+# reset timer setiap ada aktivitas user
+SESSION_SAVE_EVERY_REQUEST = True  

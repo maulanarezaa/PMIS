@@ -5,25 +5,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Mazer Admin Dashboard</title>
+    <title>Login - Project Management Information System</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'assets/css/bootstrap.css'%}">
     <link rel="stylesheet" href="{% static 'assets/vendors/bootstrap-icons/bootstrap-icons.css'%}">
     <link rel="stylesheet" href="{% static 'assets/css/app.css'%}">
     <link rel="stylesheet" href="{% static 'assets/css/pages/auth.css'%}">
+    <style>
+        #auth-right {
+            position: relative;
+            height: 100%;
+            background: url("{% static 'assets/images/bg/background.jpg' %}") no-repeat center center;
+            background-size: cover;
+        }
+
+        #auth-right::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 50, 0.4);
+            /* overlay biru transparan */
+        }
+    </style>
 </head>
 
 <body>
     <div id="auth">
-        
+
 
         <div class="row h-100">
             <div class="col-lg-5 col-12">
                 <div id="auth-left">
                     <div class="auth-logo">
-                        <a href="index.html"><img src="{% static 'assets/images/logo/logo.png'%}" alt="Logo"></a>
+                        <a href="index.html"><img src="{% static 'assets/images/logo/logoswt.jpg'%}" alt="Logo"></a>
                     </div>
-                    <h1 class="auth-title">Log in.</h1>
+                    <h1 class="auth-title">Project Management Information System</h1>
                     <p class="auth-subtitle mb-5">Log in with your data that you entered during registration.</p>
 
                     <form class="form form-vertical" method="POST" enctype="multipart/form-data">
@@ -77,8 +93,9 @@
                     {% endfor %}
                 </div>
                 {% endif %}
-                <div id="auth-right">
-
+                <div id="auth-right" class="d-flex align-items-center justify-content-center">
+                    <img src="{% static 'assets/images/bg/background.jpg'%}"
+                        style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
             </div>
         </div>
@@ -86,37 +103,38 @@
     </div>
 </body>
 <script>
-        setTimeout(function () {
-            let alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                let bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 3000);
-        document.addEventListener("DOMContentLoaded", function () {
-            const currentUrl = window.location.pathname;
-
-            // Seleksi semua link di sidebar
-            const sidebarLinks = document.querySelectorAll(".sidebar-menu .sidebar-link");
-
-            sidebarLinks.forEach(link => {
-                const linkPath = link.getAttribute("href");
-
-                if (linkPath === currentUrl) {
-                    // Tambahkan class active ke link dan parent item
-                    link.classList.add("active");
-
-                    const sidebarItem = link.closest(".sidebar-item");
-                    if (sidebarItem) sidebarItem.classList.add("active");
-
-                    const submenu = link.closest(".submenu");
-                    if (submenu) {
-                        submenu.classList.add("active");
-                        const parentSidebarItem = submenu.closest(".sidebar-item");
-                        if (parentSidebarItem) parentSidebarItem.classList.add("active");
-                    }
-                }
-            });
+    setTimeout(function () {
+        let alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
         });
-    </script>
+    }, 3000);
+    document.addEventListener("DOMContentLoaded", function () {
+        const currentUrl = window.location.pathname;
+
+        // Seleksi semua link di sidebar
+        const sidebarLinks = document.querySelectorAll(".sidebar-menu .sidebar-link");
+
+        sidebarLinks.forEach(link => {
+            const linkPath = link.getAttribute("href");
+
+            if (linkPath === currentUrl) {
+                // Tambahkan class active ke link dan parent item
+                link.classList.add("active");
+
+                const sidebarItem = link.closest(".sidebar-item");
+                if (sidebarItem) sidebarItem.classList.add("active");
+
+                const submenu = link.closest(".submenu");
+                if (submenu) {
+                    submenu.classList.add("active");
+                    const parentSidebarItem = submenu.closest(".sidebar-item");
+                    if (parentSidebarItem) parentSidebarItem.classList.add("active");
+                }
+            }
+        });
+    });
+</script>
+
 </html>

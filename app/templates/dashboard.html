@@ -1,30 +1,29 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
 <div class="page-heading">
-    <h3>Welcome Dashboard APP SWT</h3>
+    <h3>Dashboard</h3>
 </div>
 
 <section class="section">
     <div class="card">
         <div class="card-body">
-
-            <!-- BUTTON TAMBAH -->
-            <a href="{% url 'tambahdatainventory' %}">
-                <button class="btn btn-primary mb-3">Tambah Data Material</button>
-            </a>
+            <div class="card-header">
+                <h4 class="card-title " >Notifikasi Approval</h4>
+            </div>
 
             <!-- TABLE -->
             <table class="table table-striped" id="table1">
                 <thead>
                     <tr>
-                        <th>Kode</th>
-                        <th>Nama</th>
-                        <th>Spesifikasi</th>
-                        <th>Stock</th>
-                        <th>Aset</th>
-                        <th>Aktif</th>
+                        <th>No</th>
+                        <th>Nomor</th>
+                        <th>Submitted By</th>
+                        <th>Jenis</th>
+                        <th>Nilai (Rp)</th>
+                        <th>Note</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -32,44 +31,25 @@
                 <tbody>
                     {% for item in data %}
                     <tr>
-                        <td>{{item.KodeItem}}</td>
-                        <td>{{item.NamaItem}}</td>
-                        <td>{{item.SpesifikasiItem}}</td>
-                        <td>{{item.Stock}}</td>
-
-                        <!-- ASET -->
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{item.nomor}}</td>
+                        <td>{{item.submittedby}}</td>
+                        <td>{{item.jenis}}</td>
+                        <td>{{item.nilai|intcomma}}</td>
+                        <td>{{item.notes}}</td>
                         <td>
-                            {% if item.IsAset %}
-                            <span class="btn btn-success btn-sm">✓</span>
-                            {% else %}
-                            <span class="btn btn-danger btn-sm">✕</span>
-                            {% endif %}
-                        </td>
-
-                        <!-- AKTIF -->
-                        <td>
-                            {% if item.IsAktif %}
-                            <span class="btn btn-success btn-sm">✓</span>
-                            {% else %}
-                            <span class="btn btn-danger btn-sm">✕</span>
-                            {% endif %}
-                        </td>
-
-                        <!-- ACTION -->
-                        <td>
-                            <a href="{% url 'detailmaterial' item.id %}">
+                            
+                            <a href="">
+                                <button type="button" class="btn btn-success btn-sm">Approve</button>
+                            </a>
+                            
+                            <a href="">
+                                <button type="button" class="btn btn-danger btn-sm">Reject</button>
+                            </a>
+                            <a href="{% if item.jenis == 'Cash Expense Report' %}{% url 'detailcashexpensereport' item.id %}{% else %}{% url 'detailproposebudget' item.id %}{% endif %}">
                                 <button type="button" class="btn btn-info btn-sm">Info</button>
                             </a>
 
-                            <a href="{% url 'edit_material' item.id %}">
-                                <button type="button" class="btn btn-warning btn-sm">Edit</button>
-                            </a>
-
-                            <!-- BUTTON HAPUS (MODAL) -->
-                            <button type="button" class="btn btn-danger btn-sm btn-hapus" data-id="{{item.id}}"
-                                data-nama="{{item.NamaItem}}" data-bs-toggle="modal" data-bs-target="#modalHapus">
-                                Hapus
-                            </button>
                         </td>
                     </tr>
                     {% endfor %}

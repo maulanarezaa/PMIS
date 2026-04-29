@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h4>Buat Akun - {{ karyawan.nama }}</h4>
+        </div>
+
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label>Username</label>
+                    <input type="text" name="username" 
+                           value="{{ form.username.value|default:'' }}" 
+                           class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Email</label>
+                    <input type="email" name="email" 
+                           value="{{ form.email.value|default:'' }}" 
+                           class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Password</label>
+                    <input type="password" name="password1" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Konfirmasi Password</label>
+                    <input type="password" name="password2" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Simpan
+                </button>
+                <a href="{% url 'viewkaryawan' %}" class="btn btn-secondary">
+                    Kembali
+                </a>
+            </form>
+
+            {% if form.errors %}
+                <div class="alert alert-danger mt-3">
+                    {{ form.errors }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

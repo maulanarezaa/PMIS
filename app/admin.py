@@ -14,4 +14,8 @@ admin.site.register(models.PayrollDeduction)
 admin.site.register(models.MasterMaterial)
 admin.site.register(models.JobOrder)
 admin.site.register(models.BudgetItem)
+admin.site.register(models.ProposedBudget)
+admin.site.register(models.ProposeBudgetApproval)
+admin.site.register(models.CashExpenseReport)
+admin.site.register(models.CashExpenseReportApproval)
 

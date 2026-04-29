@@ -18,5 +18,29 @@ def is_valid_image(file):
 
 @login_required
 def viewdashboard(request):
-    print(request.user)
-    return render(request, "dashboard.html")
+    dataexpensereport = models.CashExpenseReportApproval.objects.filter(approver=request.user, status="Pending")
+    dataproposebudget = models.ProposeBudgetApproval.objects.filter(approver=request.user, status="Pending")
+    data = []
+    # print(dataproposebudget[0].propose.Submittedby.karyawan_profile.Nama)
+    # print(asd)
+    for item in dataexpensereport:
+        data.append({
+            'id': item.cashexpensereport.id,
+            'nomor': item.cashexpensereport.NomorCashReport,
+            'jenis': 'Cash Expense Report',
+            'nilai': item.cashexpensereport.Nilai,
+            'notes': item.cashexpensereport.Remarks,
+            'submittedby': item.cashexpensereport.Submittedby.karyawan_profile.Nama,
+        })
+    for item in dataproposebudget:
+        data.append({
+            'id': item.propose.id,
+            'nomor': item.propose.NomorProposedBudget,
+            'jenis': 'Propose Budget',
+            'nilai': item.propose.Nilai,
+            'notes': item.propose.Remarks,
+            'submittedby': item.propose.Submittedby.karyawan_profile.Nama if item.propose.Submittedby and hasattr(item.propose.Submittedby, 'karyawan_profile') else item.propose.Submittedby.karyawan_profile.Nama if item.propose.Submittedby and hasattr(item.propose.Submittedby, 'karyawan_profile') else str(item.propose.Submittedby),
+        })
+    print(data)
+
+    return render(request, "dashboard.html", {'data': data})

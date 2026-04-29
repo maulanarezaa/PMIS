@@ -1,5 +1,6 @@
 from django import template
 from django.http import HttpResponseForbidden
+from django.shortcuts import render
 
 register = template.Library()
 
@@ -13,6 +14,6 @@ def group_required(*group_names):
         def wrapper(request, *args, **kwargs):
             if request.user.groups.filter(name__in=group_names).exists():
                 return view_func(request, *args, **kwargs)
-            return HttpResponseForbidden("Tidak punya akses")
+            return render(request, 'Login/error-403.html', status=403)
         return wrapper
     return decorator

@@ -79,7 +79,7 @@ class ProposedBudget(models.Model):
         upload_to="File/Project/ProposedBudget", null=True, blank=True
     )
     # Approval fields
-    Submittedby = models.CharField(max_length=56)
+    Submittedby = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='submitted_proposebudgets')
     Status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     Approvedby = models.CharField(max_length=56)
     approved_date = models.DateTimeField(null=True, blank=True)
@@ -99,7 +99,20 @@ class ItemProposedBudget(models.Model):
     
 
     def __str__(self):
-        return f"{self.proposed_budget.NomorProposedBudget} - {self.Item}"
+        return f"{self.NomorProposedBudget} - {self.Item}"
+
+
+class ProposeBudgetApproval(models.Model):
+    propose = models.ForeignKey(ProposedBudget, on_delete=models.CASCADE, related_name='approvals')
+
+    approver = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    status = models.CharField(max_length=20)
+    # pending, approved, rejected
+
+    note = models.TextField(blank=True, null=True)
+
+    approved_at = models.DateTimeField(null=True, blank=True)
 
 class CashExpenseReport(models.Model):
     STATUS_CHOICES = [
@@ -117,7 +130,7 @@ class CashExpenseReport(models.Model):
         upload_to="File/Project/CashReport", null=True, blank=True
     )
         # Approval fields
-    Submittedby = models.CharField(max_length=56,null=True, blank=True)
+    Submittedby = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='submitted_cash_reports')
     Status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     Approvedby = models.CharField(max_length=56,null=True, blank=True)
     approved_date = models.DateTimeField(null=True, blank=True)
@@ -138,7 +151,19 @@ class ItemCashExpenseReport(models.Model):
     costcode = models.ForeignKey(BudgetItem, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.cash_report.NomorCashReport} - {self.Item}"
+        return f"{self.NomorCashReport} - {self.Item}"
+    
+class CashExpenseReportApproval(models.Model):
+    cashexpensereport = models.ForeignKey(CashExpenseReport, on_delete=models.CASCADE, related_name='approvals')
+
+    approver = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    status = models.CharField(max_length=20)
+    # pending, approved, rejected
+
+    note = models.TextField(blank=True, null=True)
+
+    approved_at = models.DateTimeField(null=True, blank=True)
 
 class Invoice(models.Model):
     Tanggal = models.DateField()
@@ -227,6 +252,7 @@ class MasterKaryawan(models.Model):
     PasFoto = models.ImageField(upload_to=pasfoto, null=True, blank=True)
     user = models.OneToOneField(
         User, on_delete=models.SET_NULL, null=True, blank=True,related_name='karyawan_profile')
+    Role = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return str(self.Nama)

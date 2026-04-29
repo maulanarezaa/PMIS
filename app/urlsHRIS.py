@@ -14,6 +14,11 @@ urlpatterns = [
         viewsHRIS.deletekaryawan,
         name="hapusdatakaryawan",
     ),
+    path(
+        "datakaryawan/<str:id>/registerakun",
+        viewsHRIS.register_karyawan,
+        name="register_karyawan",
+    ),
 
     # Kontrak Section
     path("datakontrak", viewsHRIS.viewkontrak, name="viewkontrak"),

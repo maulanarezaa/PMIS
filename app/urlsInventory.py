@@ -19,7 +19,7 @@ urlpatterns = [
     ),
     path(
         "datamaterial/delete/<str:id>",
-        viewsInventory.deletekaryawan,
+        viewsInventory.deletematerial,
         name="delete_material",
     ),
     path("datamaterialmasuk", viewsInventory.materialmasuk, name="viewmaterialmasuk"),

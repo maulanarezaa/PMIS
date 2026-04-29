@@ -22,6 +22,7 @@
                         <th>NPWP</th>
                         <th>Remarks</th>
                         <th>Status</th>
+                        <th>Akun</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -34,11 +35,18 @@
                         <td>{{item.NIK}}</td>
                         <td>{{item.NPWP}}</td>
                         <td>{{item.Remarks}}</td>
+                        
                         <td>
                             {% if item.Status == "True" %}
                             <span class="btn btn-success">Aktif</span>
                             {% elif item.Status == "False" or item.Status == None%}
                             <span class="btn btn-secondary">Non Aktif</span>
+                            {% endif %}
+                        </td>
+                        <td>{% if item.user %}
+                            <span class="btn btn-success">v</span>
+                            {% else %}
+                            <span >-</span>
                             {% endif %}
                         </td>
                         <td>
