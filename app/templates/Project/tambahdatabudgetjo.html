@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="page-heading">
+    <h3>Input Data Budget JO</h3>
+</div>
+
+<section class="section">
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="col-12 col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Upload File Budget</h5>
+            </div>
+            <div class="card-body">
+                <!-- FIX: tambah class -->
+                <input type="file" name="filebudget" >
+            </div>
+        </div>
+
+        <!-- PREVIEW TABLE -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5>Preview Data Excel</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered" id="preview-table">
+                    <thead>
+                        <tr>
+                            <th>Cost Code</th>
+                            <th>Description</th>
+                            <th>Volume</th>
+                            <th>Unit</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Simpan Semua</button>
+</form>
+
+
+
+    </form>
+    </div>
+</section>
+<script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+<script>
+    $(document).ready(function () {
+
+    // INIT FILEPOND
+    FilePond.create(document.querySelector('.basic-filepond'), {
+        allowImagePreview: false,
+        allowMultiple: false
+    });
+
+    // FIX: pakai $
+    $('input[name="filebudget"]').on('change', function () {
+
+        let file = this.files[0];
+        if (!file) return;
+
+        let formData = new FormData();
+        formData.append('filebudget', file);
+
+        $.ajax({
+            url: "{% url 'preview_budget_excel' %}",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function (response) {
+
+                let tbody = $("#preview-table tbody");
+                tbody.empty();
+
+                response.data.forEach(function (row) {
+                    tbody.append(`
+                        <tr>
+                            <td>${row.cost_code}</td>
+                            <td>${row.description}</td>
+                            <td>${row.volume}</td>
+                            <td>${row.unit}</td>
+                        </tr>
+                    `);
+                });
+
+            },
+            error: function (err) {
+                console.log("ERROR:", err);
+                alert("Gagal upload preview");
+            }
+        });
+
+    });
+
+});
+</script>
+{% endblock %}

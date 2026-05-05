@@ -9,6 +9,8 @@ from django.db.models import Count, Q, Sum, Max
 from django.contrib.auth.decorators import login_required
 from .templatetags.group_tags import group_required 
 from collections import defaultdict
+import openpyxl
+import pandas as pd
 
 
 def is_valid_image(file):
@@ -146,6 +148,92 @@ def editjoborder(request, id):
 
     return render(request, "Project/editdatajoborder.html", {"data": data})
 
+@login_required
+@group_required("Project Manager","Admin Project")
+def addbudgetjofromexcel(request,id):
+    idjo = get_object_or_404(models.JobOrder, id=id)
+    if request.method == "POST":
+        print(request.POST)
+        print(request.FILES)
+        file = request.FILES.get("filebudget")
+        bulk_data = []
+        if not file.name.endswith(('.xlsx', '.xls')):
+            messages.error(request, "File harus berformat Excel (.xlsx atau .xls)")
+            return redirect("addbudgetjofromexcel", id=idjo)
+        
+        try:
+            df = pd.read_excel(file)
+            df = df.iloc[:, :4]  # Ambil hanya 3 kolom pertama
+            print(df)
+            df.columns = ['Cost Code', 'Nama', 'Total Price', 'Remarks']
+            df = df.drop_duplicates(subset=['Cost Code'])
+            existing_codes = set(
+            models.BudgetItem.objects.filter(project=idjo)
+            .values_list('code', flat=True)
+        )  # Ganti nama kolom sesuai kebutuhan
+            df = df[~df['Cost Code'].isin(existing_codes)]
+            for index,row in df.iterrows():
+                budgetitem = models.BudgetItem(
+                    project=idjo,
+                    code=row['Cost Code'],
+                    name=row['Nama'],
+                    total_price=row['Total Price'],
+                    remarks=row['Remarks']
+                )
+                bulk_data.append(budgetitem)
+            models.BudgetItem.objects.bulk_create(bulk_data)
+            messages.success(request, "Data Budget berhasil diimpor dari Excel")
+            return redirect("viewdetailjoborder", id=idjo.id)
+        except Exception as e:
+            messages.error(request, f"Error saat mengimpor data: {str(e)}")
+            return redirect("addbudgetjofromexcel", id=idjo.id)
+
+    return render(request, "Project/tambahdatabudgetjo.html", {"idjo": idjo})
+
+def preview_budget_excel(request):
+    print("TESSSSS")
+    if request.method == 'POST':
+        file = request.FILES.get('filebudget')
+
+        df = pd.read_excel(file)
+
+        # Ambil 4 kolom pertama
+        df = df.iloc[:, :4]
+        df.columns = ['cost_code', 'description', 'volume', 'unit']
+
+        # Hapus duplicate di file
+        df = df.drop_duplicates(subset=['cost_code'])
+
+        # Optional: limit preview biar ringan
+        preview_data = df.head(100).to_dict(orient='records')
+
+        # Simpan ke session (untuk save nanti)
+        request.session['preview_budget'] = df.to_dict(orient='records')
+
+        return JsonResponse({
+            'data': preview_data
+        })
+    
+def save_budget(request, project_id):
+    data = request.session.get('preview_budget', [])
+
+    bulk_data = []
+
+    for row in data:
+        bulk_data.append(models.BudgetItem(
+            project_id=project_id,
+            cost_code=row['cost_code'],
+            description=row['description'],
+            volume=row['volume'],
+            unit=row['unit'],
+        ))
+
+    models.BudgetItem.objects.bulk_create(bulk_data)
+
+    # hapus session setelah save
+    del request.session['preview_budget']
+
+    return redirect('budget_list', project_id=project_id)
 # WORK COMPLETION
 @login_required
 @group_required("Project Manager","Admin Project")

@@ -10,6 +10,14 @@ urlpatterns = [
         viewsProject.viewdetailjoborder,
         name="detailjoborder",
     ),
+    path(
+        "joborder/detail/<str:id>/addbudget",
+        viewsProject.addbudgetjofromexcel,
+        name="addbudgetjofromexcel",
+    ),
+    path(
+        "previewbulkbudget",viewsProject.preview_budget_excel,name="preview_budget_excel"
+    ),
     path("workcompletion", viewsProject.viewworkcompletion, name="viewworkcompletion"),
     path(
         "workcompletion/add",
