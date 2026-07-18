@@ -52,8 +52,15 @@ urlpatterns = [
     path('budget/delete/<int:id>', viewsProject.deletebudget, name="deletebudget"),
     # path('budget/detail/<int:id>', viewsProject.detailbudget, name="detailbudget"),
     path('budget/edit/<int:id>', viewsProject.editbudget, name="editbudget"),
+    # Project Document
+    path('projectdocuments',viewsProject.viewprojectdocuments,name="projectdocuments"),
+    path('projectdocuments/add',viewsProject.tambahdataprojectdocuments,name="tambahdataprojectdocuments"),
+    path('projectdocuments/delete/<int:id>', viewsProject.deleteprojectdocuments, name="deleteprojectdocuments"),
+    path('projectdocuments/detail/<int:id>', viewsProject.detailprojectdocuments, name="detailprojectdocuments"),
+    path('projectdocuments/edit/<int:id>', viewsProject.editprojectdocuments, name="editprojectdocuments"),
     # SUPPORT
     path("search-item/", viewsProject.searchbudget, name="searchbudet"),
     path('ajax/joborder/', viewsProject.ajax_joborder, name='ajax_joborder'),
     path('ajax/proposebudget-by-jo/', viewsProject.ajax_proposebudget_by_jo, name='ajax_proposebudget_by_jo'),
+    path('ajax/budgetcostcode-by-jo/', viewsProject.ajax_budgetcostcode_by_jo, name='ajax_budgetcostcode_by_jo'),
 ]

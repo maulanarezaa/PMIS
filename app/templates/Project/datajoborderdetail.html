@@ -35,6 +35,9 @@
                     <a href="#" class="nav-link tab-link" data-target="invoice">Invoice </a>
                 </li>
                 <li class="nav-item">
+                    <a href="#" class="nav-link tab-link" data-target="projectdocuments">Project Documents </a>
+                </li>
+                <li class="nav-item">
                     <a href="#" class="nav-link tab-link" data-target="budget">Budget </a>
                 </li>
             </ul>
@@ -127,7 +130,7 @@
             <div class="tab-pane-custom d-none" id="tab-manpower">
                 <h5>Man Power List</h5>
 
-                <table class="table table-striped" id="table1">
+                <table class="table table-striped display " id="tblmanpower">
                     <thead>
                         <tr>
                             <th>Nama</th>
@@ -162,7 +165,7 @@
             <div class="tab-pane-custom d-none" id="tab-masuk">
                 <h5>Work Completion List</h5>
 
-                <table class="table table-striped" id="table2">
+                <table class="table table-striped display" id="tblworkcompletion">
                     <thead>
                         <tr>
                             <th>Tanggal</th>
@@ -183,17 +186,16 @@
                             </td>
                             <td>{{item.Jenis}}</td>
                             <td>{{ item.Remarks }}</td>
-
                             <td>{{item.Nilai|intcomma}}</td>
                         
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="3" class="text-center">Tidak ada data</td>
+                            <td colspan="4" class="text-center">Tidak ada data</td>
                         </tr>
                         {% endfor %}
                         <tr>
-                            <td colspan="4">Total</td>
+                            <td colspan="4" class="text-center">Total</td>
                             <td>{{data.totalworkcompletion|intcomma}}</td>
                         </tr>
                     </tbody>
@@ -204,7 +206,7 @@
             <div class="tab-pane-custom d-none" id="tab-keluar">
                 <h5>Material Keluar</h5>
 
-                <table class="table table-striped" id="table4">
+                <table class="table table-striped display " id="tblmaterialkeluar">
                     <thead>
                         <tr>
                             <th>Tanggal</th>
@@ -238,7 +240,7 @@
             <div class="tab-pane-custom d-none" id="tab-proposebudget">
                 <h5>Propose Budget</h5>
 
-                <table class="table table-striped" id="table3">
+                <table class="table table-striped display " id="tblproposebudget">
                     <thead>
                         <tr>
                             <th>Tanggal</th>
@@ -261,7 +263,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="4" class="text-center">Tidak ada data</td>
+                            <td colspan="5" class="text-center">Tidak ada data</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -271,7 +273,7 @@
             <div class="tab-pane-custom d-none" id="tab-invoice">
                 <h5>Invoice</h5>
 
-                <table class="table table-striped" id="table11">
+                <table class="table table-striped display" id="tblinvoice">
                     <thead>
                         <tr>
                             <th>Tanggal</th>
@@ -296,7 +298,42 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="4" class="text-center">Tidak ada data</td>
+                            <td colspan="5" class="text-center">Tidak ada data</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- ================= TAB Project Documents ================= -->
+            <div class="tab-pane-custom d-none" id="tab-projectdocuments">
+                <h5>Project Documents</h5>
+
+                <table class="table table-striped display" id="tblprojectdocuments">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Nomor Invoice</th>
+                            <th>Nomor Work Completion</th>
+                            <th>Nilai</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data.invoice %}
+                        <tr>
+                            <td>{{ item.Tanggal|date:'Y-m-d' }}</td>
+                            <td>
+                                {% if item.NomorInvoice %}
+                                <a href="{% url 'detailinvoice' item.id %}">{{item.NomorInvoice}}</a>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.NomorWorkCompletion.NomorWorkCompletion }}</td>
+                            <td>{{item.Nilai|intcomma}}</td>
+                            <td>{{item.Status}}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Tidak ada data</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -309,7 +346,7 @@
                 <a href="{% url 'addbudgetjofromexcel' data.id %}" class="btn btn-success">Add from Excel</a>
                 <a href="{% static 'templates/budget_bulkupdate.xlsx' %}" download class="btn btn-outline-success">Download Format Excel</a>
 
-                <table class="table table-striped" id="table11">
+                <table class="table table-striped display " id="tblbudget">
                     <thead>
                         <tr>
                             <th>Cost Code</th>
@@ -335,10 +372,10 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="text-center">Tidak ada data</td>
+                            <td colspan="5" class="text-center">Tidak ada data</td>
                         </tr>
                         {% endfor %}
-                    
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -396,12 +433,6 @@
 
     });
 
-    // 🔥 OPTIONAL: AKTIFKAN DATATABLE
-    $(document).ready(function () {
-        $('#table1').DataTable({
-            scrollX: true
-        });
-    });
 </script>
 
 <!-- ================= JS ================= -->
@@ -423,6 +454,13 @@
             // tampilkan target
             $("#tab-" + target).removeClass("d-none");
         });
+
+        $('#tblmanpower').DataTable();
+        $('#tblworkcompletion').DataTable();
+        $('#tblmaterialkeluar').DataTable();
+        $('#tblproposebudget').DataTable();
+        $('#tblinvoice').DataTable();
+        $('#tblprojectdocuments').DataTable();
 
     });
 </script>

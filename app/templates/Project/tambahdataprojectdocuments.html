@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="page-heading">
+    <h3>Input Data Dokumen Project</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card-header">
+                <h4 class="card-title">Data Dokumen</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="form-group has-icon-left">
+                            <label>Tanggal</label>
+                            <div class="position-relative">
+                                <input type="date" class="form-control" name="tanggal" placeholder="Piih Tanggal"
+                                    required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-group has-icon-left">
+                            <label>Tipe Dokumen</label>
+                            <div class="position-relative">
+                                <select name="tipe_dokumen" class="form-select" required>
+                                    <option value="" disabled selected>Pilih Tipe Dokumen</option>
+                                    <option value="BA">Berita Acara</option>
+                                    <option value="BAST">BAST</option>
+                                    <option value="Surat">Surat</option>
+                                    <option value="Memo">Memo</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Nomor Dokumen</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control jo-search" name="nomordokumen"
+                                    placeholder="Masukkan Nomor Job Order / Pekerjaan" autocomplete="off" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Project</label>
+                            <div class="position-relative">
+                                <select name="project" class="form-select" id="workcompletion" required>
+                                    <option value="" disabled selected>Pilih Project</option>
+                                    {% for project in datajo %}
+                                        <option value="{{ project.id }}">{{ project.NomorJO }} - {{ project.Deskripsi }}</option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Deskripsi</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control pekerjaan-field" name="deskripsi">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Upload File Lampiran</label>
+                            <div class="position-relative">
+                                <input class="form-control" type="file" name="filedokumen">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!-- BUTTON -->
+    <button type="button" class="btn btn-secondary" id="add-row">+ Tambah Baris</button>
+    <button type="submit" class="btn btn-primary">Simpan Semua</button>
+
+
+
+    </form>
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+<script>
+    
+</script>
+
+{% endblock %}

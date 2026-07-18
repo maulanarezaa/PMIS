@@ -18,4 +18,7 @@ admin.site.register(models.ProposedBudget)
 admin.site.register(models.ProposeBudgetApproval)
 admin.site.register(models.CashExpenseReport)
 admin.site.register(models.CashExpenseReportApproval)
+admin.site.register(models.WorkCompletion)
+admin.site.register(models.Invoice)
+admin.site.register(models.ProjectDocuments)
 

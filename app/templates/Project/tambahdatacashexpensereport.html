@@ -59,11 +59,6 @@
         <label>No Propose Budget</label>
         <select name="proposebudget" class="form-control" id="proposebudget" >
             <option disabled selected>Pilih Propose Budget</option>
-            {% for item in dataproposebudget %}
-            <option value="{{item.id}}">
-                {{item.NomorProposedBudget}} - {{item.NomorJO.NomorJO}}
-            </option>
-            {% endfor %}
         </select>
     </div>
 
@@ -87,7 +82,7 @@
 
 <h4 class="card-title mt-3">Item Cash Expense</h4>
 
-<table class="table table-bordered" id="table-input">
+<table class="table table-bordered" id="table1">
 <thead>
 <tr>
     <th>Nama Item</th>
@@ -96,6 +91,7 @@
     <th>Harga</th>
     <th>Total Harga</th>
     <th>Catatan</th>
+    <th>Cost Code</th>
     <th>Aksi</th>
 </tr>
 </thead>
@@ -125,6 +121,11 @@
 
     <td>
         <input type="text" name="catatan" class="form-control">
+    </td>
+    <td>
+        <select name="budgetitem" id="budgetitem" class="form-control">
+            <option disabled selected>Pilih Budget Cost Code</option>
+        </select>
     </td>
 
     <td>
@@ -227,6 +228,7 @@ $(document).on("click", ".jo-item", function(e){
 
     // 🔥 LOAD PROPOSE BUDGET
     loadProposeBudget(id);
+    loadbudgetcostcode(id);
 });
 
 
@@ -248,6 +250,19 @@ function loadProposeBudget(joborderId){
     });
 }
 
+function loadbudgetcostcode(joborderId){
+    $.ajax({
+        url: "{% url 'ajax_budgetcostcode_by_jo' %}",
+        data: { joborder: joborderId },
+        success: function(data){
+
+            let options = `<option disabled selected>Pilih Budget Cost Code</option>`;
+
+            data.forEach(function(item){
+                options += `<option value="${item.id}">${item.text}</option>`;
+            });
+
+            $("#budgetitem").html(options); }})}
 
 // ================= CLEAR PB JIKA INPUT DIUBAH =================
 $("#joborder-input").on("input", function(){

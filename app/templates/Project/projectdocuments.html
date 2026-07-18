@@ -29,7 +29,7 @@
 </style>
 
 <div class="page-heading">
-    <h3>Data Cash Expense Report</h3>
+    <h3>Project Documents</h3>
 </div>
 
 <section class="section">
@@ -37,8 +37,8 @@
         <div class="card-body">
 
             <!-- BUTTON TAMBAH -->
-            <a href="{% url 'tambahdatacashexpensereport' %}">
-                <button class="btn btn-primary mb-3">Tambah Data Cash Expense Report</button>
+            <a href="{% url 'tambahdataprojectdocuments' %}">
+                <button class="btn btn-primary mb-3">Tambah Data Dokumen</button>
             </a>
 
             <!-- TABLE -->
@@ -46,40 +46,41 @@
                 <table class="table table-striped table-sm" id="table1" style="font-size: 12px;">
                     <thead>
                         <tr>
-                            <th >Nomor CER</th>
-                            <th >Tanggal</th>
-                            <th >Nomor Proposed Budget</th>
-                            <th>Job Order</th>
+                            <th>Tanggal</th>
+                            <th>Nomor Dokumen</th>
+                            <th>Nomor JO</th>
                             <th>Pekerjaan</th>
-                            <th>Remarks</th>
-                            <th>Nilai</th>
+                            <th>Tipe</th>
+                            <th>Deskripsi</th>
+                            <th>File</th>
                             <th>Status</th>
-                            <th>Approval</th>
                             <th>Action</th>
-
                         </tr>
                     </thead>
 
                     <tbody>
                         {% for item in data %}
                         <tr>
-                            <td>{{item.NomorCashReport}}</td>
                             <td>{{item.Tanggal|date:"Y-m-d"}}</td>
-                            <td>{{item.NomorProposedBudget.NomorProposedBudget}}</td>
-                            <td>{{item.NomorProposedBudget.NomorJO.NomorJO}}</td>
-                            <td>{{item.NomorProposedBudget.NomorJO.Deskripsi}}</td>
-                            <td>{{item.Remarks}}</td>
-                            <td>Rp {{item.Nilai|intcomma}}</td>
-                            <td>{{item.Status}}</td>
-                            <td>{{item.Approvedby}}</td>
-
+                            <td>{{item.Nomor}}</td>
+                            <td>{{item.Project.NomorJO}}</td>
+                            <td>{{item.Project.Deskripsi}}</td>
+                            <td>{{item.Tipe}}</td>
+                            <td>{{item.Deskripsi}}</td>
+                            <td>{% if item.File %}<a href="{{ item.File.url }}" target="_blank">Lihat File</a>{% else %} - {% endif %}</td>
+                            <td>
+                                {%if item.Status == "Unpaid"%}
+                                    <span class="badge bg-danger">Unpaid</span>
+                                {% elif item.Status == "Paid"%}
+                                    <span class="badge bg-success">Paid</span>
+                                {% else %}
+                                    {{item.Status}}
+                                {% endif %}
+                            </td>
                             <!-- ACTION -->
                             <td>
-                                <a href="{% url 'detailcashexpensereport' item.id %}">
-                                    <button type="button" class="btn btn-info btn-sm">Info</button>
-                                </a>
 
-                                <a href="{% url 'editcashexpensereport' item.id %}">
+                                <a href="{% url 'editprojectdocuments' item.id %}">
                                     <button type="button" class="btn btn-warning btn-sm">Edit</button>
                                 </a>
 
@@ -143,12 +144,14 @@
                 const nama = this.getAttribute("data-nama");
 
                 namaItem.textContent = nama;
-                btnConfirm.href = `cashexpensereport/delete/${id}`;
+                btnConfirm.href = `projectdocuments/delete/${id}`;
 
             });
         });
 
     });
+
+
 </script>
 
 {% endblock content %}

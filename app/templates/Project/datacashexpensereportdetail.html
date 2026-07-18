@@ -110,6 +110,7 @@
                             <th>Satuan</th>
                             <th>Harga</th>
                             <th>Total Harga</th>
+                            <th>Cost Code</th>
                             <th>Remarks</th>
                         </tr>
                     </thead>
@@ -122,6 +123,7 @@
                             <td>{{item.Satuan}}</td>
                             <td>{{item.Harga|intcomma}}</td>
                             <td>{{item.TotalHarga|intcomma}}</td>
+                            <td>{{item.costcode.code}} - {{item.costcode.name}}</td>
                             <td>{{item.Remarks}}</td>
     
                         </tr>

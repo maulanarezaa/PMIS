@@ -135,6 +135,7 @@ class CashExpenseReport(models.Model):
     Approvedby = models.CharField(max_length=56,null=True, blank=True)
     approved_date = models.DateTimeField(null=True, blank=True)
     approval_comments = models.TextField(blank=True)
+    costcode = models.ForeignKey(BudgetItem, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f"{self.NomorProposedBudget}-{self.NomorCashReport}"
@@ -177,6 +178,21 @@ class Invoice(models.Model):
 
     def __str__(self):
         return f"{self.NomorWorkCompletion}-{self.NomorInvoice}"
+
+class ProjectDocuments(models.Model):
+    Project = models.ForeignKey(JobOrder, on_delete=models.CASCADE)
+    Tipe = models.CharField(max_length=100)
+    Nomor = models.CharField(max_length=100)
+    Tanggal = models.DateField()
+    Deskripsi = models.CharField(max_length=255)
+    File = models.FileField(upload_to="File/Project/Documents", null=True, blank=True)
+    Created_at = models.DateTimeField(auto_now_add=True)
+    Created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    Last_modified_at = models.DateTimeField(auto_now=True)
+    Last_modified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='modified_project_documents')
+
+    def __str__(self):
+        return f"{self.Project.NomorJO} - {self.Tipe} - {self.Nomor}"
 
 
 """

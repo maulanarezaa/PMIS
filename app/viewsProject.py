@@ -539,6 +539,7 @@ def tambahdatacashexpensereport(request):
         total_harga = request.POST.getlist("total_harga")
         catatan = request.POST.getlist("catatan")
         approverlist = request.POST.getlist("approver[]")
+        budgetid = request.POST.getlist('budgetitem')
 
         try:
             dataobj = models.CashExpenseReport(
@@ -563,7 +564,7 @@ def tambahdatacashexpensereport(request):
             messages.error(request, e)
             return redirect("tambahdatacashexpensereport")
         try:
-            for item in zip(item, jumlah, satuan, harga, total_harga, catatan):
+            for item in zip(item, jumlah, satuan, harga, total_harga, catatan, budgetid):
                 models.ItemCashExpenseReport(
                     NomorCashReport=models.CashExpenseReport.objects.last(),
                     Item=item[0],
@@ -572,6 +573,7 @@ def tambahdatacashexpensereport(request):
                     Harga=item[3],
                     TotalHarga=item[4],
                     Remarks=item[5],
+                    costcode=models.BudgetItem.objects.get(id=item[6]) if item[6] else None
                 ).save()
         except Exception as e:
             messages.error(request, e)
@@ -918,6 +920,7 @@ def ajax_joborder(request):
 @group_required("Project Manager","Admin Project","Admin Finance")
 def ajax_proposebudget_by_jo(request):
     joborder_id = request.GET.get('joborder')
+    print(joborder_id)
 
     qs = models.ProposedBudget.objects.filter(NomorJO_id=joborder_id)
 
@@ -929,3 +932,75 @@ def ajax_proposebudget_by_jo(request):
         })
 
     return JsonResponse(data, safe=False)
+
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
+def ajax_budgetcostcode_by_jo(request):
+    joborder_id = request.GET.get('joborder')
+    print(joborder_id)
+
+    qs = models.BudgetItem.objects.filter(project__id=joborder_id)
+
+    data = []
+    for item in qs:
+        data.append({
+            'id': item.id,
+            'text': f"{item.code} - {item.name}"
+        })
+
+    return JsonResponse(data, safe=False)
+
+
+'''PROJECT DOCUMENTS'''
+def viewprojectdocuments(request):
+    data = models.ProjectDocuments.objects.all()
+    print(data)
+    return render(request,"Project/projectdocuments.html", {"data": data})
+
+def tambahdataprojectdocuments(request):
+    datajo = models.JobOrder.objects.all()
+
+    if request.method == "POST":
+        print(request.POST)
+        print(request.FILES)
+        # save object
+        tanggal = request.POST["tanggal"]
+        nomordokumen = request.POST["nomordokumen"]
+        tipedokumen = request.POST["tipe_dokumen"]
+        file = request.FILES.get("filedokumen")
+        deskripsi = request.POST["deskripsi"]
+        
+        try:
+            dataobj = models.ProjectDocuments(
+                Tanggal=tanggal,
+                Tipe = tipedokumen,
+                Nomor=nomordokumen,
+                Deskripsi = deskripsi,
+                Project=models.JobOrder.objects.get(id=request.POST["project"]),
+                File=file,
+                Created_by=request.user,
+                Last_modified_by=request.user
+            ).save()
+            messages.success(request, "Data Berhasil disimpan")
+            return redirect("projectdocuments")
+        except Exception as e:
+            messages.error(request, e)
+            return redirect("tambahdataprojectdocuments")
+
+    return render(request, "Project/tambahdataprojectdocuments.html", {"datajo": datajo})
+
+def deleteprojectdocuments(request, id):
+    data = get_object_or_404(models.ProjectDocuments, id=id)
+    data.delete()
+    messages.success(request, "Data Berhasil dihapus")
+    return redirect("projectdocuments") 
+
+def detailprojectdocuments(request, id):
+    data = get_object_or_404(models.ProjectDocuments    , id=id)
+    return render(request, "Project/projectdocumentsdetail.html", {"data": data})
+
+def editprojectdocuments(request, id):
+    data = get_object_or_404(models.ProjectDocuments, id=id)
+    datajo = models.JobOrder.objects.all()
+    return render(request, "Project/editprojectdocuments.html", {"data": data, "datajo": datajo})
+

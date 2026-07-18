@@ -156,73 +156,91 @@
 
     <script src="https://cdn.datatables.net/2.3.8/js/dataTables.min.js"></script>
     <script>
-        function slideToggle(t,e,o){0===t.clientHeight?j(t,e,o,!0):j(t,e,o)}function slideUp(t,e,o){j(t,e,o)}function slideDown(t,e,o){j(t,e,o,!0)}function j(t,e,o,i){void 0===e&&(e=400),void 0===i&&(i=!1),t.style.overflow="hidden",i&&(t.style.display="block");var p,l=window.getComputedStyle(t),n=parseFloat(l.getPropertyValue("height")),a=parseFloat(l.getPropertyValue("padding-top")),s=parseFloat(l.getPropertyValue("padding-bottom")),r=parseFloat(l.getPropertyValue("margin-top")),d=parseFloat(l.getPropertyValue("margin-bottom")),g=n/e,y=a/e,m=s/e,u=r/e,h=d/e;window.requestAnimationFrame(function l(x){void 0===p&&(p=x);var f=x-p;i?(t.style.height=g*f+"px",t.style.paddingTop=y*f+"px",t.style.paddingBottom=m*f+"px",t.style.marginTop=u*f+"px",t.style.marginBottom=h*f+"px"):(t.style.height=n-g*f+"px",t.style.paddingTop=a-y*f+"px",t.style.paddingBottom=s-m*f+"px",t.style.marginTop=r-u*f+"px",t.style.marginBottom=d-h*f+"px"),f>=e?(t.style.height="",t.style.paddingTop="",t.style.paddingBottom="",t.style.marginTop="",t.style.marginBottom="",t.style.overflow="",i||(t.style.display="none"),"function"==typeof o&&o()):window.requestAnimationFrame(l)})}
+        function slideToggle(t, e, o) { 0 === t.clientHeight ? j(t, e, o, !0) : j(t, e, o) } function slideUp(t, e, o) { j(t, e, o) } function slideDown(t, e, o) { j(t, e, o, !0) } function j(t, e, o, i) { void 0 === e && (e = 400), void 0 === i && (i = !1), t.style.overflow = "hidden", i && (t.style.display = "block"); var p, l = window.getComputedStyle(t), n = parseFloat(l.getPropertyValue("height")), a = parseFloat(l.getPropertyValue("padding-top")), s = parseFloat(l.getPropertyValue("padding-bottom")), r = parseFloat(l.getPropertyValue("margin-top")), d = parseFloat(l.getPropertyValue("margin-bottom")), g = n / e, y = a / e, m = s / e, u = r / e, h = d / e; window.requestAnimationFrame(function l(x) { void 0 === p && (p = x); var f = x - p; i ? (t.style.height = g * f + "px", t.style.paddingTop = y * f + "px", t.style.paddingBottom = m * f + "px", t.style.marginTop = u * f + "px", t.style.marginBottom = h * f + "px") : (t.style.height = n - g * f + "px", t.style.paddingTop = a - y * f + "px", t.style.paddingBottom = s - m * f + "px", t.style.marginTop = r - u * f + "px", t.style.marginBottom = d - h * f + "px"), f >= e ? (t.style.height = "", t.style.paddingTop = "", t.style.paddingBottom = "", t.style.marginTop = "", t.style.marginBottom = "", t.style.overflow = "", i || (t.style.display = "none"), "function" == typeof o && o()) : window.requestAnimationFrame(l) }) }
 
-let sidebarItems = document.querySelectorAll('.sidebar-item.has-sub');
-for(var i = 0; i < sidebarItems.length; i++) {
-    let sidebarItem = sidebarItems[i];
-	sidebarItems[i].querySelector('.sidebar-link').addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        let submenu = sidebarItem.querySelector('.submenu');
-        if( submenu.classList.contains('active') ) submenu.style.display = "block"
+        let sidebarItems = document.querySelectorAll('.sidebar-item.has-sub');
+        for (var i = 0; i < sidebarItems.length; i++) {
+            let sidebarItem = sidebarItems[i];
+            sidebarItems[i].querySelector('.sidebar-link').addEventListener('click', function (e) {
+                e.preventDefault();
 
-        if( submenu.style.display == "none" ) submenu.classList.add('active')
-        else submenu.classList.remove('active')
-        slideToggle(submenu, 300)
-    })
-}
+                let submenu = sidebarItem.querySelector('.submenu');
+                if (submenu.classList.contains('active')) submenu.style.display = "block"
 
-window.addEventListener('DOMContentLoaded', (event) => {
-    var w = window.innerWidth;
-    if(w < 1200) {
-        document.getElementById('sidebar').classList.remove('active');
-    }
-});
-window.addEventListener('resize', (event) => {
-    var w = window.innerWidth;
-    if(w < 1200) {
-        document.getElementById('sidebar').classList.remove('active');
-    }else{
-        document.getElementById('sidebar').classList.add('active');
-    }
-});
+                if (submenu.style.display == "none") submenu.classList.add('active')
+                else submenu.classList.remove('active')
+                slideToggle(submenu, 300)
+            })
+        }
 
-document.querySelector('.burger-btn').addEventListener('click', () => {
-    document.getElementById('sidebar').classList.toggle('active');
-})
-document.querySelector('.sidebar-hide').addEventListener('click', () => {
-    document.getElementById('sidebar').classList.toggle('active');
+        window.addEventListener('DOMContentLoaded', (event) => {
+            var w = window.innerWidth;
+            if (w < 1200) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        });
+        window.addEventListener('resize', (event) => {
+            var w = window.innerWidth;
+            if (w < 1200) {
+                document.getElementById('sidebar').classList.remove('active');
+            } else {
+                document.getElementById('sidebar').classList.add('active');
+            }
+        });
 
-})
+        document.querySelector('.burger-btn').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('active');
+        })
+        document.querySelector('.sidebar-hide').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('active');
+
+        })
 
 
-// Perfect Scrollbar Init
-if(typeof PerfectScrollbar == 'function') {
-    const container = document.querySelector(".sidebar-wrapper");
-    const ps = new PerfectScrollbar(container, {
-        wheelPropagation: false
-    });
-}
+        // Perfect Scrollbar Init
+        if (typeof PerfectScrollbar == 'function') {
+            const container = document.querySelector(".sidebar-wrapper");
+            const ps = new PerfectScrollbar(container, {
+                wheelPropagation: false
+            });
+        }
 
-// Scroll into active sidebar
-const activeItem = document.querySelector('.sidebar-item.active');
-if (activeItem) {
-    activeItem.scrollIntoView({ behavior: "smooth", block: "center" });
-}
+        // Scroll into active sidebar
+        const activeItem = document.querySelector('.sidebar-item.active');
+        if (activeItem) {
+            activeItem.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
     </script>
     <script>
         // Simple Datatable
-        let table1 = document.querySelector('#table1');
-        let dataTable = new simpleDatatables.DataTable(table1);
-        let table2 = document.querySelector('#table2');
-        let dataTable2 = new simpleDatatables.DataTable(table2);
-        let table3 = document.querySelector('#table3');
-        let dataTable3 = new simpleDatatables.DataTable(table3);
-        new dataTable("table1", {
-            responsive: true,
-        })
-        dataTable3.order = [[3, 'asc']]; // Urutkan berdasarkan kolom pertama (ID) secara menurun
+        
+        // $(document).ready(function () {
+        //     $('#table1').DataTable({
+        //         scrollX: true,
+                
+        //     });
+        // });
+        // $(document).ready(function () {
+        //     $('#table2').DataTable({
+        //         scrollX: true
+        //     });
+        // });
+        // $(document).ready(function () {
+        //     $('#table3').DataTable({
+        //         scrollX: true
+        //     });
+        // });
+        // $(document).ready(function () {
+        //     $('#table4').DataTable({
+        //         scrollX: true
+        //     });
+        // });
+        // $(document).ready(function () {
+        //     $('#table5').DataTable({
+        //         scrollX: true
+        //     });
+        // });
+        
     </script>
     <script>
         setTimeout(function () {
