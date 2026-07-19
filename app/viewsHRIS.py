@@ -178,7 +178,11 @@ def tambahdatakaryawan(request):
         satuankontrak = request.POST["satuan_kontrak"]
         durasikontrak = int(request.POST["JenisKontrak"])
         TanggalAwal = request.POST["TanggalAwal"]
-        JobOrderobj = models.JobOrder.objects.get(pk=request.POST["Proyek"])
+        try:
+            JobOrderobj = models.JobOrder.objects.get(pk=request.POST["Proyek"])
+        except Exception as e:
+            messages.error(request, "Job Order tidak ditemukan.")
+            JobOrderobj = None
         Posisi = request.POST["Posisi"]
         RemarksKontrak = request.POST["RemarksKontrak"]
 

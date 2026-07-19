@@ -504,6 +504,70 @@ class MaterialKeluar(models.Model):
 '''
 Account Management
 '''
+class UserProfile(models.Model):
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="profile"
+    )
+
+    karyawan = models.OneToOneField(
+        MasterKaryawan,
+        on_delete=models.CASCADE,
+        related_name="account"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="created_users"
+    )
+
+    def __str__(self):
+        return self.user.username
+
+class UserJobOrder(models.Model):
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="job_order_access"
+    )
+
+    job_order = models.ForeignKey(
+        JobOrder,
+        on_delete=models.CASCADE,
+        related_name="user_access"
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_job_access"
+    )
+
+
+    class Meta:
+        unique_together = (
+            "user",
+            "job_order"
+        )
+
+
+    def __str__(self):
+        return f"{self.user.username} - {self.job_order.NomorJO}"
+    
 class Role(models.Model):
     nama = models.CharField(max_length=100)
 

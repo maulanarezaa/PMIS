@@ -11,6 +11,7 @@ from .templatetags.group_tags import group_required
 from collections import defaultdict
 import openpyxl
 import pandas as pd
+from .viewsService import get_user_job_orders
 
 
 def is_valid_image(file):
@@ -23,7 +24,9 @@ def is_valid_image(file):
 @login_required
 @group_required("Project Manager","Admin Project","Admin Finance")
 def viewjoborder(request):
-    data = models.JobOrder.objects.all()
+    data = models.JobOrder.objects.filter(
+    user_access__user=request.user
+)
     print(request.user)
     return render(request, "Project/datajoborder.html", {"data": data})
 
@@ -238,7 +241,10 @@ def save_budget(request, project_id):
 @login_required
 @group_required("Project Manager","Admin Project")
 def viewworkcompletion(request):
-    data = models.WorkCompletion.objects.all()
+    data = models.WorkCompletion.objects.filter(
+        NomorJO__user_access__user=request.user
+    )
+
     return render(request, "Project/dataworkcompletion.html", {"data": data})
 
 
@@ -324,7 +330,9 @@ def search_proposebudget(request):
 @login_required
 @group_required("Project Manager","Admin Project","Admin Finance")
 def viewproposebudget(request):
-    data = models.ProposedBudget.objects.all()
+    data = models.ProposedBudget.objects.filter(
+        NomorJO__user_access__user=request.user
+    )
     for item in data:
         item.totalcer = models.CashExpenseReport.objects.filter(NomorProposedBudget=item).aggregate(Total=Sum("Nilai"))["Total"] or 0
     return render(request,"Project/dataproposebudget.html", {"data": data})
@@ -513,7 +521,8 @@ Cash Expense Report
 @login_required
 @group_required("Project Manager","Admin Project","Admin Finance")
 def viewcashexpensereport(request):
-    data = models.CashExpenseReport.objects.all()
+    data = models.CashExpenseReport.objects.filter(
+        NomorProposedBudget__NomorJO__user_access__user=request.user)
     return render(request,"Project/datacashexpensereport.html", {"data": data})
 
 @login_required
@@ -681,7 +690,9 @@ def editcashexpensereport(request, id):
 @login_required
 @group_required("Project Manager","Admin Project")
 def viewinvoice(request):
-    data = models.Invoice.objects.all()
+    data = models.Invoice.objects.filter(
+        NomorWorkCompletion__NomorJO__user_access__user=request.user
+    )
     return render(request,"Project/datainvoice.html", {"data": data})
 
 @login_required

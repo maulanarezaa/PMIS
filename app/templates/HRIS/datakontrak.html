@@ -53,12 +53,10 @@
                                     Edit
                                 </button>
                             </a>
-                            <a href="{% url 'hapusdatakontrak' item.id %}">
-                                <button type="button" class="btn btn-danger">
-                                    Hapus
-
-                                </button>
-                            </a>
+                            <button type="button" class="btn btn-danger btn-sm btn-hapus" data-id="{{item.id}}"
+                                data-nama="{{item.NamaItem}}" data-bs-toggle="modal" data-bs-target="#modalHapus">
+                                Hapus
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -66,6 +64,56 @@
             </table>
         </div>
     </div>
+<div class="modal fade" id="modalHapus" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
 
+            <div class="modal-header">
+                <h5 class="modal-title">Konfirmasi Hapus</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus data berikut?</p>
+                <h5 id="namaItemHapus" class="text-danger"></h5>
+                <p class="text-muted">Data yang dihapus tidak dapat dikembalikan.</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Batal
+                </button>
+
+                <a href="#" id="btnConfirmHapus" class="btn btn-danger">
+                    Ya, Hapus
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+        const buttons = document.querySelectorAll(".btn-hapus");
+        const namaItem = document.getElementById("namaItemHapus");
+        const btnConfirm = document.getElementById("btnConfirmHapus");
+
+        buttons.forEach(button => {
+            button.addEventListener("click", function () {
+
+                const id = this.getAttribute("data-id");
+                const nama = this.getAttribute("data-nama");
+
+                namaItem.textContent = nama;
+                btnConfirm.href = `datakontrak/delete/${id}`;
+
+            });
+        });
+
+    });
+
+</script>
 </section>
 {% endblock content %}

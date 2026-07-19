@@ -5,6 +5,7 @@ from . import viewsProject
 urlpatterns = [
     path("viewjoborder", viewsProject.viewjoborder, name="viewjoborder"),
     path("joborder/add", viewsProject.tambahdatajoborder, name="tambahdatajoborder"),
+    path("joborder/edit/<str:id>", viewsProject.editjoborder, name="editjoborder"),
     path(
         "joborder/detail/<str:id>",
         viewsProject.viewdetailjoborder,

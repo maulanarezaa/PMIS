@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-heading">
+    <h3>
+        Assign Job Order
+    </h3>
+    <p>
+        User :
+        <strong>
+            {{ user.username }}
+        </strong>
+    </p>
+</div>
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th width="50">
+                            Pilih
+                        </th>
+                        <th>
+                            No Job Order
+                        </th>
+                        <th>
+                            Project
+                        </th>
+                        <th>
+                            Client
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for jo in job_orders %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="job_orders" value="{{ jo.id }}" {% if jo.id in selected_job_orders %} checked {% endif %}>
+                        </td>
+                        <td>
+                            {{ jo.NomorJO }}
+                        </td>
+                        <td>
+                            {{ jo.Deskripsi }}
+                        </td>
+                        <td>
+                            {{ jo.Client }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button class="btn btn-primary">
+                Save Access
+            </button>
+            <a href="{% url 'user_list' %}" class="btn btn-secondary">
+                Back
+            </a>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

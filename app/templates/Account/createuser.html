@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-heading">
+
+    <h3>Create User Account</h3>
+
+</div>
+
+<div class="card">
+
+    <div class="card-body">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <label>Karyawan</label>
+
+                    <select class="form-select" name="employee" required>
+
+                        <option value="">
+
+                            Pilih Karyawan
+
+                        </option>
+
+                        {% for employee in employees %}
+
+                        <option value="{{ employee.id }}">
+
+                            {{ employee.Nama }}
+
+                            -
+
+                            {{ employee.NIK }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label>Username</label>
+
+                    {{ form.username }}
+
+                </div>
+
+                <div class="col-md-6 mt-3">
+
+                    <label>Email</label>
+
+                    {{ form.email }}
+
+                </div>
+
+                <div class="col-md-6 mt-3">
+
+                    <label>Group</label>
+
+                    {{ form.group }}
+
+                </div>
+
+                <div class="col-md-6 mt-3">
+
+                    <label>Password</label>
+
+                    {{ form.password }}
+
+                </div>
+
+                <div class="col-md-6 mt-3">
+
+                    <label>Status</label>
+
+                    {{ form.is_active }}
+
+                </div>
+
+            </div>
+
+            <hr>
+
+            <button class="btn btn-primary">
+
+                Save
+
+            </button>
+
+            <a href="{% url 'user_list' %}" class="btn btn-secondary">
+
+                Cancel
+
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -88,9 +88,9 @@
                     <div class="col-12 col-md-3 ">
                         <label>Nilai</label>
                         <div class="position-relative">
-                                                        {% if request.user|has_any_group:"Project Manager" %}
+                            {% if request.user|has_any_group:"Project Manager" %}
                             <input type="text" disabled class="form-control" value="{{data.Nilai}}">
-                            {%  else%}
+                            {% else%}
                             <input type="text" disabled class="form-control" value="kosong">
                             {% endif %}
                         </div>
@@ -164,6 +164,9 @@
             <!-- ================= TAB MASUK ================= -->
             <div class="tab-pane-custom d-none" id="tab-masuk">
                 <h5>Work Completion List</h5>
+                
+                <h6>Total Nilai Work Completion: </h6>
+                <h6>Rp{{data.totalworkcompletion|intcomma}}</h6>
 
                 <table class="table table-striped display" id="tblworkcompletion">
                     <thead>
@@ -187,19 +190,21 @@
                             <td>{{item.Jenis}}</td>
                             <td>{{ item.Remarks }}</td>
                             <td>{{item.Nilai|intcomma}}</td>
-                        
+
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="4" class="text-center">Tidak ada data</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-center">Tidak ada data</td>
                         </tr>
                         {% endfor %}
-                        <tr>
-                            <td colspan="4" class="text-center">Total</td>
-                            <td>{{data.totalworkcompletion|intcomma}}</td>
-                        </tr>
+
                     </tbody>
                 </table>
+                
             </div>
 
             <!-- ================= TAB KELUAR ================= -->
@@ -235,7 +240,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             <!-- ================= TAB proposebudget ================= -->
             <div class="tab-pane-custom d-none" id="tab-proposebudget">
                 <h5>Propose Budget</h5>
@@ -344,7 +349,8 @@
                 <h5>Budget</h5>
                 <a href="{% url 'tambahdatabudget' data.id %}" class="btn btn-primary">Add Item</a>
                 <a href="{% url 'addbudgetjofromexcel' data.id %}" class="btn btn-success">Add from Excel</a>
-                <a href="{% static 'templates/budget_bulkupdate.xlsx' %}" download class="btn btn-outline-success">Download Format Excel</a>
+                <a href="{% static 'templates/budget_bulkupdate.xlsx' %}" download
+                    class="btn btn-outline-success">Download Format Excel</a>
 
                 <table class="table table-striped display " id="tblbudget">
                     <thead>
@@ -365,7 +371,7 @@
                             <td>{{ item.remarks }}</td>
                             <td>
                                 <a href="{% url 'editbudget' item.id %}" class="btn btn-sm btn-primary">Edit</a>
-                                <a  type="button" class="btn btn-danger btn-sm btn-hapus" data-id="{{item.id}}"
+                                <a type="button" class="btn btn-danger btn-sm btn-hapus" data-id="{{item.id}}"
                                     data-nama="{{item.NamaItem}}" data-bs-toggle="modal" data-bs-target="#modalHapus">
                                     Hapus</a>
                             </td>
