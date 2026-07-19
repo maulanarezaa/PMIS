@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="page-heading">
+    <h3>Register Vendor</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card-header">
+                <h4 class="card-title">Data Vendor</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Nama Vendor</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="nama" placeholder="Masukkan Nama Vendor"
+                                    required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Alamat</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="alamat"
+                                    placeholder="Masukkan Alamat Vendor" required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Kategori</label>
+                            <div class="position-relative">
+                                <select name="kategori" class="form-select" required>
+                                <option value="" selected disabled>Pilih Kategori</option>
+                                <option value="Material" {% if data.Kategori == "Material" %}selected{% endif %}>Material</option>
+                                <option value="Service" {% if data.Kategori == "Service" %}selected{% endif %}>Service</option>
+                                <option value ="Rental" {% if data.Kategori == "Rental" %}selected{% endif %}>Rental</option>
+                                <option value="Fabrication" {% if data.Kategori == "Fabrication" %}selected{% endif %}>Fabrication</option>
+                                <option value="Consultant" {% if data.Kategori == "Consultant" %}selected{% endif %}>Consultant</option>
+                                <option value="Lainnya" {% if data.Kategori == "Lainnya" %}selected{% endif %}>Lainnya</option>
+                                </select>
+                                <!-- Dropdown hasil -->
+                                <div class="list-group position-absolute w-100 jo-result" style="z-index:999;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Nara Hubung</label>
+                            <div class="position-relative">
+                                <input  type="text" class="form-control pekerjaan-field" name="narahubung" value="{{ data.PIC }}">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Kontak</label>
+                            <div class="position-relative">
+                                <input  type="text" class="form-control nilai-field" name="kontak" value="{{ data.Kontak }}">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Email</label>
+                            <div class="position-relative">
+                                <input type="email" class="form-control nilai-field" name="email" value="{{ data.Email }}">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Status Aktif</label>
+                            <div class="position-relative">
+                               <select name="status" class="form-select" required>
+                                <option value="" selected disabled>Pilih Status</option>
+                                <option value="True" {% if data.Status == "True" %}selected{% endif %}>Aktif</option>
+                                <option value="False" {% if data.Status == "False" %}selected{% endif %}>Tidak Aktif</option>
+                                </select>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+    </div>
+
+    <!-- BUTTON -->
+    <button type="submit" class="btn btn-primary">Simpan Semua</button>
+
+
+
+    </form>
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+<script>
+    $(document).on('keyup', '.jo-search', function () {
+
+        let input = $(this);
+        let query = input.val();
+        let resultBox = input.siblings('.jo-result');
+
+        if (query.length > 1) {
+            $.ajax({
+                url: "{% url 'search_jo' %}",
+                data: { 'q': query },
+                success: function (data) {
+
+                    resultBox.empty();
+
+                    data.forEach(function (item) {
+                        resultBox.append(`
+                        <a href="#" 
+                           class="list-group-item list-group-item-action select-jo"
+                           data-id="${item.idjo}"
+                           data-nomor="${item.NomorJO}"
+                           data-deskripsi="${item.Deskripsi}"
+                           data-nilai="${item.Nilai}">
+                           
+                           ${item.NomorJO} - ${item.Deskripsi}
+                        </a>
+                    `);
+                    });
+                }
+            });
+        } else {
+            resultBox.empty();
+        }
+    });
+
+    $(document).on('click', '.select-jo', function (e) {
+        e.preventDefault();
+
+        let selected = $(this);
+        console.log("Selected JO:", selected.data('nomor'), "ID:", selected.data('id'));
+        let container = selected.closest('.position-relative');
+
+        let jo_id = selected.data('id');
+
+        // isi input JO
+        container.find('.jo-search').val(selected.data('nomor'));
+        container.find('.jo-id').val(jo_id);
+
+        $('.pekerjaan-field').val(selected.data('deskripsi'));
+        $('.nilai-field').val(selected.data('nilai'));
+
+        container.find('.jo-result').empty();
+
+        // 🔥 LOAD WORK COMPLETION BERDASARKAN JO
+        loadWorkCompletion(jo_id);
+    });
+
+    function loadWorkCompletion(jo_id) {
+
+        let selectWC = $("#workcompletion");
+
+        selectWC.empty();
+        selectWC.append('<option disabled selected>Loading...</option>');
+
+        $.ajax({
+            url: "{% url 'get_workcompletion_by_jo' %}",
+            data: { 'jo_id': jo_id },
+            success: function (data) {
+
+                selectWC.empty();
+                selectWC.append('<option disabled selected>Pilih Work Completion</option>');
+
+                data.forEach(function (item) {
+                    selectWC.append(`
+                    <option value="${item.id}">
+                        ${item.NomorWorkCompletion}
+                    </option>
+                `);
+                });
+
+            }
+        });
+    }
+</script>
+
+{% endblock %}

@@ -610,7 +610,62 @@ class AuditLog(models.Model):
     keterangan = models.TextField(null=True, blank=True)
 
 """
-Custom Models User
+PROCUREMENT
 """
+class VendorMaster(models.Model):
+    Nama = models.CharField(max_length=256)
+    Alamat = models.CharField(max_length=256, null=True, blank=True)
+    Kategori = models.CharField(max_length=256, null=True, blank=True)
+    PIC = models.CharField(max_length=256, null=True, blank=True)
+    Kontak = models.CharField(max_length=256, null=True, blank=True)
+    Email = models.EmailField(max_length=256, null=True, blank=True)
+    Status = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return f"{self.Nama} - {self.Kategori}"
 
+class VendorQuotation(models.Model):
+    NomorQuotation = models.CharField(max_length=256, unique=True)
+    Vendor = models.ForeignKey(VendorMaster, on_delete=models.CASCADE)
+    Tanggal = models.DateField()
+    Deskripsi = models.CharField(max_length=256, null=True, blank=True)
+    FileQuotation = models.FileField(upload_to="File/Procurement/Quotation", null=True, blank=True)
+    NomorJO = models.ForeignKey(JobOrder, on_delete=models.CASCADE, null=True, blank=True)
+    
+    def __str__(self):
+        return f"{self.NomorQuotation} - {self.Vendor.Nama}"
 
+class VendorQuotationItem(models.Model):
+    NomorQuotation = models.ForeignKey(VendorQuotation, on_delete=models.CASCADE, related_name='items')
+    Item = models.CharField(max_length=256)
+    Jumlah = models.FloatField()
+    Satuan = models.CharField(max_length=25, null=True, blank=True)
+    Harga = models.FloatField()
+    TotalHarga = models.FloatField()
+    Remarks = models.CharField(max_length=128, blank=True,null=True)
+    
+    def __str__(self):
+        return f"{self.NomorQuotation} - {self.Item}"
+
+class PurchaseOrder(models.Model):
+    NomorPO = models.CharField(max_length=256, unique=True)
+    Vendor = models.ForeignKey(VendorMaster, on_delete=models.CASCADE)
+    Tanggal = models.DateField()
+    Deskripsi = models.CharField(max_length=256, null=True, blank=True)
+    FilePO = models.FileField(upload_to="File/Procurement/PO", null=True, blank=True)
+    NomorJO = models.ForeignKey(JobOrder, on_delete=models.CASCADE, null=True, blank=True)
+    
+    def __str__(self):
+        return f"{self.NomorPO} - {self.Vendor.Nama}"
+
+class PurchaseOrderItem(models.Model):
+    NomorPO = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE, related_name='items')
+    Item = models.CharField(max_length=256)
+    Jumlah = models.FloatField()
+    Satuan = models.CharField(max_length=25, null=True, blank=True)
+    Harga = models.FloatField()
+    TotalHarga = models.FloatField()
+    Remarks = models.CharField(max_length=128, blank=True,null=True)
+    
+    def __str__(self):
+        return f"{self.NomorPO} - {self.Item}"

@@ -59,6 +59,11 @@ urlpatterns = [
     path('projectdocuments/delete/<int:id>', viewsProject.deleteprojectdocuments, name="deleteprojectdocuments"),
     path('projectdocuments/detail/<int:id>', viewsProject.detailprojectdocuments, name="detailprojectdocuments"),
     path('projectdocuments/edit/<int:id>', viewsProject.editprojectdocuments, name="editprojectdocuments"),
+    # Procurement
+    path('vendorlist',viewsProject.viewvendor,name="vendorlist"),
+    path('vendor/edit/<int:id>', viewsProject.editvendor, name="editvendor"),
+    path('vendor/add', viewsProject.tambahvendor, name="tambahvendor"),
+    path('vendor/delete/<int:id>', viewsProject.deletevendor, name="deletevendor"),
     # SUPPORT
     path("search-item/", viewsProject.searchbudget, name="searchbudet"),
     path('ajax/joborder/', viewsProject.ajax_joborder, name='ajax_joborder'),

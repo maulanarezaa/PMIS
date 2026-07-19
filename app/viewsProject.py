@@ -1015,3 +1015,74 @@ def editprojectdocuments(request, id):
     datajo = models.JobOrder.objects.all()
     return render(request, "Project/editprojectdocuments.html", {"data": data, "datajo": datajo})
 
+'''
+PROCUREMENT
+'''
+
+def viewvendor(request):
+    data = models.VendorMaster.objects.all()
+    return render(request,"Procurement/vendorlist.html", {"data": data})
+
+def editvendor(request, id):
+    data = get_object_or_404(models.VendorMaster, id=id)
+    if request.method == "POST":
+        print(request.POST)
+        nama = request.POST["nama"]
+        alamat = request.POST["alamat"]
+        kontak = request.POST["kontak"]
+        email = request.POST["email"]
+        kategori = request.POST["kategori"]
+        narahubung = request.POST["narahubung"]
+        status = request.POST["status"]
+
+        try:
+            data.Nama = nama
+            data.Alamat = alamat
+            data.Kontak = kontak
+            data.Email = email
+            data.save()
+            messages.success(request, "Data Berhasil diupdate")
+            return redirect("vendor")
+        except Exception as e:
+            messages.error(request, e)
+            return redirect("editvendor", id=id)
+
+    return render(request, "Procurement/editvendor.html", {"data": data})
+
+def tambahvendor(request):
+    if request.method == "POST":
+        print(request.POST)
+        # print(asd)
+        nama = request.POST["nama"]
+        alamat = request.POST["alamat"]
+        kontak = request.POST["kontak"]
+        email = request.POST["email"]
+        kategori = request.POST["kategori"]
+        narahubung = request.POST["narahubung"]
+        status = request.POST["status"]
+
+        try:
+            dataobj = models.VendorMaster(
+                Nama=nama,
+                Alamat=alamat,
+                Kontak=kontak,
+                Email=email,
+                Kategori=kategori,
+                PIC=narahubung,
+                Status=status
+            ).save()
+            messages.success(request, "Data Berhasil disimpan")
+            return redirect("vendorlist")
+        except Exception as e:
+            messages.error(request, e)
+            return redirect("tambahvendor")
+
+    return render(request, "Procurement/registervendor.html")
+
+def deletevendor(request, id):
+    data = get_object_or_404(models.VendorMaster, id=id)
+    data.delete()
+    messages.success(request, "Data Berhasil dihapus")
+    return redirect("vendorlist")
+
+
