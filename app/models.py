@@ -654,6 +654,7 @@ class PurchaseOrder(models.Model):
     Deskripsi = models.CharField(max_length=256, null=True, blank=True)
     FilePO = models.FileField(upload_to="File/Procurement/PO", null=True, blank=True)
     NomorJO = models.ForeignKey(JobOrder, on_delete=models.CASCADE, null=True, blank=True)
+    ReferenceQuotation = models.ForeignKey(VendorQuotation, on_delete=models.CASCADE, null=True, blank=True)
     
     def __str__(self):
         return f"{self.NomorPO} - {self.Vendor.Nama}"

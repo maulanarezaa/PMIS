@@ -22,5 +22,7 @@ admin.site.register(models.WorkCompletion)
 admin.site.register(models.Invoice)
 admin.site.register(models.ProjectDocuments)
 admin.site.register(models.VendorMaster)
+admin.site.register(models.VendorQuotation)
+admin.site.register(models.VendorQuotationItem)
 
 

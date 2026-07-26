@@ -1,0 +1,432 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+
+{% block content %}
+<div class="page-heading">
+    <h3>Edit Data Vendor Quotation</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <form class="form form-vertical" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- ================= DATA DIRI ================= -->
+            <div class="card-header">
+                <h4 class="card-title">Data Quotation</h4>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Nomor Quotation</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="nomorquotation"
+                                    value="{{ data.NomorQuotation }}" placeholder="Masukkan Nomor Quotation" required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Nomor Job Order</label>
+                            <input type="hidden" name="joborder" id="joborder-id" value="{{ data.NomorJO.id }}">
+
+                            <!-- input search -->
+                            <input type="text" id="joborder-input" class="form-control" placeholder="Cari Job Order..."
+                                autocomplete="off" value="{{ data.NomorJO }}">
+
+                            <!-- dropdown result -->
+                            <div id="joborder-list" class="list-group"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Vendor</label>
+                            <input type="hidden" name="vendor" id="vendor-id" value="{{ data.Vendor.id }}">
+
+                            <!-- input search -->
+                            <input type="text" id="vendor-input" class="form-control" placeholder="Cari Vendor..."
+                                autocomplete="off" value="{{ data.Vendor }}">
+
+                            <!-- dropdown result -->
+                            <div id="vendor-list" class="list-group"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Tanggal</label>
+                            <div class="position-relative">
+                                <input type="date" class="form-control" name="tanggal" placeholder="Masukan Tanggal"
+                                    required value="{{ data.Tanggal|date:'Y-m-d' }}">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-house"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Deskripsi Quotation</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="deskripsi"
+                                    placeholder="Masukkan Deskripsi Quotation" required value="{{ data.Deskripsi }}">
+                                <div class="form-control-icon">
+                                    <i class="bi bi-phone"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+
+
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label class="form-label">File Quotation</label>
+
+                            {% if data.FileQuotation %}
+                            <input type="hidden" id="delete_file" name="delete_file" value="0">
+                            <div class="border rounded p-2 mb-2 bg-light" id="fileQuotationContainer">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-file-earmark-pdf text-danger"></i>
+                                        <strong>{{ data.FileQuotation.name|cut:"vendor/quotation/" }}</strong>
+                                    </div>
+
+                                    <div class="btn-group">
+                                        <a href="{{ data.FileQuotation.url }}" target="_blank"
+                                            class="btn btn-sm btn-primary">
+                                            <i class="bi bi-eye"></i> Lihat
+                                        </a>
+
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                            data-bs-target="#deleteFileModal">
+                                            <i class="bi bi-trash"></i> Hapus
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="border rounded p-2 mb-2 bg-light py-2">
+                                Belum ada file quotation.
+                            </div>
+                            {% endif %}
+
+                            <input type="file" name="FileQuotation" class="form-control">
+
+                            <small class="text">
+                                Kosongkan apabila tidak ingin mengganti file.
+                            </small>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-header">
+                <h4 class="card-title">Item Quotataion</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+
+                    <table class="table" id="table12" style="font-size: 12px;">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Deskripsi</th>
+                                <th>Qty</th>
+                                <th>Satuan</th>
+                                <th>Harga Satuan</th>
+                                <th>Total Harga</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="quotationTable">
+                            {% for item in data.detail %}
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control" name="item[]" placeholder="Masukkan Item"
+                                        required value="{{ item.Item }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" name="deskripsiitem[]"
+                                        placeholder="Masukkan Deskripsi Item" required value="{{ item.Remarks }}">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control qty" name="qty[]"
+                                        placeholder="Masukkan Qty" required value="{{ item.Jumlah }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" name="satuan[]"
+                                        placeholder="Masukkan Satuan" required value="{{ item.Satuan }}">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control harga" name="harga[]"
+                                        placeholder="Masukkan Harga Satuan" required value="{{ item.Harga }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control total" name="total[]"
+                                        placeholder="Total Harga" readonly
+                                        value="{{ item.TotalHarga|floatformat:2|intcomma }}">
+                                </td>
+                                <td width="80">
+                                    <button type="button" class="btn btn-danger btn-sm removeRow">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-success btn-sm" id="addRow">
+                            <i class="bi bi-plus-circle"></i>
+                            Tambah Item
+                        </button>
+                    </div>
+                    <div class="col-12 d-flex justify-content-start mt-3">
+                        <button type="submit" class="btn btn-primary me-2">Submit</button>
+                    </div>
+                </div>
+        </form>
+    </div>
+
+    <div class="modal fade" id="deleteFileModal" tabindex="-1">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        Konfirmasi Hapus
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    Apakah Anda yakin ingin menghapus file quotation ini?
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Batal
+                    </button>
+
+                    <button type="button" class="btn btn-danger" id="confirmDeleteFile">
+
+                        <i class="bi bi-trash"></i>
+                        Hapus
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+<script>
+    document.getElementById("confirmDeleteFile").addEventListener("click", function () {
+
+        // tandai file akan dihapus
+        document.getElementById("delete_file").value = "1";
+
+        // hilangkan tampilan file
+        document.getElementById("fileQuotationContainer").remove();
+
+        // tutup modal
+        bootstrap.Modal.getInstance(
+            document.getElementById("deleteFileModal")
+        ).hide();
+
+    });
+    $("#joborder-input").keyup(function () {
+        let query = $(this).val();
+
+        if (query.length < 2) {
+            $("#joborder-list").empty();
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'ajax_joborder' %}",
+            data: { q: query },
+            success: function (data) {
+                let html = "";
+
+                data.forEach(function (item) {
+                    html += `
+                    <a href="#" class="list-group-item list-group-item-action jo-item"
+                       data-id="${item.id}"
+                       data-text="${item.text}">
+                       ${item.text}
+                    </a>
+                `;
+                });
+
+                $("#joborder-list").html(html);
+            }
+        });
+    });
+
+    $("#vendor-input").keyup(function () {
+        let query = $(this).val();
+
+        if (query.length < 2) {
+            $("#vendor-list").empty();
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'ajax_vendor' %}",
+            data: { q: query },
+            success: function (data) {
+                let html = "";
+
+                data.forEach(function (item) {
+                    html += `
+                    <a href="#" class="list-group-item list-group-item-action vendor-item"
+                       data-id="${item.id}"
+                       data-text="${item.text}">
+                       ${item.text}
+                    </a>
+                `;
+                });
+
+                $("#vendor-list").html(html);
+            }
+        });
+    });
+
+
+    // ================= PILIH JO =================
+    $(document).on("click", ".jo-item", function (e) {
+        e.preventDefault();
+
+        let id = $(this).data("id");
+        let text = $(this).data("text");
+
+        $("#joborder-id").val(id);
+        $("#joborder-input").val(text);
+        $("#joborder-list").empty();
+
+
+    });
+    // ================= PILIH Vendor =================
+    $(document).on("click", ".vendor-item", function (e) {
+        e.preventDefault();
+
+        let id = $(this).data("id");
+        let text = $(this).data("text");
+
+        $("#vendor-id").val(id);
+        $("#vendor-input").val(text);
+        $("#vendor-list").empty();
+
+
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        function hitungSemua() {
+
+            let grand = 0;
+
+            document.querySelectorAll("#quotationTable tr").forEach(function (row) {
+
+                let qty = parseFloat(row.querySelector(".qty").value) || 0;
+                let harga = parseFloat(row.querySelector(".harga").value) || 0;
+
+                let total = qty * harga;
+
+                row.querySelector(".total").value = total.toLocaleString('id-ID');
+
+                grand += total;
+
+            });
+
+            document.getElementById("grandTotal").value =
+                grand.toLocaleString('id-ID');
+        }
+
+        document.getElementById("addRow").addEventListener("click", function () {
+
+            let tbody = document.getElementById("quotationTable");
+
+            let row = tbody.rows[0].cloneNode(true);
+
+            row.querySelectorAll("input").forEach(function (input) {
+
+                if (input.classList.contains("qty")) {
+                    input.value = 1;
+                }
+                else {
+                    input.value = "";
+                }
+
+            });
+
+            tbody.appendChild(row);
+
+        });
+
+        document.addEventListener("click", function (e) {
+
+            if (e.target.closest(".removeRow")) {
+
+                let tbody = document.getElementById("quotationTable");
+
+                if (tbody.rows.length > 1) {
+
+                    e.target.closest("tr").remove();
+
+                    hitungSemua();
+
+                }
+
+            }
+
+        });
+
+        document.addEventListener("input", function (e) {
+
+            if (e.target.classList.contains("qty") ||
+                e.target.classList.contains("harga")) {
+
+                hitungSemua();
+
+            }
+
+        });
+
+        hitungSemua();
+
+    });
+</script>
+
+{% endblock content %}

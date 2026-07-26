@@ -24,6 +24,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("hris/", include("app.urlsHRIS")),
     path("project/", include("app.urlsProject")),
+    path("procurement/", include("app.urlsProcurement")),
     path("auth/", include("app.urlslogin")),
     path("", include("app.urlsdashboard")),
     path("inventory/", include("app.urlsInventory")),
