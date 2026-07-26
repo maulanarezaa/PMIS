@@ -949,6 +949,27 @@ def ajax_vendor(request):
         })
 
     return JsonResponse(data, safe=False)
+@login_required
+@group_required("Project Manager","Admin Project","Admin Finance")
+def ajax_quotation(request):
+    keyword = request.GET.get('q', '')
+
+    qs = models.VendorQuotation.objects.all()
+
+    if keyword:
+        qs = qs.filter(
+            Q(NomorQuotation__icontains=keyword)
+            | Q(Vendor__Nama__icontains=keyword) | Q(NomorJO__NomorJO__icontains=keyword)
+        )
+
+    data = []
+    for item in qs[:20]:
+        data.append({
+            'id': item.id,
+            'text': f"{item.NomorQuotation} - {item.Vendor.Nama} - {item.NomorJO.NomorJO}"
+        })
+
+    return JsonResponse(data, safe=False)
 
 @login_required
 @group_required("Project Manager","Admin Project","Admin Finance")
@@ -1114,7 +1135,7 @@ def deletevendor(request, id):
 '''
 Quotation
 '''
-
+@login_required
 def vendorquotation(request):
     data = models.VendorQuotation.objects.all()
     for item in data:
@@ -1122,6 +1143,7 @@ def vendorquotation(request):
         item.detail = items
     return render(request,"Procurement/vendorquotation.html", {"data": data})
 
+@login_required
 def tambahvendorquotation(request):
     datajo = models.JobOrder.objects.all()
     datavendor = models.VendorMaster.objects.all()
@@ -1175,18 +1197,23 @@ def tambahvendorquotation(request):
 
     return render(request, "Procurement/tambahdatavendorquotation.html", {"datajo": datajo, "datavendor": datavendor})
 
+@login_required
+# @group_required("Project Manager","Admin Project","Admin Finance")
 def deletevendorquotation(request, id):
     data = get_object_or_404(models.VendorQuotation, id=id)
     data.delete()
     messages.success(request, "Data Berhasil dihapus")
     return redirect("vendorquotation")
 
+@login_required
+# @group_required("Project Manager","Admin Project","Admin Finance")
 def detailvendorquotation(request, id):
     data = models.VendorQuotation.objects.get(id=id)
     item = models.VendorQuotationItem.objects.filter(NomorQuotation=data)
     data.detail = item
     return render(request, "Procurement/vendorquotationdetail.html", {"data": data})
-
+@login_required
+# @group_required("Project Manager","Admin Project","Admin Finance")
 def editvendorquotation(request, id):
     data = get_object_or_404(models.VendorQuotation, id=id)
     datajo = models.JobOrder.objects.all()
@@ -1252,7 +1279,154 @@ def editvendorquotation(request, id):
             return redirect("editvendorquotation", id=id)
     return render(request, "Procurement/editdatavendorquotation.html", {"data": data, "datajo": datajo, "datavendor": datavendor})
 
-
+'''Purchase Order'''
+@login_required
+# @group_required("Project Manager","Admin Project","Admin Finance")
 def purchaseorder(request):
     data = models.PurchaseOrder.objects.all()
+    for item in data:
+        items = models.PurchaseOrderItem.objects.filter(NomorPO=item)
+        item.detail = items
     return render(request,"Procurement/purchaseorder.html", {"data": data})
+@login_required
+# @group_required("Project Manager","Admin Project","Admin Finance")
+def tambahpurchaseorder(request):
+    datajo = models.JobOrder.objects.all()
+    datavendor = models.VendorMaster.objects.all()
+    dataquotation = models.VendorQuotation.objects.all()
+
+    if request.method == "POST":
+        print(request.POST)
+        print(request.FILES)
+        # print(asd)
+        # save object
+        tanggal = request.POST["tanggal"]
+        nomorpo = request.POST["nomorpo"]
+        file = request.FILES.get("file")
+        nomorjo = request.POST["joborder"]
+        vendor = request.POST["vendor"]
+        quotation = request.POST["quotation"]
+        if quotation == "":
+            quotation = None
+        else:
+            quotation = models.VendorQuotation.objects.get(id=quotation)
+        deskripsi = request.POST["deskripsi"]
+        # Data detail item purchase order
+        item = request.POST.getlist("item[]")
+        deskripsiitem = request.POST.getlist("deskripsi[]")
+        qty = request.POST.getlist("qty[]")
+        satuan = request.POST.getlist("satuan[]")
+        harga_satuan = request.POST.getlist("harga[]")
+        
+        try:
+            dataobj = models.PurchaseOrder(
+                Tanggal=tanggal,
+                NomorPO=nomorpo,
+                FilePO=file,
+                NomorJO=models.JobOrder.objects.get(id=nomorjo),
+                Vendor=models.VendorMaster.objects.get(id=vendor),
+                ReferenceQuotation=quotation,
+                Deskripsi=deskripsi
+            )
+            dataobj.save()
+        except Exception as e:
+            messages.error(request, e)
+            return redirect("tambahpurchaseorder")
+        
+        try:
+            for item in zip(item, deskripsiitem, qty, satuan, harga_satuan):
+                models.PurchaseOrderItem(
+                    NomorPO=models.PurchaseOrder.objects.all().last(),
+                    Item=item[0],
+                    Remarks=item[1],
+                    Jumlah=item[2],
+                    Satuan=item[3],
+                    Harga=item[4],
+                    TotalHarga=int(item[2]) * int(item[4]) if item[2] and item[4] else 0
+                ).save()
+            messages.success(request, "Data Berhasil disimpan")
+            return redirect("purchaseorder")
+        except Exception as e:
+            messages.error(request, e)
+            return redirect("tambahpurchaseorder")
+    return render(request, "Procurement/tambahpurchaseorder.html", {"datajo": datajo, "datavendor": datavendor, "dataquotation": dataquotation})
+
+def deletepurchaseorder(request, id):
+    data = get_object_or_404(models.PurchaseOrder, id=id)
+    data.delete()
+    messages.success(request, "Data Berhasil dihapus")
+    return redirect("purchaseorder")
+
+def detailpurchaseorder(request, id):
+    data = get_object_or_404(models.PurchaseOrder, id=id)
+    items = models.PurchaseOrderItem.objects.filter(NomorPO=data)
+    return render(request, "Procurement/purchaseorderdetail.html", {
+        "data": data,
+        "items": items
+    })
+
+def editpurchaseorder(request, id):
+    data = get_object_or_404(models.PurchaseOrder, id=id)
+    datajo = models.JobOrder.objects.all()
+    datavendor = models.VendorMaster.objects.all()
+    dataquotation = models.VendorQuotation.objects.all()
+    items = models.PurchaseOrderItem.objects.filter(NomorPO=data)
+
+    if request.method == "POST":
+        print(request.POST)
+        print(request.FILES)
+        # print(asd)
+        # update object
+        tanggal = request.POST["tanggal"]
+        nomorpo = request.POST["nomorpo"]
+        if request.POST.get("delete_file") == "1":
+            if data.FilePO:
+                data.FilePO.delete(save=False)
+                data.FilePO = None
+
+        if request.FILES.get("FilePO"):
+            data.FilePO = request.FILES["file"]
+
+        nomorjo = request.POST["joborder"]
+        vendor = request.POST["vendor"]
+        quotation = request.POST["quotation"]
+        if quotation == "":
+            quotation = None
+        else:
+            quotation = models.VendorQuotation.objects.get(id=quotation)
+        deskripsi = request.POST["deskripsi"]
+        # Data detail item purchase order
+        item = request.POST.getlist("item[]")
+        deskripsiitem = request.POST.getlist("deskripsiitem[]")
+        qty = request.POST.getlist("qty[]")
+        satuan = request.POST.getlist("satuan[]")
+        harga_satuan = request.POST.getlist("harga[]")
+
+        try:
+            data.Tanggal=tanggal
+            data.NomorPO=nomorpo
+            data.NomorJO=models.JobOrder.objects.get(id=nomorjo)
+            data.Vendor=models.VendorMaster.objects.get(id=vendor)
+            data.ReferenceQuotation=quotation
+            data.Deskripsi=deskripsi
+            data.save()
+
+            # Update detail items
+            models.PurchaseOrderItem.objects.filter(NomorPO=data).delete()
+            for item in zip(item, deskripsiitem, qty, satuan, harga_satuan):
+                models.PurchaseOrderItem(
+                    NomorPO=data,
+                    Item=item[0],
+                    Remarks=item[1],
+                    Jumlah=item[2],
+                    Satuan=item[3],
+                    Harga=item[4],
+                    TotalHarga=(float(item[2])) * (float(item[4])) if item[2] and item[4] else 0
+                ).save()
+
+            messages.success(request, "Data Berhasil diupdate")
+            return redirect("purchaseorder")
+        except Exception as e:
+            messages.error(request, e)
+            return redirect("editpurchaseorder", id=id)
+    return render(request, "Procurement/editpurchaseorder.html", {"data": data, "datajo": datajo, "datavendor": datavendor, "dataquotation": dataquotation, "items": items})

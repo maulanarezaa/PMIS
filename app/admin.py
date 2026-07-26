@@ -24,5 +24,7 @@ admin.site.register(models.ProjectDocuments)
 admin.site.register(models.VendorMaster)
 admin.site.register(models.VendorQuotation)
 admin.site.register(models.VendorQuotationItem)
+admin.site.register(models.PurchaseOrder)
+admin.site.register(models.PurchaseOrderItem)
 
 

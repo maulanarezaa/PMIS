@@ -17,5 +17,8 @@ urlpatterns = [
     path('vendorquotation/edit/<int:id>', viewsProject.editvendorquotation, name="editvendorquotation"),
     # Purchase Order
     path('purchaseorder',viewsProject.purchaseorder,name="purchaseorder"),
-    
+    path('purchaseorder/add',viewsProject.tambahpurchaseorder,name="tambahpurchaseorder"),
+    path('purchaseorder/detail/<int:id>', viewsProject.detailpurchaseorder, name="detailpurchaseorder"),
+    path('purchaseorder/edit/<int:id>', viewsProject.editpurchaseorder, name="editpurchaseorder"),
+    path('purchaseorder/delete/<int:id>', viewsProject.deletepurchaseorder, name="deletepurchaseorder"),
 ]

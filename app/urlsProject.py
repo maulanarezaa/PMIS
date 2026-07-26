@@ -63,6 +63,7 @@ urlpatterns = [
     path("search-item/", viewsProject.searchbudget, name="searchbudet"),
     path('ajax/joborder/', viewsProject.ajax_joborder, name='ajax_joborder'),
     path('ajax/vendor/', viewsProject.ajax_vendor, name='ajax_vendor'),
+    path('ajax/quotation/', viewsProject.ajax_quotation, name='ajax_quotation'),
     path('ajax/proposebudget-by-jo/', viewsProject.ajax_proposebudget_by_jo, name='ajax_proposebudget_by_jo'),
     path('ajax/budgetcostcode-by-jo/', viewsProject.ajax_budgetcostcode_by_jo, name='ajax_budgetcostcode_by_jo'),
 ]

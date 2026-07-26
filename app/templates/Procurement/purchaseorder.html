@@ -38,8 +38,8 @@
 
             <!-- BUTTON TAMBAH -->
             {% if request.user|has_any_group:"Project Manager,Admin Project" %}
-            <a href="{% url 'tambahvendor' %}">
-                <button class="btn btn-primary mb-3">Tambah Quotation</button>
+            <a href="{% url 'tambahpurchaseorder' %}">
+                <button class="btn btn-primary mb-3">Tambah Purchase Order</button>
             </a>
             {% endif %}
 
@@ -62,21 +62,27 @@
                     <tbody>
                         {% for item in data %}
                         <tr>
-                            <td>{{item.NomorQuotation}}</td>
+                            <td>{{item.NomorPO}}</td>
                             <td>{{item.Vendor}}</td>
                             <td>{{item.Tanggal}}</td>
                             <td>{{item.Deskripsi}}</td>
-                            <td>{{item.File}}</td>
+                            <td> {% if item.FilePO %}<a href="{{item.FilePO.url}}" target="_blank">Lihat File</a>{% endif %}</td>
                             <td>{{item.NomorJO}}</td>
-                            <td>{{item.Item}}</td>
+                            <td>
+                                <ul>
+                                    {% for detail in item.detail %}
+                                        <li>{{detail.Item}}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
                                                        
                             <!-- ACTION -->
                             <td>
-                                <a href="{% url 'detailjoborder' item.id %}">
+                                <a href="{% url 'detailpurchaseorder' item.id %}">
                                     <button type="button" class="btn btn-info btn-sm">Info</button>
                                 </a>
                                 {% if request.user|has_any_group:"Project Manager,Admin Project" %}
-                                <a href="{% url 'editvendor' item.id %}">
+                                <a href="{% url 'editpurchaseorder' item.id %}">
                                     <button type="button" class="btn btn-warning btn-sm">Edit</button>
                                 </a>
 
@@ -152,7 +158,7 @@ $('#table12').DataTable({
                 const nama = this.getAttribute("data-nama");
 
                 namaItem.textContent = nama;
-                btnConfirm.href = `vendor/delete/${id}`;
+                btnConfirm.href = `purchaseorder/delete/${id}`;
 
             });
         });

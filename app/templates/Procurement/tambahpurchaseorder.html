@@ -1,0 +1,400 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <h3>Input Data Purchase Order</h3>
+</div>
+
+<section class="section">
+    <div class="card">
+        <form class="form form-vertical" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- ================= DATA DIRI ================= -->
+            <div class="card-header">
+                <h4 class="card-title">Data Purchase Order</h4>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Nomor Purchase Order</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="nomorpo"
+                                    placeholder="Masukkan Nomor Purchase Order" required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Nomor Job Order</label>
+                            <input type="hidden" name="joborder" id="joborder-id" required>
+
+                            <!-- input search -->
+                            <input type="text" id="joborder-input" class="form-control" placeholder="Cari Job Order..."
+                                autocomplete="off" required>
+
+                            <!-- dropdown result -->
+                            <div id="joborder-list" class="list-group"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Vendor</label>
+                            <input type="hidden" name="vendor" id="vendor-id" required>
+
+                            <!-- input search -->
+                            <input type="text" id="vendor-input" class="form-control" placeholder="Cari Vendor..."
+                                autocomplete="off" required>
+
+                            <!-- dropdown result -->
+                            <div id="vendor-list" class="list-group"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Tanggal</label>
+                            <div class="position-relative">
+                                <input type="date" class="form-control" name="tanggal" placeholder="Masukan Tanggal"
+                                    required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-house"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Deskripsi Purchase Order</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" name="deskripsi"
+                                    placeholder="Masukkan Deskripsi Quotation" required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-phone"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+
+
+                    <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>File Purchase Order</label>
+                            <div class="position-relative">
+                                <input type="file" class="form-control" name="file" placeholder="Pilih File Quotation"
+                                    required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-window"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                                        <div class="col-6">
+                        <div class="form-group has-icon-left">
+                            <label>Reference Quotation</label>
+                            <input type="hidden" name="quotation" id="quotation-id">
+
+                            <!-- input search -->
+                            <input type="text" id="quotation-input" class="form-control" placeholder="Cari Quotation..."
+                                autocomplete="off">
+
+                            <!-- dropdown result -->
+                            <div id="quotation-list" class="list-group"></div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+            <div class="card-header">
+                <h4 class="card-title">Item Purchase Order</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+
+                    <table class="table" id="table12" style="font-size: 12px;">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Deskripsi</th>
+                                <th>Qty</th>
+                                <th>Satuan</th>
+                                <th>Harga Satuan</th>
+                                <th>Total Harga</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="quotationTable">
+                            <tr>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm" name="item[]" required>
+                                </td>
+
+                                <td>
+                                    <input type="text" class="form-control form-control-sm" name="deskripsi[]">
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control form-control-sm qty" name="qty[]" min="1">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm" name="satuan[]" required>
+                                </td>
+
+                                <td>
+                                    <input type="number" class="form-control form-control-sm harga" name="harga[]">
+                                </td>
+
+                                <td>
+                                    <input type="text" class="form-control form-control-sm total" name="total[]"
+                                        readonly>
+                                </td>
+
+                                <td width="80">
+                                    <button type="button" class="btn btn-danger btn-sm removeRow">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-success btn-sm" id="addRow">
+                            <i class="bi bi-plus-circle"></i>
+                            Tambah Item
+                        </button>
+                    </div>
+                    <div class="col-12 d-flex justify-content-start mt-3">
+                        <button type="submit" class="btn btn-primary me-2">Submit</button>
+                    </div>
+                </div>
+        </form>
+    </div>
+</section>
+
+<!-- ================= JS ================= -->
+<script>
+$("#joborder-input").keyup(function(){
+    let query = $(this).val();
+
+    if (query.length < 2){
+        $("#joborder-list").empty();
+        return;
+    }
+
+    $.ajax({
+        url: "{% url 'ajax_joborder' %}",
+        data: { q: query },
+        success: function(data){
+            let html = "";
+
+            data.forEach(function(item){
+                html += `
+                    <a href="#" class="list-group-item list-group-item-action jo-item"
+                       data-id="${item.id}"
+                       data-text="${item.text}">
+                       ${item.text}
+                    </a>
+                `;
+            });
+
+            $("#joborder-list").html(html);
+        }
+    });
+});
+
+$("#vendor-input").keyup(function(){
+    let query = $(this).val();
+
+    if (query.length < 2){
+        $("#vendor-list").empty();
+        return;
+    }
+
+    $.ajax({
+        url: "{% url 'ajax_vendor' %}",
+        data: { q: query },
+        success: function(data){
+            let html = "";
+
+            data.forEach(function(item){
+                html += `
+                    <a href="#" class="list-group-item list-group-item-action vendor-item"
+                       data-id="${item.id}"
+                       data-text="${item.text}">
+                       ${item.text}
+                    </a>
+                `;
+            });
+
+            $("#vendor-list").html(html);
+        }
+    });
+});
+
+$("#quotation-input").keyup(function(){
+    let query = $(this).val();
+
+    if (query.length < 2){
+        $("#quotation-list").empty();
+        return;
+    }
+
+    $.ajax({
+        url: "{% url 'ajax_quotation' %}",
+        data: { q: query },
+        success: function(data){
+            let html = "";
+
+            data.forEach(function(item){
+                html += `
+                    <a href="#" class="list-group-item list-group-item-action quotation-item"
+                       data-id="${item.id}"
+                       data-text="${item.text}">
+                       ${item.text}
+                    </a>
+                `;
+            });
+
+            $("#quotation-list").html(html);
+        }
+    });
+});
+
+
+// ================= PILIH JO =================
+$(document).on("click", ".jo-item", function(e){
+    e.preventDefault();
+
+    let id = $(this).data("id");
+    let text = $(this).data("text");
+
+    $("#joborder-id").val(id);
+    $("#joborder-input").val(text);
+    $("#joborder-list").empty();
+
+
+});
+// ================= PILIH Vendor =================
+$(document).on("click", ".vendor-item", function(e){
+    e.preventDefault();
+
+    let id = $(this).data("id");
+    let text = $(this).data("text");
+
+    $("#vendor-id").val(id);
+    $("#vendor-input").val(text);
+    $("#vendor-list").empty();
+
+
+});
+$(document).on("click", ".quotation-item", function(e){
+    e.preventDefault();
+
+    let id = $(this).data("id");
+    let text = $(this).data("text");
+
+    $("#quotation-id").val(id);
+    $("#quotation-input").val(text);
+    $("#quotation-list").empty();
+
+
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+
+        function hitungSemua() {
+
+            let grand = 0;
+
+            document.querySelectorAll("#quotationTable tr").forEach(function (row) {
+
+                let qty = parseFloat(row.querySelector(".qty").value) || 0;
+                let harga = parseFloat(row.querySelector(".harga").value) || 0;
+
+                let total = qty * harga;
+
+                row.querySelector(".total").value = total.toLocaleString('id-ID');
+
+                grand += total;
+
+            });
+
+            document.getElementById("grandTotal").value =
+                grand.toLocaleString('id-ID');
+        }
+
+        document.getElementById("addRow").addEventListener("click", function () {
+
+            let tbody = document.getElementById("quotationTable");
+
+            let row = tbody.rows[0].cloneNode(true);
+
+            row.querySelectorAll("input").forEach(function (input) {
+
+                if (input.classList.contains("qty")) {
+                    input.value = 1;
+                }
+                else {
+                    input.value = "";
+                }
+
+            });
+
+            tbody.appendChild(row);
+
+        });
+
+        document.addEventListener("click", function (e) {
+
+            if (e.target.closest(".removeRow")) {
+
+                let tbody = document.getElementById("quotationTable");
+
+                if (tbody.rows.length > 1) {
+
+                    e.target.closest("tr").remove();
+
+                    hitungSemua();
+
+                }
+
+            }
+
+        });
+
+        document.addEventListener("input", function (e) {
+
+            if (e.target.classList.contains("qty") ||
+                e.target.classList.contains("harga")) {
+
+                hitungSemua();
+
+            }
+
+        });
+
+        hitungSemua();
+
+    });
+</script>
+
+{% endblock content %}
