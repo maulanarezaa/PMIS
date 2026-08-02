@@ -8,7 +8,72 @@
 
 <section class="section">
     <div class="card">
-        <form class="form form-vertical" method="POST" enctype="multipart/form-data">
+
+        <!-- ================= TOGGLE MODE INPUT ================= -->
+        <div class="card-body pb-0">
+            <label>Metode Input</label>
+            <div class="mb-3">
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="mode_input" id="modeManual" value="manual" checked>
+                    <label class="btn btn-outline-primary" for="modeManual">Input Manual</label>
+
+                    <input type="radio" class="btn-check" name="mode_input" id="modeExcel" value="excel">
+                    <label class="btn btn-outline-success" for="modeExcel">Import Excel</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================================================= -->
+        <!-- ================= FORM IMPORT EXCEL ================= -->
+        <!-- ======================================================= -->
+        <form id="formExcel" class="form form-vertical d-none" method="POST" enctype="multipart/form-data"
+            action="{% url 'import_karyawan_excel' %}">
+            {% csrf_token %}
+
+            <div class="card-header">
+                <h4 class="card-title">Import Data Karyawan via Excel</h4>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-12 mb-3">
+                        <a href="{% static 'templates/masterkaryawan_bulkinput.xlsx' %}" class="btn btn-light-info">
+                            <i class="bi bi-download"></i> Download Template Excel
+                        </a>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-group has-icon-left">
+                            <label>Upload File Excel</label>
+                            <div class="position-relative">
+                                <input type="file" class="form-control" name="FileExcel" accept=".xlsx,.xls" required>
+                                <div class="form-control-icon">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </div>
+                            </div>
+                            <small class="text-muted">Gunakan template di atas agar kolom sesuai format yang
+                                dibutuhkan sistem.</small>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="card-body pt-0">
+                <div class="col-12 d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn btn-success me-2">
+                        <i class="bi bi-upload"></i> Import
+                    </button>
+                    <button type="reset" class="btn btn-light-secondary">Reset</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- ======================================================= -->
+        <!-- ================= FORM INPUT MANUAL ================= -->
+        <!-- ======================================================= -->
+        <form id="formManual" class="form form-vertical" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
             <!-- ================= DATA DIRI ================= -->
@@ -245,6 +310,7 @@
             </div>
 
         </form>
+
     </div>
 </section>
 
@@ -252,6 +318,27 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
+        /* ===== Toggle Mode Input: Manual vs Excel ===== */
+        const modeManual = document.getElementById("modeManual");
+        const modeExcel = document.getElementById("modeExcel");
+        const formManual = document.getElementById("formManual");
+        const formExcel = document.getElementById("formExcel");
+
+        function toggleInputMode() {
+            if (modeManual.checked) {
+                formManual.classList.remove("d-none");
+                formExcel.classList.add("d-none");
+            } else {
+                formManual.classList.add("d-none");
+                formExcel.classList.remove("d-none");
+            }
+        }
+
+        modeManual.addEventListener("change", toggleInputMode);
+        modeExcel.addEventListener("change", toggleInputMode);
+        toggleInputMode();
+
+        /* ===== Toggle Penempatan: Proyek vs Office ===== */
         const modeProyek = document.getElementById("modeProyek");
         const modeOffice = document.getElementById("modeOffice");
         const selectProyek = document.getElementById("selectProyek");

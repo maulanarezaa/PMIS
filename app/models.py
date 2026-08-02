@@ -262,13 +262,15 @@ class MasterKaryawan(models.Model):
     FotoKK = models.ImageField(upload_to=rename_kk, null=True, blank=True)
     FotoNPWP = models.ImageField(upload_to=rename_npwp, null=True, blank=True)
     Gender = models.BooleanField(default=True)
-    JenisKaryawan = models.ForeignKey(
-        MasterJenisKaryawan, on_delete=models.CASCADE, null=True, blank=True
-    )
+    JenisKaryawan = models.CharField(max_length=50, blank=True, null=True)
+    TanggalLahir = models.DateField(blank=True, null=True)
     PasFoto = models.ImageField(upload_to=pasfoto, null=True, blank=True)
     user = models.OneToOneField(
         User, on_delete=models.SET_NULL, null=True, blank=True,related_name='karyawan_profile')
     Role = models.CharField(max_length=50, blank=True, null=True)
+    JobOrder = models.ForeignKey(
+        JobOrder, on_delete=models.SET_NULL, null=True, blank=True, related_name='karyawan_joborder'
+    )
 
     def __str__(self):
         return str(self.Nama)
@@ -318,7 +320,7 @@ class PeriodePayroll(models.Model):
     TanggalPembayaran = models.DateField(null=True, blank=True)
     JenisPayroll = models.CharField(max_length=25)
     Status = models.CharField(max_length=10, choices=STATUS_CHOICES)
-    joborder = models.ForeignKey(
+    NomorJO = models.ForeignKey(
         JobOrder, on_delete=models.CASCADE, null=True, blank=True
     )
 
@@ -339,6 +341,7 @@ class detailpayroll(models.Model):
     AllowanceTotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     DeductionTotal = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     Tax = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    NetSalary = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     Status = models.CharField(max_length=10, choices=STATUS_CHOICES)
     Keterangan = models.TextField(blank=True)
 

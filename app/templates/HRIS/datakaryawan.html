@@ -17,11 +17,8 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Alamat</th>
                         <th>Kontak</th>
-                        <th>NIK</th>
-                        <th>NPWP</th>
-                        <th>Remarks</th>
+                        <th>Tipe</th>
                         <th>Status</th>
                         <th>Akun</th>
                         <th>Action</th>
@@ -31,12 +28,19 @@
                     {% for item in data %}
                     <tr>
                         <td>{{item.Nama}}</td>
-                        <td>{{item.Alamat}}</td>
+                       
                         <td>{{item.Kontak}}</td>
-                        <td>{{item.NIK}}</td>
-                        <td>{{item.NPWP}}</td>
-                        <td>{{item.Remarks}}</td>
                         
+                        <td>
+                            {% if item.JenisKaryawan == "office" %}
+                            <span class="badge bg-primary">Office</span>
+                            {% elif item.JenisKaryawan == "proyek" %}
+                            <span class="badge bg-secondary">{{item.JobOrder.NomorJO}}</span>
+                            {% else %}
+                            <span class="badge bg-warning">Belum di set</span>
+                            {% endif %}
+                        </td>
+
                         <td>
                             {% if item.Status == "True" %}
                             <span class="btn btn-success">Aktif</span>
@@ -47,7 +51,7 @@
                         <td>{% if item.user %}
                             <span class="btn btn-success">v</span>
                             {% else %}
-                            <span >-</span>
+                            <span>-</span>
                             {% endif %}
                         </td>
                         <td>
@@ -78,4 +82,9 @@
     </div>
 
 </section>
+<script>
+    $(document).ready(function() {
+        $('#table1').DataTable();
+    });
+</script>
 {% endblock content %}

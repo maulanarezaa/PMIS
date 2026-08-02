@@ -9,6 +9,7 @@ urlpatterns = [
     path("datakaryawan/<str:id>", viewsHRIS.viewkaryawandetail, name="info_karyawan"),
     path("datakaryawan/edit/<str:id>", viewsHRIS.editkaryawan, name="edit_karyawan"),
     path("tambahdatakaryawan", viewsHRIS.tambahdatakaryawan, name="tambahdatakaryawan"),
+    path("inputdatakaryawan", viewsHRIS.import_karyawan_excel, name="import_karyawan_excel"),
     path(
         "datakaryawan/<str:id>/delete",
         viewsHRIS.deletekaryawan,
@@ -49,4 +50,6 @@ urlpatterns = [
         viewsHRIS.tambahdetailpayroll,
         name="detailpayroll",
     ),
+    # AJAX 
+    path("ajax/get_karyawan/", viewsHRIS.get_karyawan, name="get_karyawan"),
 ]

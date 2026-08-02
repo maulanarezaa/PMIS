@@ -12,6 +12,7 @@ from django.contrib import messages
 from .forms import RegisterKaryawanForm
 from app.templatetags.group_tags import group_required
 from django.contrib.auth.decorators import login_required
+import pandas as pd
 
 # Create your views here.
 
@@ -143,6 +144,20 @@ def tambahdatakaryawan(request):
         NamaIbu = request.POST["NamaIbu"]
         RemarksKaryawan = request.POST["Remarks"]
         StatusAktif = request.POST["StatusAktif"]
+        penempatan = request.POST['mode_penempatan']
+        if penempatan == "proyek":
+            idjo = request.POST["Proyek"]
+            if idjo =="":
+                JobOrderobj = None
+            else:
+                try:
+                    JobOrderobj = models.JobOrder.objects.get(pk=idjo)
+                except models.JobOrder.DoesNotExist:
+                    JobOrderobj = None
+                    messages.error(request, "Job Order tidak ditemukan.")
+        else :
+            JobOrderobj = None
+
         if StatusAktif == "True":
             StatusAktif = True
         else:
@@ -167,6 +182,8 @@ def tambahdatakaryawan(request):
                 FotoNPWP=foto_npwp,
                 FotoKK=foto_kk,
                 Status=StatusAktif,
+                JenisKaryawan = penempatan,
+                JobOrder=JobOrderobj
             ).save()
             # Manajemen Kontrak
             NamaKaryawanobj = models.MasterKaryawan.objects.last()
@@ -178,11 +195,7 @@ def tambahdatakaryawan(request):
         satuankontrak = request.POST["satuan_kontrak"]
         durasikontrak = int(request.POST["JenisKontrak"])
         TanggalAwal = request.POST["TanggalAwal"]
-        try:
-            JobOrderobj = models.JobOrder.objects.get(pk=request.POST["Proyek"])
-        except Exception as e:
-            messages.error(request, "Job Order tidak ditemukan.")
-            JobOrderobj = None
+
         Posisi = request.POST["Posisi"]
         RemarksKontrak = request.POST["RemarksKontrak"]
 
@@ -215,6 +228,62 @@ def tambahdatakaryawan(request):
         return redirect("viewkaryawan")
 
     return render(request, "HRIS/tambahdatakaryawan.html", {"proyek": JobOrder})
+
+def import_karyawan_excel(request):
+    if request.method == "POST" and request.FILES.get("FileExcel"):
+        file = request.FILES["FileExcel"]
+        bulk_data =[]
+        # wb = openpyxl.load_workbook(file)
+        # print(wb)
+        if not file.name.endswith(('.xlsx', '.xls')):
+            messages.error(request, "File harus berformat .xlsx atau .xls")
+            return redirect("input_karyawan")
+        try:
+            df = pd.read_excel(file)
+            print(df)
+            df = df.iloc[:, :11]  # Ambil hanya 12 kolom pertama
+            df = df.dropna(how='all')
+            df = df.fillna('')  # Ganti nilai NaN dengan string kosong
+            print(df)
+            for index, row in df.iterrows():
+                if row['Jenis Karyawan'] is not "":
+                    print("ini row", row['Jenis Karyawan'])
+                    row['Jenis Karyawan'] = row['Jenis Karyawan'].lower()
+                    if row['Jenis Karyawan'] == "office":
+                        jokaryawan = None
+                    else:
+                        try:
+                            jokaryawan = models.JobOrder.objects.get(NomorJO=row['Job Order'])
+                        except models.JobOrder.DoesNotExist:
+                            jokaryawan = None
+                            messages.error(request, f"Job Order {row['Job Order']} tidak ditemukan.")
+                            continue
+
+                bulk_data.append(
+                    models.MasterKaryawan(
+                        Nama=row["Nama Karyawan"],
+                        NIK=row["NIK"],
+                        Alamat=row["Alamat"],
+                        Kontak=row["Kontak"],
+                        NPWP=row["NPWP"],
+                        NOKK=row["NOKK"],
+                        NamaIbu=row["Nama Ibu"],
+                        Remarks=row["Remarks"],
+                        JenisKaryawan=row["Jenis Karyawan"],
+                        JobOrder=jokaryawan,  # Set default status aktif
+
+                    )
+                )
+            models.MasterKaryawan.objects.bulk_create(bulk_data)
+            messages.success(request, "Data Karyawan berhasil diimpor dari Excel")
+            
+        except Exception as e:
+            messages.error(request, f"Terjadi kesalahan saat membaca file Excel: {str(e)}")
+            return redirect("viewkaryawan")
+        return redirect("viewkaryawan")  # sesuaikan nama url list/form kamu
+
+    messages.error(request, "File Excel tidak ditemukan.")
+    return redirect("viewkaryawan")
 
 @group_required("Project Manager","Human Resource")
 def deletekaryawan(request, id):
@@ -449,6 +518,21 @@ def tambahdatapayroll(request):
         tanggalawal = request.POST["TanggalAwal"]
         tanggalakhir = request.POST["TanggalAkhir"]
         status = request.POST["Status"]
+        joborder = request.POST['joborder']
+        try:
+            joborderobj = models.JobOrder.objects.get(pk=joborder)
+        except models.JobOrder.DoesNotExist:
+            joborderobj = None
+            messages.error(request, "Job Order tidak ditemukan.")
+            
+        
+        detailkaryawan = request.POST.getlist("karyawan[]")
+        detailbasic = request.POST.getlist("BasicSalary[]")
+        detailallowance = request.POST.getlist("AllowanceTotal[]")
+        detaildeduction = request.POST.getlist("DeductionTotal[]")
+        detailtax = request.POST.getlist("Tax[]")
+        detailstatus = request.POST.getlist("Status[]")
+        detailnetsalary = request.POST.getlist("NetSalary[]")
 
         payrollobj = models.PeriodePayroll(
             KodePeriode=kodepayroll,
@@ -456,7 +540,30 @@ def tambahdatapayroll(request):
             TanggalAkhir=tanggalakhir,
             JenisPayroll=jenis,
             Status=status,
+            NomorJO=joborderobj,
         ).save()
+        
+        for karyawan, basic, allowance, deduction, tax, status, netsalary in zip(
+            detailkaryawan,
+            detailbasic,
+            detailallowance,
+            detaildeduction,
+            detailtax,
+            detailstatus,
+            detailnetsalary,
+        ):
+            models.detailpayroll(
+                PeriodePayroll=models.PeriodePayroll.objects.last(),
+                Karyawan=models.MasterKaryawan.objects.get(pk=karyawan),
+                BasicSalary=basic,
+                AllowanceTotal=allowance,
+                DeductionTotal=deduction,
+                Tax=tax,
+                Status=status,
+                NetSalary=netsalary,
+                
+            ).save()
+        
         return redirect("payroll")
     return render(request, "HRIS/tambahdatapayrollperiode.html")
 
@@ -516,3 +623,13 @@ def tambahdetailpayroll(request, id):
         {"datakaryawan": datakaryawan, "dataperiode": dataperiode},
     )
 
+
+'''
+Support
+'''
+def get_karyawan(request):
+    search_term = request.GET.get('q', '')  # Ambil parameter pencarian dari query string
+    karyawan_list = models.MasterKaryawan.objects.filter(Nama__icontains=search_term)
+    results = [{'id': karyawan.id, 'text': karyawan.Nama} for karyawan in karyawan_list]
+    print("ini hasil search", results)
+    return JsonResponse({'results': results})

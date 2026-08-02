@@ -83,8 +83,8 @@
                         <div class="form-group has-icon-left">
                             <label>Nilai Pekerjaan</label>
                             <div class="position-relative">
-                                <input type="number" step="any" class="form-control" name="nilai"
-                                    placeholder="Masukkan Nilai Pekerjaan" required>
+                                <input type="text" step="any" class="form-control autonumber" name="nilai"
+                                    placeholder="Masukkan Nilai Pekerjaan " required>
                                 <div class="form-control-icon">
                                     <i class="bi bi-window"></i>
                                 </div>
@@ -171,6 +171,7 @@
 
         toggleMode();
     });
+    new AutoNumeric.multiple('.autonumber', autoNumericOptions);
 </script>
 
 {% endblock content %}
